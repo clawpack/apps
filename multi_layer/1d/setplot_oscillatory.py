@@ -15,13 +15,14 @@ import re
 import matplotlib
 import matplotlib.pyplot as mpl
 
+from pyclaw.solution import Solution
 from visclaw import geoplot, colormaps
-from oldclawdata import Data
+from clawutil.oldclawdata import Data
 
 matplotlib.rcParams['figure.figsize'] = [16.0,6.0]
 
 #--------------------------
-def setplot(plotdata):
+def setplot(plotdata,xlower,xupper,rho,dry_tolerance):
 #--------------------------
     
     """ 
@@ -31,35 +32,46 @@ def setplot(plotdata):
     
     """
     
-    claw_data = Data(os.path.join(plotdata.outdir,'claw.data'))
-    prob_data = Data(os.path.join(plotdata.outdir,'problem.data'))
+    # Legacy fortran output in q
+    # 0,1,2,3,4,5 = h(1),hu(1),h(2),hu(2),wind,kappa
+    
+    # Load bathymetry
+    b = Solution(0,path=plotdata.outdir,read_aux=True).state.aux[0,:]
 
     def hurricane_afterframe(current_data):
         # Draw line for eye of hurricane
         pass
 
-    def bathy(current_data):
-        return np.loadtxt(os.path.join(plotdata.outdir,'fort.aux'),converters={0:(lambda x:float(re.compile("[Dd]").sub("e",x)))})
+    def bathy(cd):
+        return b
+
+    def kappa(cd):
+        return Solution(cd.frameno,path=plotdata.outdir,read_aux=True).state.aux[4,:]
+
+    def wind(cd):
+        return Solution(cd.frameno,path=plotdata.outdir,read_aux=True).state.aux[1,:]
     
-    def eta_2(current_data):
-        h_2 = current_data.q[:,2]
-        return h_2 + bathy(current_data)
+    def h_1(cd):
+        return cd.q[0,:] / rho[0]
+    
+    def h_2(cd):
+        return cd.q[2,:] / rho[1]
         
-    def eta_1(current_data):
-        h_1 = current_data.q[:,0]
-        return h_1 + eta_2(current_data)
+    def eta_2(cd):
+        return h_2(cd) + bathy(cd)
         
-    def u_1(current_data):
-        h_1 = current_data.q[:,0]
-        return (np.abs(h_1) > 1e-3) * current_data.q[:,1]/h_1[:]
+    def eta_1(cd):
+        return h_1(cd) + eta_2(cd)
         
-    def u_2(current_data):
-        h_2 = current_data.q[:,2]
-        return (np.abs(h_2) > 1e-3) * current_data.q[:,3]/h_2[:]
+    def u_1(cd):
+        return (np.abs(h_1(cd)) > dry_tolerance) * cd.q[1,:] / cd.q[0,:]
+        
+    def u_2(cd):
+        return (np.abs(h_2(cd)) > dry_tolerance) * cd.q[3,:] / cd.q[2,:]
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
     
-    xlimits = [claw_data.xlower,claw_data.xupper]
+    xlimits = [xlower,xupper]
     ylimits_velocities = (-0.15,0.15)
     ylimits_depth = [-1.0,0.1]
     ylimits_wind = [-5,5]
@@ -141,21 +153,19 @@ def setplot(plotdata):
         fig = mpl.gcf()
         fig.clf()
         
-        x = cd.grid.dimensions[0].center
-        
         # Draw fill plot
         ax1 = fig.add_subplot(121)
         
         # Bottom layer
-        ax1.fill_between(x,bathy(cd),eta_1(cd),color='b')
+        ax1.fill_between(cd.x,bathy(cd),eta_1(cd),color='b')
         # Top Layer
-        ax1.fill_between(x,eta_1(cd),eta_2(cd),color=(0.2,0.8,1.0))
+        ax1.fill_between(cd.x,eta_1(cd),eta_2(cd),color=(0.2,0.8,1.0))
         # Plot bathy
-        ax1.plot(x,bathy(cd),'k')
+        ax1.plot(cd.x,bathy(cd),'k')
         # Plot internal layer
-        ax1.plot(x,eta_2(cd),'k')
+        ax1.plot(cd.x,eta_2(cd),'k')
         # Plot surface
-        ax1.plot(x,eta_1(cd),'k')
+        ax1.plot(cd.x,eta_1(cd),'k')
         
         ax1.set_title('Multilayer Surfaces t = %s' % cd.t)
         ax1.set_xlim((0.0,1.0))
@@ -168,15 +178,15 @@ def setplot(plotdata):
         ax2 = ax1.twinx()              # the kappa scale
         
         # Bottom layer velocity
-        bottom_layer = ax1.plot(x,u_2(cd),'k-',label="Bottom Layer Velocity")
+        bottom_layer = ax1.plot(cd.x,u_2(cd),'k-',label="Bottom Layer Velocity")
         # Top Layer velocity
-        top_layer = ax1.plot(x,u_1(cd),'b-',label="Top Layer velocity")#,color=(0.2,0.8,1.0))
+        top_layer = ax1.plot(cd.x,u_1(cd),'b-',label="Top Layer velocity")#,color=(0.2,0.8,1.0))
         
         # Kappa
-        kappa_line = ax2.plot(x,cd.q[:,5],color='r',label="Kappa")
-        ax2.plot(x,np.ones(x.shape),'r--')
+        kappa_line = ax2.plot(cd.x,kappa(cd),color='r',label="Kappa")
+        ax2.plot(cd.x,np.ones(cd.x.shape),'r--')
         
-        ax1.legend((bottom_layer,top_layer,kappa_line),('Bottom Layer','Top Layer',"Kappa"),loc=4)
+        # ax1.legend((bottom_layer,top_layer,kappa_line),('Bottom Layer','Top Layer',"Kappa"),loc=4)
         ax1.set_xlim(xlimits)
         ax1.set_ylim(ylimits_velocities)
         ax2.set_ylim(ylimits_kappa)
@@ -220,7 +230,7 @@ def setplot(plotdata):
     plotaxes.ylimits = ylimits_wind
     
     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    plotitem.plot_var = 4
+    plotitem.plot_var = wind
     plotitem.color = 'r'
     plotitem.show = True
     
@@ -236,7 +246,7 @@ def setplot(plotdata):
     plotaxes.ylimits = ylimits_wind
     
     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    plotitem.plot_var = 4
+    plotitem.plot_var = wind
     plotitem.color = 'r'
     plotitem.show = True
     
@@ -252,7 +262,7 @@ def setplot(plotdata):
     plotaxes.ylimits = ylimits_kappa
     
     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    plotitem.plot_var = 5
+    plotitem.plot_var = kappa
     plotitem.color = 'b'
     plotitem.show = True
     

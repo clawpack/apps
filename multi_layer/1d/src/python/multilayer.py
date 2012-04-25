@@ -9,6 +9,13 @@ import glob
 import numpy as np
 
 import wind
+import clawutil.runclaw as runclaw
+
+# Aux array indices
+bathy_index = 0
+wind_index = 1
+h_hat_index = [2,3]
+kappa_index = 4
 
 # Function called before each time step
 def before_step(solver,solution,wind_func=wind.set_no_wind,
@@ -40,13 +47,13 @@ def before_step(solver,solution,wind_func=wind.set_no_wind,
         wet_index = h[layer,:] > dry_tolerance
         u = np.zeros((2,solution.q.shape[1]))
         u[layer,wet_index] = solution.q[layer_index+1,wet_index] / solution.q[layer_index,wet_index]
-    aux[2,:] = (u[0,:] - u[1,:])**2 / (g * one_minus_r * (h[0,:] + h[1,:]))
-    if np.any(aux[2,wet_index] > richardson_tolerance):
+    aux[kappa_index,:] = (u[0,:] - u[1,:])**2 / (g * one_minus_r * (h[0,:] + h[1,:]))
+    if np.any(aux[kappa_index,wet_index] > richardson_tolerance):
         # Actually calculate where the indices failed
-        bad_indices = (aux[2,wet_index] > richardson_tolerance).nonzero()[0]
+        bad_indices = (aux[kapp_index,wet_index] > richardson_tolerance).nonzero()[0]
         print "Hyperbolicity may have failed at the following points:"
         for i in bad_indices:
-            print "\tkappa(%s) = %s" % (i,aux[2,i])
+            print "\tkappa(%s) = %s" % (i,aux[kappa_index,i])
         if stop_on_fail:
             raise Exception("Richardson tolerance exceeded!")
             
@@ -76,79 +83,19 @@ def friction_source(solver,state,dt,TOLERANCE=1e-30):
             dgamma = 1.0 + dt * gamma
             hu_index = 2 * (layer_index) + 1
             state.q[hu_index,i] = state.q[hu_index,i] / dgamma * rho[layer_index]
-            
-
-def create_path(path,overwrite=False):
-    r""""""
-    if not os.path.exists(path):
-        os.makedirs(path)
-    elif overwrite:
-        data_files = glob.glob(path,"*")
-        for data_file in data_files:
-            os.remove(data_file)
-
-def create_output_paths(name,prefix,**kargs):
-    r""""""
-    if kargs.has_key('outdir'):
-        outdir = kargs['outdir']
-    else:
-        base_path = os.environ.get('DATA_PATH',os.getcwd())
-        outdir = os.path.join(base_path,name,"%s_output" % prefix)
-    if kargs.has_key('plotdir'):
-        plotdir = kargs['plotdir']
-    else:
-        base_path = os.environ.get('DATA_PATH',os.getcwd())
-        plotdir = os.path.join(base_path,name,"%s_plots" % prefix)
-    if kargs.has_key('logfile'):
-        log_path = kargs['logfile']
-    else:
-        base_path = os.environ.get('DATA_PATH',os.getcwd())
-        log_path = os.path.join(base_path,name,"%s_log.txt" % prefix)
-        
-    create_path(outdir,overwrite=kargs.get('overwrite',False))
-    create_path(plotdir,overwrite=kargs.get('overwrite',False))
-    create_path(os.path.dirname(log_path),overwrite=False)
-    
-    return outdir,plotdir,log_path
-
-
-def replace_stream_handlers(logger_name,log_path,log_file_append=True):
-    r"""Replace the stream handlers in the logger logger_name
-        
-        This routine replaces all stream handlers in logger logger_name with a 
-        file handler which outputs to the log file at log_path. If 
-        log_file_append is True then the log files is opened for appending, 
-        otherwise it is written over.
-    """
-    import logging
-    
-    logger = logging.getLogger(logger_name)
-    handler_list = [handler for handler in logger.handlers if isinstance(handler,logging.StreamHandler)]
-    for handler in handler_list:
-        # Create new handler
-        if log_file_append:
-            new_handler = logging.FileHandler(log_path,'a')
-        else:
-            new_handler = logging.FileHandler(log_path,'w')
-            log_file_append = True
-        new_handler.setLevel(handler.level)
-        # new_handler.name = handler.name
-        new_handler.setFormatter(handler.formatter)
-            
-        # Remove old handler
-        if isinstance(handler,logging.FileHandler):
-            handler.close()
-            if os.path.exists(handler.baseFilename):
-                os.remove(handler.baseFilename)
-        logger.removeHandler(handler)
-          
-        # Add new handler  
-        logger.addHandler(new_handler)
 
             
 def setup(lower=0.0,upper=1.0,num_layers=2,num_cells=100,log_path='./pyclaw.log',
           use_petsc=False,iplot=False,htmlplot=False,outdir='./_output',solver_type='classic'):
-    r"""Generic setup routine for all 1d multi-layer runs in PyClaw"""
+    r"""Generic setup routine for all 1d multi-layer runs in PyClaw
+    
+    :Input:
+    
+    :Output:
+     - *solver* (pyclaw.solver) 
+     - *solution* (pyclaw.solution)
+     - *controller* (pyclaw.controller)
+    """
     
     # Load in appropriate PyClaw library
     if use_petsc:
@@ -157,9 +104,9 @@ def setup(lower=0.0,upper=1.0,num_layers=2,num_cells=100,log_path='./pyclaw.log'
         import pyclaw
     
     # Redirect loggers
-    replace_stream_handlers('io',log_path,log_file_append=False)
+    runclaw.replace_stream_handlers('io',log_path,log_file_append=False)
     for logger_name in ['io','solution','plot','evolve','f2py','data']:
-        replace_stream_handlers(logger_name,log_path)
+        runclaw.replace_stream_handlers(logger_name,log_path)
         
     # Create solver object
     if solver_type == 'classic':
@@ -193,6 +140,7 @@ def setup(lower=0.0,upper=1.0,num_layers=2,num_cells=100,log_path='./pyclaw.log'
     x = pyclaw.Dimension('x',lower,upper,num_cells)
     domain = pyclaw.Domain([x])
     state = pyclaw.State(domain,2*num_layers,3+num_layers)
+    state.aux[kappa_index,:] = 0.0
 
     # Set physics data
     state.problem_data['g'] = 9.8
@@ -224,44 +172,73 @@ def setup(lower=0.0,upper=1.0,num_layers=2,num_cells=100,log_path='./pyclaw.log'
     
     return solver,solution,controller
 
-    
-def plot(setplot_path,outdir,plotdir=None,htmlplot=False,iplot=False,**plot_kargs):
-    r""""""
-    
-    # Construct plotdir if not provided
-    if plotdir is None:
-        plotdir = os.path.join(os.path.split(outdir)[:-2],"_plots")
-    
-    if htmlplot or iplot:
-        import pyclaw.plot
-    
-        # Grab and import the setplot function
-        path = os.path.abspath(os.path.expandvars(os.path.expanduser(setplot_path)))
-        setplot_module_dir = os.path.dirname(path)
-        setplot_module_name = os.path.splitext(os.path.basename(setplot_path))[0]
-        sys.path.insert(0,setplot_module_dir)
-        setplot_module = __import__(setplot_module_name)
-        reload(setplot_module)
-        setplot = lambda plotdata:setplot_module.setplot(plotdata,**plot_kargs)
-        
-        if not isinstance(setplot,types.FunctionType):
-            raise ImportError("Failed importing %s.setplot" % setplot_module_name)
-        
-        if iplot:
-            from visclaw import Iplotclaw
-        
-            ip=Iplotclaw.Iplotclaw(setplot=setplot)
-            ip.plotdata.outdir = outdir
-            ip.plotdata.format = 'ascii'
-        
-            ip.plotloop()
-            
-        if htmlplot:
-            from visclaw import plotclaw            
-            plotclaw.plotclaw(outdir,plotdir,format='ascii',setplot=setplot)
-            
 
+def set_jump_bathymetry(state,jump_location,depths):
+    """
+    Set bathymetry representing a jump from depths[0] to depths[1] at 
+    jump_location.
+    """
+    x = state.grid.dimensions[0].centers
+    state.aux[bathy_index,:] = (x < jump_location) * depths[0]  + \
+                               (x >= jump_location) * depths[1]
+
+def set_h_hat(state,jump_location,eta_left,eta_right):
+    """Set the initial surfaces for Riemann solver use"""
+    x_left = (state.grid.dimensions[0].centers < jump_location)
+    x_right = (state.grid.dimensions[0].centers >= jump_location)
+    b = state.aux[bathy_index,:]
     
+    state.aux[h_hat_index[0],:] = x_left  * (eta_left[1] > b)   * (eta_left[0] - eta_left[1]) \
+                                + x_left  * (eta_left[1] <= b)  * (eta_left[0] - b) \
+                                + x_right * (eta_right[1] > b)  * (eta_right[0] - eta_right[1]) \
+                                + x_right * (eta_right[1] <= b) * (eta_right[0] - b)
+    state.aux[h_hat_index[1],:] = x_left  * (eta_left[1] > b)   * (eta_left[1] - b) \
+                                + x_left  * (eta_left[1] <= b)  * b \
+                                + x_right * (eta_right[1] > b)  * (eta_right[1] - b) \
+                                + x_right * (eta_right[1] <= b) * b
+    
+def set_quiescent_init_condition(state):
+    """Set a quiescent (stationary) initial condition
+    
+    This assumes that you have already set the h hat values.
+    """
+    state.q[0,:] = state.aux[h_hat_index[0],:] * state.problem_data['rho'][0]
+    state.q[2,:] = state.aux[h_hat_index[1],:] * state.problem_data['rho'][1]
+    state.q[1,:] = np.zeros((state.grid.dimensions[0].num_cells))
+    state.q[3,:] = np.zeros((state.grid.dimensions[0].num_cells))
+    
+def set_wave_family_init_condition(state,wave_family):
+    """Set initial condition of a jump in the specified wave family"""
+    
+    # Set stationary initial state, perturb off of that
+    set_quiescent_init_condition(state)
+    
+    raise NotImplemented("Wave family initial condition not yet implemented!")
+
+def set_gaussian_init_condition(state,A,location,sigma,internal_layer=False):
+    """Set initial condition to a gaussian hump of water
+    
+    Sets the condition for what should act like a shallow water wave.  If a
+    gaussian on only the interal layer is desired set internal_only = True
+    """
+    
+    # Set stationary initial state, perturb off of that
+    set_quiescent_init_condition(state)
+    
+    raise NotImplemented("Gaussian initial condition not yet implemented!")
+    
+def set_acta_numerica_init_condition(state,A):
+    """Set initial condition based on the intitial condition in
+    
+    LeVeque, R. J., George, D. L. & Berger, M. J. Tsunami Propagation and 
+    inundation with adaptively refined finite volume methods. Acta Numerica 
+    211–289 (2011).  doi:10.1017/S0962492904
+    """
+    
+    # Set stationary initial state, perturb off of that
+    set_quiescent_init_condition(state)
+    
+    raise NotImplemented("Acta Numerica initial condition not yet implemented!")
     
     
             
