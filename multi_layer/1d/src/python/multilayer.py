@@ -37,6 +37,8 @@ def before_step(solver,solution,wind_func=wind.set_no_wind,
     
     # Calculate wind
     wind_func(solution.state)
+    # Want to apply new aux values into auxbc
+    solver.apply_aux_bcs(solution.state)
     
     # Calculate kappa
     h = np.zeros((num_layers,q.shape[1]))
