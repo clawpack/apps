@@ -167,7 +167,7 @@ def setup(lower=0.0,upper=1.0,num_layers=2,num_cells=100,log_path='./pyclaw.log'
     controller.solution = solution
     controller.solver = solver
     controller.output_style = 1
-    controller.tfinal = 1.0
+    controller.tfinal = 0.5
     controller.num_output_times = 50
     controller.outdir = './_output'
     controller.write_aux_init = True
@@ -186,6 +186,7 @@ def set_jump_bathymetry(state,jump_location,depths):
 
 def set_h_hat(state,jump_location,eta_left,eta_right):
     """Set the initial surfaces for Riemann solver use"""
+    # TODO: This code is not working for dry states in the bottom layer
     x_left = (state.grid.dimensions[0].centers < jump_location)
     x_right = (state.grid.dimensions[0].centers >= jump_location)
     b = state.aux[bathy_index,:]
@@ -209,13 +210,45 @@ def set_quiescent_init_condition(state):
     state.q[1,:] = np.zeros((state.grid.dimensions[0].num_cells))
     state.q[3,:] = np.zeros((state.grid.dimensions[0].num_cells))
     
-def set_wave_family_init_condition(state,wave_family):
+def set_wave_family_init_condition(state,wave_family,jump_location,epsilon):
     """Set initial condition of a jump in the specified wave family"""
     
     # Set stationary initial state, perturb off of that
     set_quiescent_init_condition(state)
     
-    raise NotImplemented("Wave family initial condition not yet implemented!")
+    r = state.problem_data['r']
+    rho = state.problem_data['rho']
+    g = state.problem_data['g']
+    x = state.grid.dimensions[0].centers
+    gamma = state.aux[h_hat_index[1],:] / state.aux[h_hat_index[0],:]
+    if wave_family == 1:
+        alpha = 0.5 * (gamma - 1.0 + np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+        eig_value = -np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
+    elif wave_family == 2:
+        alpha = 0.5 * (gamma - 1.0 - np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+        eig_value = -np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
+    elif wave_family == 3:
+        alpha = 0.5 * (gamma - 1.0 - np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+        eig_value = np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
+    elif wave_family == 4:
+        alpha = 0.5 * (gamma - 1.0 + np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+        eig_value = np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
+    else:
+        raise Exception("Unsupported wave family %s requested." % wave_family)
+
+    if wave_family >= 3:
+        location_condition = x < jump_location
+        state.q[0,:] += location_condition * rho[0] * epsilon
+        state.q[1,:] += location_condition * rho[0] * epsilon * eig_value
+        state.q[2,:] += location_condition * rho[1] * epsilon * alpha
+        state.q[3,:] += location_condition * rho[1] * epsilon * alpha * eig_value
+    elif wave_family < 3:
+        location_condition = (x > jump_location)
+        state.q[0,:] += location_condition * rho[0] * epsilon
+        state.q[1,:] += location_condition * rho[0] * epsilon * eig_value
+        state.q[2,:] += location_condition * rho[1] * epsilon * alpha
+        state.q[3,:] += location_condition * rho[1] * epsilon * alpha * eig_value
+    
 
 def set_gaussian_init_condition(state,A,location,sigma,internal_layer=False):
     """Set initial condition to a gaussian hump of water
