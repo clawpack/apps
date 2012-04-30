@@ -18,23 +18,6 @@ sys.path.append('./src/python/')
 import init_solution
 import wind
 import multilayer as ml
-
-def wall_qbc_lower(state,dim,t,qbc,num_ghost):
-    for i in xrange(num_ghost):
-        qbc[0,i] = qbc[0,num_ghost]
-        qbc[1,i] = -qbc[1,num_ghost]
-        qbc[2,i] = qbc[2,num_ghost]
-        qbc[3,i] = -qbc[3,num_ghost]
-    
-def wall_qbc_upper(state,dim,t,qbc,num_ghost):
-    for i in xrange(num_ghost + dim.num_cells,
-                    2*num_ghost + dim.num_cells):
-        qbc[0,i] = qbc[0,num_ghost + dim.num_cells-1]
-        qbc[1,i] = -qbc[1,num_ghost + dim.num_cells-1]
-        qbc[2,i] = qbc[2,num_ghost + dim.num_cells-1]
-        qbc[3,i] = -qbc[3,num_ghost + dim.num_cells-1]
-        
-
         
 def oscillatory_wind(num_cells,eigen_method,**kargs):
     r"""docstring for oscillatory_wind"""
@@ -51,8 +34,8 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
     # Set wall boundary conditions
     solver.bc_lower[0] = 0
     solver.bc_upper[0] = 0
-    solver.user_bc_lower = wall_qbc_lower
-    solver.user_bc_upper = wall_qbc_upper
+    solver.user_bc_lower = ml.wall_qbc_lower
+    solver.user_bc_upper = ml.wall_qbc_upper
 
     # Set wind function
     wind_func = lambda state:wind.set_oscillatory_wind(state,

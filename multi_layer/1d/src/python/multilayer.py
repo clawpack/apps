@@ -85,9 +85,26 @@ def friction_source(solver,state,dt,TOLERANCE=1e-30):
             hu_index = 2 * (layer_index) + 1
             state.q[hu_index,i] = state.q[hu_index,i] / dgamma * rho[layer_index]
 
+
+# Special boundary conditions for multi-layer shallow water equations
+def wall_qbc_lower(state,dim,t,qbc,num_ghost):
+    for i in xrange(num_ghost):
+        qbc[0,i] = qbc[0,num_ghost]
+        qbc[1,i] = -qbc[1,num_ghost]
+        qbc[2,i] = qbc[2,num_ghost]
+        qbc[3,i] = -qbc[3,num_ghost]
+    
+def wall_qbc_upper(state,dim,t,qbc,num_ghost):
+    for i in xrange(num_ghost + dim.num_cells,
+                    2*num_ghost + dim.num_cells):
+        qbc[0,i] = qbc[0,num_ghost + dim.num_cells-1]
+        qbc[1,i] = -qbc[1,num_ghost + dim.num_cells-1]
+        qbc[2,i] = qbc[2,num_ghost + dim.num_cells-1]
+        qbc[3,i] = -qbc[3,num_ghost + dim.num_cells-1]
+
             
 def setup(lower=0.0,upper=1.0,num_layers=2,num_cells=100,log_path='./pyclaw.log',
-          use_petsc=False,iplot=False,htmlplot=False,outdir='./_output',solver_type='classic'):
+          use_petsc=False,solver_type='classic'):
     r"""Generic setup routine for all 1d multi-layer runs in PyClaw
     
     :Input:
@@ -296,7 +313,7 @@ def set_gaussian_init_condition(state,A,location,sigma,internal_layer=False):
     
     raise NotImplemented("Gaussian initial condition not yet implemented!")
     
-def set_acta_numerica_init_condition(state,A):
+def set_acta_numerica_init_condition(state,epsilon):
     """Set initial condition based on the intitial condition in
     
     LeVeque, R. J., George, D. L. & Berger, M. J. Tsunami Propagation and 
@@ -306,8 +323,17 @@ def set_acta_numerica_init_condition(state,A):
     
     # Set stationary initial state, perturb off of that
     set_quiescent_init_condition(state)
+
+    rho = state.problem_data['rho']
+    x = state.grid.dimensions[0].centers
     
-    raise NotImplemented("Acta Numerica initial condition not yet implemented!")
+    gamma = state.aux[h_hat_index[1],:] / state.aux[h_hat_index[0],:]
+    alpha = 0.0
+    xmid = 0.5 * (-180e3 - 80e3)
+    
+    deta = epsilon * np.sin((x-xmid) * np.pi / (-80e3 - xmid))
+    state.q[2,:] += (x > -130e3) * (x < -80e3) * rho[1] * alpha * deta
+    state.q[0,:] += (x > -130e3) * (x < -80e3) * rho[0] * deta * (1.0 - alpha)
     
     
             
