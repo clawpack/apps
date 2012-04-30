@@ -47,15 +47,14 @@ def before_step(solver,solution,wind_func=wind.set_no_wind,
         layer_index = 2*layer
         h[layer,:] = solution.q[layer_index,:] / rho[layer]
         wet_index = h[layer,:] > dry_tolerance
-        u = np.zeros((2,solution.q.shape[1]))
         u[layer,wet_index] = solution.q[layer_index+1,wet_index] / solution.q[layer_index,wet_index]
     aux[kappa_index,:] = (u[0,:] - u[1,:])**2 / (g * one_minus_r * (h[0,:] + h[1,:]))
     if np.any(aux[kappa_index,wet_index] > richardson_tolerance):
         # Actually calculate where the indices failed
-        bad_indices = (aux[kapp_index,wet_index] > richardson_tolerance).nonzero()[0]
+        bad_indices = (aux[kappa_index,wet_index] > richardson_tolerance).nonzero()[0]
         print "Hyperbolicity may have failed at the following points:"
         for i in bad_indices:
-            print "\tkappa(%s) = %s" % (i,aux[kappa_index,i])
+            print "\tkappa(%s) = %s" % (i,aux[kappa_index,i+1])
         if stop_on_fail:
             raise Exception("Richardson tolerance exceeded!")
             
@@ -180,25 +179,30 @@ def set_jump_bathymetry(state,jump_location,depths):
     Set bathymetry representing a jump from depths[0] to depths[1] at 
     jump_location.
     """
+    
     x = state.grid.dimensions[0].centers
     state.aux[bathy_index,:] = (x < jump_location) * depths[0]  + \
                                (x >= jump_location) * depths[1]
 
 def set_h_hat(state,jump_location,eta_left,eta_right):
     """Set the initial surfaces for Riemann solver use"""
-    # TODO: This code is not working for dry states in the bottom layer
-    x_left = (state.grid.dimensions[0].centers < jump_location)
-    x_right = (state.grid.dimensions[0].centers >= jump_location)
     b = state.aux[bathy_index,:]
-    
-    state.aux[h_hat_index[0],:] = x_left  * (eta_left[1] > b)   * (eta_left[0] - eta_left[1]) \
-                                + x_left  * (eta_left[1] <= b)  * (eta_left[0] - b) \
-                                + x_right * (eta_right[1] > b)  * (eta_right[0] - eta_right[1]) \
-                                + x_right * (eta_right[1] <= b) * (eta_right[0] - b)
-    state.aux[h_hat_index[1],:] = x_left  * (eta_left[1] > b)   * (eta_left[1] - b) \
-                                + x_left  * (eta_left[1] <= b)  * b \
-                                + x_right * (eta_right[1] > b)  * (eta_right[1] - b) \
-                                + x_right * (eta_right[1] <= b) * b
+
+    for (i,x) in enumerate(state.grid.dimensions[0].centers):
+        if x < jump_location:
+            if eta_left[1] > b[i]:
+                state.aux[h_hat_index[0],i] = eta_left[0] - eta_left[1]
+                state.aux[h_hat_index[1],i] = eta_left[1] - b[i]
+            else:
+                state.aux[h_hat_index[0],i] = eta_left[0] - b[i]
+                state.aux[h_hat_index[1],i] = 0.0
+        else:
+            if eta_right[1] > b[i]:
+                state.aux[h_hat_index[0],i] = eta_right[0] - eta_right[1]
+                state.aux[h_hat_index[1],i] = eta_right[1] - b[i]
+            else:
+                state.aux[h_hat_index[0],i] = eta_right[0] - b[i]
+                state.aux[h_hat_index[1],i] = 0.0
     
 def set_quiescent_init_condition(state):
     """Set a quiescent (stationary) initial condition
@@ -219,35 +223,65 @@ def set_wave_family_init_condition(state,wave_family,jump_location,epsilon):
     r = state.problem_data['r']
     rho = state.problem_data['rho']
     g = state.problem_data['g']
-    x = state.grid.dimensions[0].centers
-    gamma = state.aux[h_hat_index[1],:] / state.aux[h_hat_index[0],:]
-    if wave_family == 1:
-        alpha = 0.5 * (gamma - 1.0 + np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
-        eig_value = -np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
-    elif wave_family == 2:
-        alpha = 0.5 * (gamma - 1.0 - np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
-        eig_value = -np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
-    elif wave_family == 3:
-        alpha = 0.5 * (gamma - 1.0 - np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
-        eig_value = np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
-    elif wave_family == 4:
-        alpha = 0.5 * (gamma - 1.0 + np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
-        eig_value = np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
-    else:
-        raise Exception("Unsupported wave family %s requested." % wave_family)
 
-    if wave_family >= 3:
-        location_condition = x < jump_location
-        state.q[0,:] += location_condition * rho[0] * epsilon
-        state.q[1,:] += location_condition * rho[0] * epsilon * eig_value
-        state.q[2,:] += location_condition * rho[1] * epsilon * alpha
-        state.q[3,:] += location_condition * rho[1] * epsilon * alpha * eig_value
-    elif wave_family < 3:
-        location_condition = (x > jump_location)
-        state.q[0,:] += location_condition * rho[0] * epsilon
-        state.q[1,:] += location_condition * rho[0] * epsilon * eig_value
-        state.q[2,:] += location_condition * rho[1] * epsilon * alpha
-        state.q[3,:] += location_condition * rho[1] * epsilon * alpha * eig_value
+    for (i,x) in enumerate(state.grid.dimensions[0].centers):
+        gamma = state.aux[h_hat_index[1],i] / state.aux[h_hat_index[0],i]
+        if wave_family == 1:
+            alpha = 0.5 * (gamma - 1.0 + np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+            eig_value = -np.sqrt(g * state.aux[h_hat_index[0],i] * (1.0 + alpha))
+        elif wave_family == 2:
+            alpha = 0.5 * (gamma - 1.0 - np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+            eig_value = -np.sqrt(g * state.aux[h_hat_index[0],i] * (1.0 + alpha))
+        elif wave_family == 3:
+            alpha = 0.5 * (gamma - 1.0 - np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+            eig_value = np.sqrt(g * state.aux[h_hat_index[0],i] * (1.0 + alpha))
+        elif wave_family == 4:
+            alpha = 0.5 * (gamma - 1.0 + np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+            eig_value = np.sqrt(g * state.aux[h_hat_index[0],i] * (1.0 + alpha))
+        else:
+            raise Exception("Unsupported wave family %s requested!" % wave_family)
+            
+        if x < jump_location and wave_family >= 3:
+            state.q[0,i] += rho[0] * epsilon
+            state.q[1,i] += rho[0] * epsilon * eig_value
+            state.q[2,i] += rho[1] * epsilon * alpha
+            state.q[3,i] += rho[1] * epsilon * eig_value * alpha
+        elif x >= jump_location and wave_family < 3:
+            state.q[0,i] += rho[0] * epsilon
+            state.q[1,i] += rho[0] * epsilon * eig_value
+            state.q[2,i] += rho[1] * epsilon * alpha
+            state.q[3,i] += rho[1] * epsilon * eig_value * alpha
+            
+    # x = state.grid.dimensions[0].centers
+    # 
+    # gamma = state.aux[h_hat_index[1],:] / state.aux[h_hat_index[0],:]
+    # if wave_family == 1:
+    #     alpha = 0.5 * (gamma - 1.0 + np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+    #     eig_value = -np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
+    # elif wave_family == 2:
+    #     alpha = 0.5 * (gamma - 1.0 - np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+    #     eig_value = -np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
+    # elif wave_family == 3:
+    #     alpha = 0.5 * (gamma - 1.0 - np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+    #     eig_value = np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
+    # elif wave_family == 4:
+    #     alpha = 0.5 * (gamma - 1.0 + np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
+    #     eig_value = np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
+    # else:
+    #     raise Exception("Unsupported wave family %s requested." % wave_family)
+    # 
+    # if wave_family >= 3:
+    #     location_condition = x < jump_location
+    #     state.q[0,:] += location_condition * rho[0] * epsilon
+    #     state.q[1,:] += location_condition * rho[0] * epsilon * eig_value
+    #     state.q[2,:] += location_condition * rho[1] * epsilon * alpha
+    #     state.q[3,:] += location_condition * rho[1] * epsilon * alpha * eig_value
+    # elif wave_family < 3:
+    #     location_condition = (x > jump_location)
+    #     state.q[0,:] += location_condition * rho[0] * epsilon
+    #     state.q[1,:] += location_condition * rho[0] * epsilon * eig_value
+    #     state.q[2,:] += location_condition * rho[1] * epsilon * alpha
+    #     state.q[3,:] += location_condition * rho[1] * epsilon * alpha * eig_value
     
 
 def set_gaussian_init_condition(state,A,location,sigma,internal_layer=False):
