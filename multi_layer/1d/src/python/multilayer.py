@@ -17,7 +17,9 @@ wind_index = 1
 h_hat_index = [2,3]
 kappa_index = 4
 
-# Function called before each time step
+# =========================================
+# = Function called before each time step =
+# =========================================
 def before_step(solver,solution,wind_func=wind.set_no_wind,
                 dry_tolerance=1e-3,richardson_tolerance=0.95,
                 stop_on_fail=False):
@@ -37,8 +39,6 @@ def before_step(solver,solution,wind_func=wind.set_no_wind,
     
     # Calculate wind
     wind_func(solution.state)
-    # Want to apply new aux values into auxbc
-    solver.apply_aux_bcs(solution.state)
     
     # Calculate kappa
     h = np.zeros((num_layers,q.shape[1]))
@@ -59,7 +59,9 @@ def before_step(solver,solution,wind_func=wind.set_no_wind,
             raise Exception("Richardson tolerance exceeded!")
             
 
-# Friction source function
+# ============================
+# = Friction source function =
+# ============================
 def friction_source(solver,state,dt,TOLERANCE=1e-30):
     r""""""
     num_layers = state.problem_data['num_layers']
@@ -86,7 +88,9 @@ def friction_source(solver,state,dt,TOLERANCE=1e-30):
             state.q[hu_index,i] = state.q[hu_index,i] / dgamma * rho[layer_index]
 
 
-# Special boundary conditions for multi-layer shallow water equations
+# =======================================================================
+# = Special boundary conditions for multi-layer shallow water equations =
+# =======================================================================
 def wall_qbc_lower(state,dim,t,qbc,num_ghost):
     for i in xrange(num_ghost):
         qbc[0,i] = qbc[0,num_ghost]
@@ -102,7 +106,10 @@ def wall_qbc_upper(state,dim,t,qbc,num_ghost):
         qbc[2,i] = qbc[2,num_ghost + dim.num_cells-1]
         qbc[3,i] = -qbc[3,num_ghost + dim.num_cells-1]
 
-            
+
+# =========================================================
+# = Generic Setup Routine for all multi-layer 1d problems =
+# =========================================================
 def setup(lower=0.0,upper=1.0,num_layers=2,num_cells=100,log_path='./pyclaw.log',
           use_petsc=False,solver_type='classic'):
     r"""Generic setup routine for all 1d multi-layer runs in PyClaw
@@ -187,10 +194,14 @@ def setup(lower=0.0,upper=1.0,num_layers=2,num_cells=100,log_path='./pyclaw.log'
     controller.num_output_times = 50
     controller.outdir = './_output'
     controller.write_aux_init = True
+    # controller.write_aux_always = True
     
     return solver,solution,controller
 
 
+# ==============================
+# = Aux Intialization Routines =
+# ==============================
 def set_jump_bathymetry(state,jump_location,depths):
     """
     Set bathymetry representing a jump from depths[0] to depths[1] at 
@@ -200,6 +211,24 @@ def set_jump_bathymetry(state,jump_location,depths):
     x = state.grid.dimensions[0].centers
     state.aux[bathy_index,:] = (x < jump_location) * depths[0]  + \
                                (x >= jump_location) * depths[1]
+                               
+def set_sloped_shelf_bathymetry(state,x0,x1,basin_depth,shelf_depth):
+    r"""
+    Set bathymetry to a simple shelf with a slope coming up from the basin
+    
+        (x1,shelf_depth) *-----------
+                        /
+                      /
+                    /
+        ___________* (x0,basin_depth)
+    """
+    
+    x = state.grid.dimensions[0].centers
+    slope = (basin_depth - shelf_depth) / (x0 - x1) * (x - x0) + basin_depth
+    
+    state.aux[bathy_index,:] = (x < x0) * basin_depth
+    state.aux[bathy_index,:] += (x0 <= x) * (x < x1) * slope
+    state.aux[bathy_index,:] += (x1 <= x) * shelf_depth
 
 def set_h_hat(state,jump_location,eta_left,eta_right):
     """Set the initial surfaces for Riemann solver use"""
@@ -220,7 +249,11 @@ def set_h_hat(state,jump_location,eta_left,eta_right):
             else:
                 state.aux[h_hat_index[0],i] = eta_right[0] - b[i]
                 state.aux[h_hat_index[1],i] = 0.0
-    
+
+
+# =============================
+# = Q Initialization Routines =
+# =============================
 def set_quiescent_init_condition(state):
     """Set a quiescent (stationary) initial condition
     
@@ -231,6 +264,7 @@ def set_quiescent_init_condition(state):
     state.q[1,:] = np.zeros((state.grid.dimensions[0].num_cells))
     state.q[3,:] = np.zeros((state.grid.dimensions[0].num_cells))
     
+
 def set_wave_family_init_condition(state,wave_family,jump_location,epsilon):
     """Set initial condition of a jump in the specified wave family"""
     
@@ -268,38 +302,7 @@ def set_wave_family_init_condition(state,wave_family,jump_location,epsilon):
             state.q[1,i] += rho[0] * epsilon * eig_value
             state.q[2,i] += rho[1] * epsilon * alpha
             state.q[3,i] += rho[1] * epsilon * eig_value * alpha
-            
-    # x = state.grid.dimensions[0].centers
-    # 
-    # gamma = state.aux[h_hat_index[1],:] / state.aux[h_hat_index[0],:]
-    # if wave_family == 1:
-    #     alpha = 0.5 * (gamma - 1.0 + np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
-    #     eig_value = -np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
-    # elif wave_family == 2:
-    #     alpha = 0.5 * (gamma - 1.0 - np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
-    #     eig_value = -np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
-    # elif wave_family == 3:
-    #     alpha = 0.5 * (gamma - 1.0 - np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
-    #     eig_value = np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
-    # elif wave_family == 4:
-    #     alpha = 0.5 * (gamma - 1.0 + np.sqrt((gamma - 1.0)**2 + 4.0 * r * gamma))
-    #     eig_value = np.sqrt(g*state.aux[h_hat_index[0],:]*(1.0+alpha))
-    # else:
-    #     raise Exception("Unsupported wave family %s requested." % wave_family)
-    # 
-    # if wave_family >= 3:
-    #     location_condition = x < jump_location
-    #     state.q[0,:] += location_condition * rho[0] * epsilon
-    #     state.q[1,:] += location_condition * rho[0] * epsilon * eig_value
-    #     state.q[2,:] += location_condition * rho[1] * epsilon * alpha
-    #     state.q[3,:] += location_condition * rho[1] * epsilon * alpha * eig_value
-    # elif wave_family < 3:
-    #     location_condition = (x > jump_location)
-    #     state.q[0,:] += location_condition * rho[0] * epsilon
-    #     state.q[1,:] += location_condition * rho[0] * epsilon * eig_value
-    #     state.q[2,:] += location_condition * rho[1] * epsilon * alpha
-    #     state.q[3,:] += location_condition * rho[1] * epsilon * alpha * eig_value
-    
+
 
 def set_gaussian_init_condition(state,A,location,sigma,internal_layer=False):
     """Set initial condition to a gaussian hump of water
@@ -313,6 +316,7 @@ def set_gaussian_init_condition(state,A,location,sigma,internal_layer=False):
     
     raise NotImplemented("Gaussian initial condition not yet implemented!")
     
+
 def set_acta_numerica_init_condition(state,epsilon):
     """Set initial condition based on the intitial condition in
     
