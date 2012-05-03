@@ -15,7 +15,6 @@ import clawutil.runclaw as runclaw
 # Add src/python local directory to python path for multilayer specific tests
 sys.path.append('./src/python/')
 
-import init_solution
 import wind
 import multilayer as ml
         
@@ -29,7 +28,7 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
 
     # Initialize common pieces of the solver and pass through all non-specific
     # parameters
-    solver,solution,controller = ml.setup(num_cells=num_cells,log_path=log_path,**kargs)
+    solver,solution,controller = ml.setup(num_cells=num_cells,log_path=log_path)
 
     # Set wall boundary conditions
     solver.bc_lower[0] = 0

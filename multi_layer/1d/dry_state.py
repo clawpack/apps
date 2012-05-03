@@ -18,12 +18,16 @@ sys.path.append('./src/python/')
 import wind
 import multilayer as ml
         
-def wave_family(num_cells,eigen_method,wave_family,**kargs):
+def dry_state(num_cells,eigen_method,entropy_fix,**kargs):
     r"""docstring for oscillatory_wind"""
 
     # Construct output and plot directory paths
-    prefix = 'ml_e%s_n%s' % (eigen_method,num_cells)
-    name = 'idealized_%s' % wave_family
+    prefix = 'ml_e%s_m%s_fix' % (eigen_method,num_cells)
+    if entropy_fix:
+        prefix = "".join((prefix,"T"))
+    else:
+        prefix = "".join((prefix,"F"))
+    name = 'dry_state'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Initialize common pieces of the solver and pass through all non-specific
@@ -35,46 +39,31 @@ def wave_family(num_cells,eigen_method,wave_family,**kargs):
     # Change pertinent problem data
     solution.state.problem_data['eigen_method'] = eigen_method
     solution.state.problem_data['inundation_method'] = 2
+    solution.state.problem_data['entropy_fix'] = entropy_fix
     
     # Set aux arrays including bathymetry, wind field and linearized depths
-    ml.set_jump_bathymetry(solution.state,0.5,[-1.0,-0.2])
+    ml.set_jump_bathymetry(solution.state,0.5,[-1.0,-1.0])
     wind.set_no_wind(solution.state)
-    ml.set_h_hat(solution.state,0.5,[0.0,-0.6],[0.0,-0.6])
-    
-    # Set initial condition
-    if wave_family == 3:
-        ml.set_wave_family_init_condition(solution.state,wave_family,0.45,0.1)
-    elif wave_family == 4:
-        # The perturbation must be less in this case otherwise the internal
-        # wave will crest the bathymetry jump
-        ml.set_wave_family_init_condition(solution.state,wave_family,0.45,0.04)
+    ml.set_h_hat(solution.state,0.5,[0.0,-0.5],[0.0,-1.0])
     
     # Set output
     controller.outdir = outdir
+    controller.output_style = 3
     controller.nstepout = 1
+    controller.num_output_times = 100
     controller.write_aux = True
     
     # Run simulation
     state = controller.run()
     
     # Plotting
-    plot_kargs = {'wave_family':wave_family,
-                  'rho':solution.state.problem_data['rho'],
+    plot_kargs = {'rho':solution.state.problem_data['rho'],
                   'dry_tolerance':solution.state.problem_data['dry_tolerance']}
-    plot(setplot_path="./setplot_wave_family.py",outdir=outdir,plotdir=plotdir,
+    plot(setplot_path="./setplot_drystate.py",outdir=outdir,plotdir=plotdir,
          htmlplot=kargs.get('htmlplot',False),iplot=kargs.get('iplot',False),
          file_format=controller.output_format,**plot_kargs)
 
 if __name__ == "__main__":
-    # Run the test for the 3rd and 4th wave families for each eigen method
-    if len(sys.argv) > 1:
-        eig_methods = []
-        for value in sys.argv[1:]:
-            eig_methods.append(int(value))
-    else:
-        eig_methods = [1,2,3,4]
-        
-    for method in eig_methods:
-        wave_family(500,method,3,iplot=False,htmlplot=True)
-    for method in eig_methods:
-        wave_family(500,method,4,iplot=False,htmlplot=True)
+    # Run test case for eigen method = 2 turning on and off entropy fix
+    dry_state(500,2,True)
+    dry_state(500,2,False)
