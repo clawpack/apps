@@ -31,7 +31,6 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
     # Fetch bathymetry once
     b = Solution(0,path=plotdata.outdir,read_aux=True).state.aux[0,:]
     
-        
     # ========================================================================
     #  Plot variable functions
     def bathy(cd):

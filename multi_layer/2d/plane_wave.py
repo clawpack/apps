@@ -13,33 +13,34 @@ from pyclaw.plot import plot
 import clawutil.runclaw as runclaw
 
 # Add src/python local directory to python path for multilayer specific tests
-sys.path.append('./src/python/')
+sys.path.append('../src/python/')
 
-import wind
 import multilayer as ml
         
-def wave_family(num_cells,eigen_method,wave_family,**kargs):
-    r"""docstring for oscillatory_wind"""
+def plane_wave(angle=0.0,bathy_angle=0.0,location=[-0.1,0.0],bathy_location=0.15,**kargs):
+    r"""docstring for plane_wave"""
 
     # Construct output and plot directory paths
-    prefix = 'ml_e%s_n%s' % (eigen_method,num_cells)
-    name = 'idealized_%s' % wave_family
+    prefix = "ml_2d_ia%s_ba%s" % (int(angle * 180.0 / np.pi),
+                                  int(bathy_angle * 180.0 / np.pi))
+    name = 'plane_wave' % wave_family
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Initialize common pieces of the solver and pass through all non-specific
     # parameters
-    solver,solution,controller = ml.setup(num_cells=num_cells,log_path=log_path,**kargs)
-    solver.before_step = lambda solver,solution:ml.before_step(solver,solution
-                                                    ,stop_on_fail=False)
+    solver,solution,controller = ml.setup_2d(num_cells=[300,300],log_path=log_path,**kargs)
+    solver.before_step = lambda solver,solution:ml.before_step_2d(solver,solution,stop_on_fail=False)
     
     # Change pertinent problem data
-    solution.state.problem_data['eigen_method'] = eigen_method
+    solution.state.problem_data['eigen_method'] = 2
     solution.state.problem_data['inundation_method'] = 2
     
     # Set aux arrays including bathymetry, wind field and linearized depths
-    ml.set_jump_bathymetry(solution.state,0.5,[-1.0,-0.2])
+    ml.set_jump_bathymetry(solution.state,bathy_angle,bathy_location,[-1.0,-0.2])
     wind.set_no_wind(solution.state)
     ml.set_h_hat(solution.state,0.5,[0.0,-0.6],[0.0,-0.6])
+    
+    # TODO: add gauges
     
     # Set initial condition
     if wave_family == 3:

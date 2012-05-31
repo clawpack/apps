@@ -9,11 +9,11 @@ import types
 
 import numpy as np
 
-from pyclaw.plot import plot
-import clawutil.runclaw as runclaw
+from clawpack.pyclaw.plot import plot
+import clawpack.clawutil.runclaw as runclaw
 
 # Add src/python local directory to python path for multilayer specific tests
-sys.path.append('./src/python/')
+sys.path.append('../src/python/')
 
 import wind
 import multilayer as ml
