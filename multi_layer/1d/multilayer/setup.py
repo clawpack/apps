@@ -5,9 +5,10 @@ these routines will then pass back objects that should be specialized
 to the particular example.
 """
 
+import solver
 
 def setup(lower=0.0,upper=1.0,num_layers=2,num_cells=100,log_path='./pyclaw.log',
-          use_petsc=False,solver_type='classic'):
+          use_petsc=False,wind_func=,solver_type='classic'):
     r"""Generic setup routine for all 1d multi-layer runs in PyClaw
     
     :Input:

@@ -15,9 +15,11 @@ import re
 import matplotlib
 import matplotlib.pyplot as mpl
 
-from pyclaw.solution import Solution
-from visclaw import geoplot, colormaps
-from clawutil.oldclawdata import Data
+from clawpack.pyclaw.solution import Solution
+from clawpack.visclaw import geoplot, colormaps
+from clawpack.clawutil.oldclawdata import Data
+
+
 
 matplotlib.rcParams['figure.figsize'] = [16.0,6.0]
 
@@ -41,10 +43,10 @@ def setplot(plotdata,xlower,xupper,rho,dry_tolerance):
     def hurricane_afterframe(current_data):
         # Draw line for eye of hurricane
         pass
-
+        
     def bathy(cd):
         return b
-
+    
     def kappa(cd):
         return Solution(cd.frameno,path=plotdata.outdir,read_aux=True).state.aux[4,:]
 
@@ -64,10 +66,17 @@ def setplot(plotdata,xlower,xupper,rho,dry_tolerance):
         return h_1(cd) + eta_2(cd)
         
     def u_1(cd):
-        return (np.abs(h_1(cd)) > dry_tolerance) * cd.q[1,:] / cd.q[0,:]
+        index = np.nonzero(h_1(cd) > dry_tolerance)
+        u_1 = np.zeros(h_1(cd).shape)
+        u_1[index] = cd.q[1,index] / cd.q[0,index]
+        return u_1
         
     def u_2(cd):
-        return (np.abs(h_2(cd)) > dry_tolerance) * cd.q[3,:] / cd.q[2,:]
+        index = np.nonzero(h_2(cd) > dry_tolerance)
+        u_2 = np.zeros(h_2(cd).shape)
+        u_2[index] = cd.q[3,index] / cd.q[2,index]
+        return u_2
+
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
     

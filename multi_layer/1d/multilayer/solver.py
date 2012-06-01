@@ -4,9 +4,11 @@ r"""
 Functions used in the solver objects
 """
 
-import wind
+import numpy as np
 
-def before_step(solver,solution,wind_func=wind.set_no_wind,dry_tolerance=1e-3,
+from aux import kappa_index, set_no_wind
+
+def before_step(solver,solution,wind_func=set_no_wind,dry_tolerance=1e-3,
                     richardson_tolerance=0.95,raise_on_fail=False):
     r"""
     Sets data fields and performs calculations needed before a time
@@ -24,7 +26,7 @@ def before_step(solver,solution,wind_func=wind.set_no_wind,dry_tolerance=1e-3,
     
     :Raises:
       - (Exception) - Richardson tolerance exceeded.  Only raised if 
-        stop_on_fail is set to True.
+        raise_on_fail is set to True.
     """
     
     # Extract relevant data
@@ -58,5 +60,5 @@ def before_step(solver,solution,wind_func=wind.set_no_wind,dry_tolerance=1e-3,
         print "Hyperbolicity may have failed at the following points:"
         for i in bad_indices:
             print "\tkappa(%s) = %s" % (i,aux[kappa_index,i+1])
-        if stop_on_fail:
+        if raise_on_fail:
             raise Exception("Richardson tolerance exceeded!")

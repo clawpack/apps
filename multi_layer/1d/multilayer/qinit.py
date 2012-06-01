@@ -1,33 +1,13 @@
 # encoding: utf-8
 
 r"""
-Functions for intializing q and q hat (hat variables are the steady
-state versions of the q variables, usually this just pertains to the 
-depth variables).
+Functions for intializing q
 """
 
-bathy_index = 1
+import numpy as np
 
-def set_h_hat(state,jump_location,eta_left,eta_right):
-    """Set the initial surfaces for Riemann solver use"""
-    b = state.aux[bathy_index,:]
-
-    for (i,x) in enumerate(state.grid.dimensions[0].centers):
-        if x < jump_location:
-            if eta_left[1] > b[i]:
-                state.aux[h_hat_index[0],i] = eta_left[0] - eta_left[1]
-                state.aux[h_hat_index[1],i] = eta_left[1] - b[i]
-            else:
-                state.aux[h_hat_index[0],i] = eta_left[0] - b[i]
-                state.aux[h_hat_index[1],i] = 0.0
-        else:
-            if eta_right[1] > b[i]:
-                state.aux[h_hat_index[0],i] = eta_right[0] - eta_right[1]
-                state.aux[h_hat_index[1],i] = eta_right[1] - b[i]
-            else:
-                state.aux[h_hat_index[0],i] = eta_right[0] - b[i]
-                state.aux[h_hat_index[1],i] = 0.0
-
+# Get locations in the aux array of pertinent quantities
+from aux import kappa_index,h_hat_index
 
 def set_quiescent_init_condition(state):
     """Set a quiescent (stationary) initial condition
