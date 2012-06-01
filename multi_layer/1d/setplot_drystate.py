@@ -10,18 +10,18 @@ function setplot is called to set the plot parameters.
 import os
 
 import numpy as np
-import re
 
 import matplotlib
 import matplotlib.pyplot as mpl
 
-from visclaw import geoplot, colormaps
-from oldclawdata import Data
+from clawpack.pyclaw.solution import Solution
+from clawpack.visclaw import geoplot, colormaps
+from clawpack.clawutil.oldclawdata import Data
 
 # matplotlib.rcParams['figure.figsize'] = [6.0,10.0]
 
 #--------------------------
-def setplot(plotdata):
+def setplot(plotdata,rho,dry_tolerance,problem_type='rarefaction',wave_family=3):
 #--------------------------
     
     """ 
@@ -31,14 +31,14 @@ def setplot(plotdata):
     
     """
 
-    problem_data = Data(os.path.join(plotdata.outdir,'problem.data'))
+    # problem_data = Data(os.path.join(plotdata.outdir,'problem.data'))
 
     bathy_ref_lines = []
-    if problem_data.bathy_type == 1:
-        bathy_ref_lines.append(problem_data.bathy_location)
-    elif problem_data.bathy_type == 2:
-        bathy_ref_lines.append(problem_data.x0)
-        bathy_ref_lines.append(problem_data.x1)
+    # if problem_data.bathy_type == 1:
+    #     bathy_ref_lines.append(problem_data.bathy_location)
+    # elif problem_data.bathy_type == 2:
+    #     bathy_ref_lines.append(problem_data.x0)
+    #     bathy_ref_lines.append(problem_data.x1)
     
     def jump_afteraxes(current_data):
         # Plot position of jump on plot
@@ -47,33 +47,41 @@ def setplot(plotdata):
         mpl.plot([0.0,1.0],[0.0,0.0],'k--')
         mpl.hold(False)
         mpl.title('Layer Velocities')
+        
+    # Load bathymetery
+    b = Solution(0,path=plotdata.outdir,read_aux=True).state.aux[0,:]
 
     def bathy(current_data):
-        out_dir = current_data.plotdata.outdir
-        return np.loadtxt(os.path.join(out_dir,'fort.aux'),converters={0:(lambda x:float(re.compile("[Dd]").sub("e",x)))})
+        return b
+
+    def kappa(cd):
+        return Solution(cd.frameno,path=plotdata.outdir,read_aux=True).state.aux[4,:]
+
+    def wind(cd):
+        return Solution(cd.frameno,path=plotdata.outdir,read_aux=True).state.aux[1,:]
     
-    def eta_1(current_data):
-        r"""Top surface"""
-        h_1 = current_data.q[:,0]
-        return h_1 + eta_2(current_data)
+    def h_1(cd):
+        return cd.q[0,:] / rho[0]
+    
+    def h_2(cd):
+        return cd.q[2,:] / rho[1]
         
-    def eta_2(current_data):
-        r"""Middle surface"""
-        h_2 = current_data.q[:,2]
-        return h_2 + bathy(current_data)
+    def eta_2(cd):
+        return h_2(cd) + bathy(cd)
         
-    def u_1(current_data):
-        h_1 = current_data.q[:,0]
-        index = np.nonzero(h_1 > problem_data.dry_tolerance)
-        u_1 = np.zeros(h_1.shape)
-        u_1[index] = current_data.q[index,1]/h_1[index]
+    def eta_1(cd):
+        return h_1(cd) + eta_2(cd)
+        
+    def u_1(cd):
+        index = np.nonzero(h_1(cd) > dry_tolerance)
+        u_1 = np.zeros(h_1(cd).shape)
+        u_1[index] = cd.q[1,index] / cd.q[0,index]
         return u_1
         
-    def u_2(current_data):
-        h_2 = current_data.q[:,2]
-        index = np.nonzero(h_2 > problem_data.dry_tolerance)
-        u_2 = np.zeros(h_2.shape)
-        u_2[index] = current_data.q[index,3] / h_2[index]
+    def u_2(cd):
+        index = np.nonzero(h_2(cd) > dry_tolerance)
+        u_2 = np.zeros(h_2(cd).shape)
+        u_2[index] = cd.q[3,index] / cd.q[2,index]
         return u_2
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
@@ -84,21 +92,21 @@ def setplot(plotdata):
     ylimits_momentum = [-0.004,0.004]
     
     # Riemann problem
-    if problem_data.init_type == 0:
+    if problem_type == 'rarefaction':
         ylimits_depth = [-1.0,0.2]
         ylimits_depth_zoomed = ylimits_depth
         ylimits_velocities = [-0.75,0.75]
         ylimits_velocities_zoomed = ylimits_velocities
     # Idealized waves
-    elif problem_data.init_type == 1:
+    elif problem_type == 'dry_state':
         # External wave
-        if problem_data.wave_family == 4:
+        if wave_family == 4:
             ylimits_velocities = [-0.8,0.8]
             ylimits_depth = [-1.0,0.3]
             ylimits_depth_zoomed = [-1.0,0.4]
             ylimits_velocities_zoomed = [-0.1,0.75]
         # internal wave
-        elif problem_data.wave_family == 3:
+        elif wave_family == 3:
             ylimits_velocities = [-0.15,0.15] 
             ylimits_velocities_zoomed = ylimits_velocities
             ylimits_depth = [-1.0,0.2]
@@ -181,7 +189,7 @@ def setplot(plotdata):
         fig = mpl.gcf()
         fig.clf()
         
-        x = cd.grid.dimensions[0].center
+        x = cd.patch.dimensions[0].centers
         
         # Draw fill plot
         ax1 = fig.add_subplot(211)
