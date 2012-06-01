@@ -2,12 +2,11 @@
 
 import sys
 import os
-import re
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pyclaw.solution import Solution
-import visclaw.data as data
+from clawpack.pyclaw.solution import Solution
+import clawpack.visclaw.data as data
 
 rho = [1025.0,1045.0]
 eta_init = [0.0,-300.0]
@@ -90,7 +89,7 @@ def plot_contour(out_dir="./_output",num_layers=2,num_frames=1000,ref_lines=[-13
         axes.set_title("Contours of %s surface" % title[layer],fontsize=15)
         
     
-    file_name = "_".join((out_dir,"shelf_contour.png"))
+    file_name = os.path.join(out_dir,"shelf_contour.png")
     print "Writing out to %s" % file_name
     plt.savefig(file_name)
 
