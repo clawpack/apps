@@ -58,12 +58,10 @@ def wave_family(num_cells,eigen_method,wave_family,**kargs):
     solver.rp = riemann.rp1_layered_shallow_water
 
     # Set the before step functioning including the wind forcing
-    solver.before_step = lambda solver,solution:ml.solver.before_step(solver,
-                                                                      solution,
-                                                                      raise_on_fail=False)
+    solver.before_step = lambda solver,solution:ml.step.before_step(solver,solution)
                                             
     # Use simple friction source term
-    solver.step_source = ml.source.friction_source
+    solver.step_source = ml.step.friction_source
     
     
     # ============================

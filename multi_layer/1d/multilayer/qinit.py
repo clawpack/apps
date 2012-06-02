@@ -14,36 +14,22 @@ def set_riemann_init_condition(state,jump_location,q_left,q_right):
 
     x = state.grid.dimensions[0].centers
     mx = state.grid.dimensions[0].num_cells
-    for i in xrange(state.num_eqn):
-        state.q[i,:] = (x < jump_location) * q_left[i] * np.ones((mx)) + \
-                       (x >= jump_location) * q_right[i] * np.ones((mx))
+            
+    for m in xrange(state.num_eqn):
+        state.q[m,:] = (x < jump_location) * q_left[m] * np.ones((mx)) + \
+                       (x >= jump_location) * q_right[m] * np.ones((mx))
     
 
 def set_quiescent_init_condition(state):
     """Set a quiescent (stationary) initial condition
     
-    This assumes that you have already set the h hat values.
+    This assumes that you have already set the h hat values and the densities.
     """
-    q = [state.aux[h_hat_index[0],:] * state.problem_data['rho'][0],
-         state.aux[h_hat_index[1],:] * state.problem_data['rho'][1],
-         0.0,
-         0.0]
-    set_riemann_init_condition(state,0.5,q,q)
-    
-    
-def set_rarefaction_init_condition(state,jump_location,u_left,u_right):
-    """Set a rarefaction initial condition"""
+    state.q[0,:] = state.aux[h_hat_index[0],:] * state.problem_data['rho'][0]
+    state.q[1,:] = np.zeros((state.grid.dimensions[0].num_cells))
+    state.q[2,:] = state.aux[h_hat_index[1],:] * state.problem_data['rho'][1]
+    state.q[3,:] = np.zeros((state.grid.dimensions[0].num_cells))
 
-    q_left = [state.aux[h_hat_index[0],:] * state.problem_data['rho'][0],
-              u_left[0] * state.aux[h_hat_index[0],:] * state.problem_data['rho'][0],
-              state.aux[h_hat_index[1],:] * state.problem_data['rho'][1],
-              u_left[1] * state.aux[h_hat_index[1],:] * state.problem_data['rho'][1]]
-
-    q_right = [state.aux[h_hat_index[0],:] * state.problem_data['rho'][0],
-               u_right[0] * state.aux[h_hat_index[0],:] * state.problem_data['rho'][0],
-               state.aux[h_hat_index[1],:] * state.problem_data['rho'][1],
-               u_right[1] * state.aux[h_hat_index[1],:] * state.problem_data['rho'][1]]
-    set_riemann_init_condition(state,jump_location,q_left,q_right)
     
 
 def set_wave_family_init_condition(state,wave_family,jump_location,epsilon):

@@ -62,11 +62,11 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
     # Set the before step functioning including the wind forcing
     wind_func = lambda state:ml.aux.set_oscillatory_wind(state,
                                         A=5.0,N=2.0,omega=2.0,t_length=10.0)
-    solver.before_step = lambda solver,solution:ml.solver.before_step(solver,solution,
-                                            wind_func=wind_func,raise_on_fail=False)
+    solver.before_step = lambda solver,solution:ml.step.before_step(solver,solution,
+                                            wind_func=wind_func,raise_on_richardson=True)
                                             
     # Use simple friction source term
-    solver.step_source = ml.source.friction_source
+    solver.step_source = ml.step.friction_source
     
     # ============================
     # = Create Initial Condition =
@@ -122,7 +122,10 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
     # ==================
     # = Run Simulation =
     # ==================
-    state = controller.run()
+    try:
+        state = controller.run()
+    except ml.step.RichardsonExceededError as e:
+        print e
     
     # ============
     # = Plotting =

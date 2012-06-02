@@ -60,12 +60,11 @@ def jump_shelf(num_cells,eigen_method,**kargs):
     solver.rp = riemann.rp1_layered_shallow_water
 
     # Set the before step function
-    solver.before_step = lambda solver,solution:ml.solver.before_step(solver,
-                                                                      solution,
-                                                                      raise_on_fail=False)
+    solver.before_step = lambda solver,solution:ml.step.before_step(solver,
+                                                                    solution)
                                             
     # Use simple friction source term
-    solver.step_source = ml.source.friction_source
+    solver.step_source = ml.step.friction_source
 
     
     # ============================
@@ -188,12 +187,10 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
     solver.rp = riemann.rp1_layered_shallow_water
 
     # Set the before step function
-    solver.before_step = lambda solver,solution:ml.solver.before_step(solver,
-                                                                      solution,
-                                                                      raise_on_fail=False)
+    solver.before_step = lambda solver,solution:ml.step.before_step(solver,solution)
                                             
     # Use simple friction source term
-    solver.step_source = ml.source.friction_source
+    solver.step_source = ml.step.friction_source
 
     
     # ============================
@@ -278,7 +275,7 @@ if __name__ == "__main__":
     else:
         eig_methods = [1,2,3,4]
         
-    # for method in eig_methods:
-    #     jump_shelf(2000,method,iplot=False,htmlplot=True)
+    for method in eig_methods:
+        jump_shelf(2000,method,iplot=False,htmlplot=True)
     for method in eig_methods:
         sloped_shelf(2000,method,iplot=False,htmlplot=True)
