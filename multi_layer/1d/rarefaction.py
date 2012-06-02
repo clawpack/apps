@@ -34,6 +34,7 @@ def rarefaction(num_cells,eigen_method,entropy_fix,**kargs):
     else:
         import clawpack.pyclaw as pyclaw
 
+
     # =================
     # = Create Solver =
     # =================
@@ -69,6 +70,7 @@ def rarefaction(num_cells,eigen_method,entropy_fix,**kargs):
     # Use simple friction source term
     solver.step_source = ml.source.friction_source
     
+    
     # ============================
     # = Create Initial Condition =
     # ============================
@@ -98,12 +100,25 @@ def rarefaction(num_cells,eigen_method,entropy_fix,**kargs):
     solution.t = 0.0
     
     # Set aux arrays including bathymetry, wind field and linearized depths
+    eta = [0.0,-0.5]
     ml.aux.set_jump_bathymetry(solution.state,0.5,[-1.0,-1.0])
     ml.aux.set_no_wind(solution.state)
-    ml.aux.set_h_hat(solution.state,0.5,[0.0,-0.5],[0.0,-0.5])
+    ml.aux.set_h_hat(solution.state,0.5,eta,eta)
     
-    # Set sea at rest initial condition
-    ml.qinit.set_rarefaction_init_condition(state,0.5,[0.0,-0.5],[0.0,0.5])
+    # Set sea at rest initial condition with diverging velocities
+    u_left = [0.0,-0.5]
+    u_right = [0.0,0.5]
+    h_hat = [eta[0] - eta[1],eta[1] + 1.0]
+    q_left = [h_hat[0] * state.problem_data['rho'][0],
+              u_left[0] * h_hat[0] * state.problem_data['rho'][0],
+              h_hat[1] * state.problem_data['rho'][1],
+              u_left[1] * h_hat[1] * state.problem_data['rho'][1]]
+
+    q_right = [h_hat[0] * state.problem_data['rho'][0],
+               u_right[0] * h_hat[0] * state.problem_data['rho'][0],
+               h_hat[1] * state.problem_data['rho'][1],
+               u_right[1] * h_hat[1] * state.problem_data['rho'][1]]
+    ml.qinit.set_riemann_init_condition(state,0.5,q_left,q_right)
     
     
     # ================================

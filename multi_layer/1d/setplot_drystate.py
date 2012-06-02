@@ -21,7 +21,7 @@ from clawpack.clawutil.oldclawdata import Data
 # matplotlib.rcParams['figure.figsize'] = [6.0,10.0]
 
 #--------------------------
-def setplot(plotdata,rho,dry_tolerance,problem_type='rarefaction',wave_family=3):
+def setplot(plotdata,rho,dry_tolerance):
 #--------------------------
     
     """ 
@@ -90,27 +90,10 @@ def setplot(plotdata,rho,dry_tolerance,problem_type='rarefaction',wave_family=3)
     xlimits = [0.0,1.0]
     xlimits_zoomed = [0.45,0.55]
     ylimits_momentum = [-0.004,0.004]
-    
-    # Riemann problem
-    if problem_type == 'rarefaction':
-        ylimits_depth = [-1.0,0.2]
-        ylimits_depth_zoomed = ylimits_depth
-        ylimits_velocities = [-0.75,0.75]
-        ylimits_velocities_zoomed = ylimits_velocities
-    # Idealized waves
-    elif problem_type == 'dry_state':
-        # External wave
-        if wave_family == 4:
-            ylimits_velocities = [-0.8,0.8]
-            ylimits_depth = [-1.0,0.3]
-            ylimits_depth_zoomed = [-1.0,0.4]
-            ylimits_velocities_zoomed = [-0.1,0.75]
-        # internal wave
-        elif wave_family == 3:
-            ylimits_velocities = [-0.15,0.15] 
-            ylimits_velocities_zoomed = ylimits_velocities
-            ylimits_depth = [-1.0,0.2]
-            ylimits_depth_zoomed = ylimits_depth
+    ylimits_depth = [-1.0,0.2]
+    ylimits_depth_zoomed = ylimits_depth
+    ylimits_velocities = [-0.75,0.75]
+    ylimits_velocities_zoomed = ylimits_velocities
     
     # ========================================================================
     #  Fill plot
