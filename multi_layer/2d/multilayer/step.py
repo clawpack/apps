@@ -11,7 +11,7 @@ time step.
 
 import numpy as np
 
-from aux import set_no_wind,kappa_index
+from aux import set_no_wind,wind_index
 
 class NegativeDepthError(Exception):
     r"""Error raised when depth becomes negative in a layer"""
@@ -89,10 +89,10 @@ def before_step(solver,solution,wind_func=set_no_wind,dry_tolerance=1e-3,
         h[layer,...] = solution.q[layer_index,...] / rho[layer]
         wet_index = h[layer,...] > dry_tolerance
         u[layer,wet_index] = solution.q[layer_index+1,wet_index] / solution.q[layer_index,wet_index]
-    aux[kappa_index,:] = (u[0,...] - u[1,...])**2 / (g * one_minus_r * (h[0,...] + h[1,...]))
-    if np.any(aux[kappa_index,wet_index] > richardson_tolerance):
+    kappa = (u[0,...] - u[1,...])**2 / (g * one_minus_r * (h[0,...] + h[1,...]))
+    if np.any(kappa > richardson_tolerance):
         # Actually calculate where the indices failed
-        bad_indices = (aux[kappa_index,wet_index] > richardson_tolerance).nonzero()[0]
+        bad_indices = (kappa > richardson_tolerance).nonzero()[0]
         print "Hyperbolicity may have failed at the following points:"
         # for i in bad_indices:
         #     print "\tkappa(%s) = %s" % (i,aux[kappa_index,i+1])

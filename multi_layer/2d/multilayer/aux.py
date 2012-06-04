@@ -7,9 +7,10 @@ import numpy as np
 
 # Define aux array indices
 bathy_index = 0
-wind_index = 1
-h_hat_index = [2,3]
-kappa_index = 4
+wind_index = [3,4]
+pressure_index = 5
+h_hat_index = [6,7]
+vorticity_index = 9
 
 # ==============================================
 # = Sets values of h_hat for linearized solver =
