@@ -273,7 +273,7 @@ if __name__ == "__main__":
         for value in sys.argv[1:]:
             eig_methods.append(int(value))
     else:
-        eig_methods = [1,2,3,4]
+        eig_methods = [2]
         
     for method in eig_methods:
         jump_shelf(2000,method,iplot=False,htmlplot=True)

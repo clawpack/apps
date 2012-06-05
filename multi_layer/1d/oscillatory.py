@@ -141,4 +141,4 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
          
          
 if __name__ == "__main__":
-    oscillatory_wind(100,2,iplot=True,htmlplot=False)
+    oscillatory_wind(100,2,htmlplot=True)

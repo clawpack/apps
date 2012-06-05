@@ -144,4 +144,4 @@ def dry_state(num_cells,eigen_method,entropy_fix,**kargs):
 if __name__ == "__main__":
     # Run test case for eigen method = 2 turning on and off entropy fix
     # dry_state(500,2,True)
-    dry_state(500,2,False,iplot=True)
+    dry_state(500,2,False,htmlplot=True)

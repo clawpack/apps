@@ -151,4 +151,4 @@ def rarefaction(num_cells,eigen_method,entropy_fix,**kargs):
          file_format=controller.output_format,**plot_kargs)
 
 if __name__ == "__main__":
-    rarefaction(100,2,False,iplot=True,htmlplot=False)
+    rarefaction(100,2,False,iplot=False,htmlplot=True)
