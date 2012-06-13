@@ -11,15 +11,15 @@ import clawpack.visclaw.data as data
 rho = [1025.0,1045.0]
 eta_init = [0.0,-300.0]
 
-def plot_contour(out_dir="./_output",num_layers=2,num_frames=1000,ref_lines=[-130e3,-30e3]):
+def plot_contour(data_dir="./_output",out_dir='./',num_layers=2,num_frames=1000,ref_lines=[-130e3,-30e3],color=True):
     """Plot a contour plot of a shelf based simluation"""
     
     # Create plot data
     plot_data = data.ClawPlotData()
-    plot_data.outdir = out_dir
+    plot_data.outdir = data_dir
     
     # Read in bathymetry
-    sol = [Solution(0,path=out_dir,read_aux=True)]
+    sol = [Solution(0,path=data_dir,read_aux=True)]
     b = sol[0].state.aux[0,:]
     
     # Extract x coordinates, this assumes that these do not change through the
@@ -30,7 +30,7 @@ def plot_contour(out_dir="./_output",num_layers=2,num_frames=1000,ref_lines=[-13
     print "Reading in solutions..."
     for frame in xrange(1,num_frames):
         try:
-            sol.append(Solution(frame,path=out_dir))
+            sol.append(Solution(frame,path=data_dir))
         except IOError:
             # We have reached the last frame before given num_frames reached
             num_frames = frame - 1
@@ -58,17 +58,24 @@ def plot_contour(out_dir="./_output",num_layers=2,num_frames=1000,ref_lines=[-13
     X,T = np.meshgrid(x,t)
     
     # Plot the contours of each layer
-    clines = np.linspace(.025,.4,15)
+    clines_color = np.linspace(.025,.4,15)
+    clines_bw = np.linspace(-0.4,0.4,16)
     title = ['top','internal']
     print "Creating plots..."
-    fig = plt.figure(1,figsize=[10,8])
+    fig = plt.figure(figsize=[10,8])
     for layer in xrange(num_layers):
         axes = fig.add_subplot(1,num_layers,layer+1)
 
         # Plot positive and negative contours
         eta_plot = eta[:,layer,:] - eta_init[layer]
-        plot = axes.contour(X,T, eta_plot,clines,colors='r')
-        plot = axes.contour(X,T,-eta_plot,clines,colors='b',linestyle='dashed')
+        if color:
+            plot = axes.contour(X,T, eta_plot,clines_color,colors='r')
+            plot = axes.contour(X,T,-eta_plot,clines_color,colors='b')
+        else:
+            plot = axes.contour(X,T,eta_plot,clines_bw,colors='k',linestyle='dashed')
+            # plot = axes.contour(X,T, eta_plot,clines,colors='r')
+            # plot = axes.contour(X,T,-eta_plot,clines,colors='b',linestyle='dashed')
+            
         for ref_line in ref_lines:
             axes.plot([ref_line,ref_line],[0,2],'k--')
         
@@ -89,12 +96,20 @@ def plot_contour(out_dir="./_output",num_layers=2,num_frames=1000,ref_lines=[-13
         axes.set_title("Contours of %s surface" % title[layer],fontsize=15)
         
     
-    file_name = os.path.join(out_dir,"shelf_contour.png")
+    if color:
+        file_name = os.path.join(out_dir,"contour.png")
+    else:
+        file_name = os.path.join(out_dir,"contour_bw.png")
     print "Writing out to %s" % file_name
     plt.savefig(file_name)
 
 if __name__=="__main__":
     if len(sys.argv) > 1:
-        plot_contour(*sys.argv[1:])
+        plot_contour(sys.argv[1],ref_lines=[-130e3,-30e3],color=color)
     else:
-        plot_contour()
+        ref_lines = ( [-30e3], [-130e3,-30e3] )
+        for (i,shelf_type) in enumerate(['jump_shelf','sloped_shelf']):
+            path = os.path.join(os.environ['DATA_PATH'],shelf_type,'ml_e2_n2000_output')
+            out_path = os.path.join(os.environ['DATA_PATH'],shelf_type,'ml_e2_n2000_plots')
+            plot_contour(path,out_dir=out_path,ref_lines=ref_lines[i],color=True)
+            plot_contour(path,out_dir=out_path,ref_lines=ref_lines[i],color=False)
