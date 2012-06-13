@@ -77,7 +77,7 @@ def plot_contour(data_dir="./_output",out_dir='./',num_layers=2,num_frames=1000,
             # plot = axes.contour(X,T,-eta_plot,clines,colors='b',linestyle='dashed')
             
         for ref_line in ref_lines:
-            axes.plot([ref_line,ref_line],[0,2],'k--')
+            axes.plot([ref_line,ref_line],[0,2],'k:')
         
         # X ticks and labels
         axes.set_xticks([-300e3,-200e3,-100e3,-30e3])
