@@ -58,8 +58,7 @@ def plot_contour(data_dir="./_output",out_dir='./',num_layers=2,num_frames=1000,
     X,T = np.meshgrid(x,t)
     
     # Plot the contours of each layer
-    clines_color = np.linspace(.025,.4,15)
-    clines_bw = np.linspace(-0.4,0.4,16)
+    clines = np.linspace(.025,.4,8)
     title = ['top','internal']
     print "Creating plots..."
     fig = plt.figure(figsize=[10,8])
@@ -68,13 +67,8 @@ def plot_contour(data_dir="./_output",out_dir='./',num_layers=2,num_frames=1000,
 
         # Plot positive and negative contours
         eta_plot = eta[:,layer,:] - eta_init[layer]
-        if color:
-            plot = axes.contour(X,T, eta_plot,clines_color,colors='r')
-            plot = axes.contour(X,T,-eta_plot,clines_color,colors='b')
-        else:
-            plot = axes.contour(X,T,eta_plot,clines_bw,colors='k',linestyle='dashed')
-            # plot = axes.contour(X,T, eta_plot,clines,colors='r')
-            # plot = axes.contour(X,T,-eta_plot,clines,colors='b',linestyle='dashed')
+        plot = axes.contour(X,T,eta_plot, clines,colors='r')
+        plot = axes.contour(X,T,eta_plot,-clines,colors='b')
             
         for ref_line in ref_lines:
             axes.plot([ref_line,ref_line],[0,2],'k:')
@@ -96,20 +90,16 @@ def plot_contour(data_dir="./_output",out_dir='./',num_layers=2,num_frames=1000,
         axes.set_title("Contours of %s surface" % title[layer],fontsize=15)
         
     
-    if color:
-        file_name = os.path.join(out_dir,"contour.png")
-    else:
-        file_name = os.path.join(out_dir,"contour_bw.png")
+    file_name = os.path.join(out_dir,"contour.png")
     print "Writing out to %s" % file_name
     plt.savefig(file_name)
 
 if __name__=="__main__":
     if len(sys.argv) > 1:
-        plot_contour(sys.argv[1],ref_lines=[-130e3,-30e3],color=color)
+        plot_contour(sys.argv[1],ref_lines=[-130e3,-30e3],num_frames=300)
     else:
         ref_lines = ( [-30e3], [-130e3,-30e3] )
         for (i,shelf_type) in enumerate(['jump_shelf','sloped_shelf']):
             path = os.path.join(os.environ['DATA_PATH'],shelf_type,'ml_e2_n2000_output')
             out_path = os.path.join(os.environ['DATA_PATH'],shelf_type,'ml_e2_n2000_plots')
-            plot_contour(path,out_dir=out_path,ref_lines=ref_lines[i],color=True)
-            plot_contour(path,out_dir=out_path,ref_lines=ref_lines[i],color=False)
+            plot_contour(path,out_dir=out_path,ref_lines=ref_lines[i])

@@ -24,8 +24,9 @@ class NegativeDepthError(Exception):
 class RichardsonExceededError(Exception):
     r"""Error raised when the Richardson tolerance has been exceeded"""
     
-    def __init__(self,indices):
+    def __init__(self,indices,solution):
         self.indices = indices
+        self.solution = solution
         msg = "Richardson tolerance exceeded at indices %s" % indices
         super(RichardsonExceededError,self).__init__(msg)
 
@@ -97,7 +98,8 @@ def before_step(solver,solution,wind_func=set_no_wind,dry_tolerance=1e-3,
         for i in bad_indices:
             print "\tkappa(%s) = %s" % (i,aux[kappa_index,i+1])
         if raise_on_richardson:
-            raise RichardsonExceededError(bad_indices)
+            solution.aux = aux
+            raise RichardsonExceededError(bad_indices,solution)
 
 
 
