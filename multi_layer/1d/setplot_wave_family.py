@@ -135,7 +135,7 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
         
         # Create axes for each plot, sharing x axis
         depth_axes = fig.add_subplot(211)
-        vel_axes = fig.add_subplot(212,sharex=depth_axes)     # the velocity scale
+        vel_axes = fig.add_subplot(212) #,sharex=depth_axes)     # the velocity scale
         
         # Bottom layer
         depth_axes.fill_between(x,bathy(cd),eta_1(cd),color=plot.bottom_color)
@@ -149,9 +149,8 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
         depth_axes.plot(x,eta_1(cd),'k',linestyle=plot.surface_linestyle)
         
         # Remove ticks from top plot
-        locs,labels = mpl.xticks()
-        labels = ['' for i in xrange(len(locs))]
-        mpl.xticks(locs,labels)
+        num_ticks = len(depth_axes.xaxis.get_ticklocs())
+        depth_axes.xaxis.set_ticklabels(["" for n in xrange(num_ticks)])
         
         # ax1.set_title('')
         depth_axes.set_title('Wave Family %s Perturbation at t = %3.2f' % (wave_family,cd.t))
@@ -174,6 +173,10 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
         vel_axes.set_xlim(xlimits)
         vel_axes.set_ylim(ylimits_velocities)
         
+        # Add axis labels (not sure why this needs to be done)
+        # locs = vel_axes.xaxis.get_ticklocs()
+        # vel_axes.xaxis.set_ticklabels([str(loc) for loc in locs])
+        
         # This does not work on all versions of matplotlib
         try:
             mpl.subplots_adjust(hspace=0.1)
@@ -186,74 +189,64 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
     # ========================================================================
     #  Fill plot zoom
     # ========================================================================
-    plotfigure = plotdata.new_plotfigure(name='full_zoom',figno=1)
-    
-    def fill_zoom_afteraxes(cd):
-        mpl.title('Multilayer Surfaces at t = %3.2f' % cd.t)
-    
-    plotaxes = plotfigure.new_plotaxes()
-    plotaxes.axescmd = 'subplot(2,1,1)'
-    plotaxes.title = 'Multilayer Surfaces'
-    plotaxes.xlimits = xlimits_zoomed
-    plotaxes.ylimits = ylimits_depth_zoomed
-    plotaxes.afteraxes = fill_zoom_afteraxes
-     
-    # Top layer
-    plotitem = plotaxes.new_plotitem(plot_type='1d_fill_between')
-    plotitem.plot_var = eta_1
-    plotitem.plot_var2 = eta_2
-    plotitem.color = plot.top_color
-    plotitem.show = True
-    
-    # Bottom Layer
-    plotitem = plotaxes.new_plotitem(plot_type='1d_fill_between')
-    plotitem.plot_var = eta_2
-    plotitem.plot_var2 = bathy
-    plotitem.color = plot.bottom_color
-    plotitem.show = True
-    
-    # Plot bathy
-    plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    plotitem.plot_var = bathy
-    plotitem.color = 'k'
-    plotitem.plotstyle = plot.bathy_linestyle
-    plotitem.show = True
-    
-    # Plot line in between layers
-    plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    plotitem.plot_var = eta_2
-    plotitem.color = 'k'
-    plotitem.plotstyle = '+'
-    plotitem.show = True
-    
-    # Plot line on top layer
-    plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    plotitem.plot_var = eta_1
-    plotitem.color = 'k'
-    plotitem.plotstyle = 'x'
-    plotitem.show = True
-    
-    # Layer Velocities
-    plotaxes = plotfigure.new_plotaxes()
-    plotaxes.axescmd = 'subplot(2,1,2)'
-    plotaxes.title = "Layer Velocities"
-    plotaxes.xlimits = xlimits_zoomed
-    plotaxes.ylimits = ylimits_velocities_zoomed
-    plotaxes.afteraxes = jump_afteraxes
-    
-    # Bottom layer
-    plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    plotitem.plot_var = u_2
-    plotitem.color = 'b'
-    plotitem.plotstyle = '+-'
-    plotitem.show = True
+    plotfigure = plotdata.new_plotfigure(name='Depth and Momentum Zoomed',figno=1)
+    plotfigure.show = True
 
-    # Top layer
-    plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    plotitem.color = (0.2,0.8,1.0)
-    plotitem.plot_var = u_1
-    plotitem.plotstyle = 'x-'
-    plotitem.show = True
+    def twin_axes_zoomed(cd):
+        fig = mpl.gcf()
+        fig.clf()
+        
+        # Get x coordinate values
+        x = cd.patch.dimensions[0].centers
+        
+        # Create axes for each plot, sharing x axis
+        depth_axes = fig.add_subplot(211)
+        vel_axes = fig.add_subplot(212) #,sharex=depth_axes)     # the velocity scale
+        
+        # Bottom layer
+        depth_axes.fill_between(x,bathy(cd),eta_1(cd),color=plot.bottom_color)
+        # Top Layer
+        depth_axes.fill_between(x,eta_1(cd),eta_2(cd),color=plot.top_color)
+        # Plot bathy
+        depth_axes.plot(x,bathy(cd),color='k',linestyle=plot.bathy_linestyle)
+        # Plot internal layer
+        depth_axes.plot(x,eta_2(cd),'kx')
+        # Plot surface
+        depth_axes.plot(x,eta_1(cd),'k+')
+        
+        # Remove ticks from top plot
+        num_ticks = len(depth_axes.xaxis.get_ticklocs())
+        depth_axes.xaxis.set_ticklabels(["" for n in xrange(num_ticks)])
+        
+        # ax1.set_title('')
+        depth_axes.set_title('Wave Family %s Perturbation at t = %3.2f' % (wave_family,cd.t))
+        depth_axes.set_xlim(xlimits_zoomed)
+        depth_axes.set_ylim(ylimits_depth_zoomed)
+        # depth_axes.set_xlabel('x')
+        depth_axes.set_ylabel('Depth (m)')
+        
+        # Bottom layer velocity
+        bottom_layer = vel_axes.plot(x,u_2(cd),'k+',label="Bottom Layer Velocity")
+        # Top Layer velocity
+        top_layer = vel_axes.plot(x,u_1(cd),'bx',label="Top Layer velocity")
+
+        # Add legend
+        vel_axes.legend(loc=4)
+        vel_axes.set_title('')
+        # vel_axes.set_title('Layer Velocities')
+        vel_axes.set_ylabel('Velocities (m/s)')
+        vel_axes.set_xlabel('x (m)')
+        vel_axes.set_xlim(xlimits_zoomed)
+        vel_axes.set_ylim(ylimits_velocities_zoomed)
+        
+        # This does not work on all versions of matplotlib
+        try:
+            mpl.subplots_adjust(hspace=0.1)
+        except:
+            pass
+    
+    plotaxes = plotfigure.new_plotaxes()
+    plotaxes.afteraxes = twin_axes_zoomed
     
     # ========================================================================
     #  Momentum
@@ -283,6 +276,7 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
 
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
+    # plotdata.print_framenos = [0,25,50]      # list of frames to print
     plotdata.print_framenos = 'all'          # list of frames to print
     plotdata.print_fignos = 'all'            # list of figures to print
     plotdata.html = True                     # create html files of plots?

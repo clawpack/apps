@@ -11,12 +11,15 @@ from clawpack.pyclaw.plot import plot
 
 import multilayer as ml
         
-def wave_family(num_cells,eigen_method,wave_family,**kargs):
+def wave_family(num_cells,eigen_method,wave_family,dry_state=True,**kargs):
     r"""docstring for oscillatory_wind"""
 
     # Construct output and plot directory paths
     prefix = 'ml_e%s_n%s' % (eigen_method,num_cells)
-    name = 'idealized_%s' % wave_family
+    if dry_state:
+        name = 'dry_wave_%s' % wave_family
+    else:
+        name = 'wet_wave_%s' % wave_family
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers
@@ -93,7 +96,10 @@ def wave_family(num_cells,eigen_method,wave_family,**kargs):
     solution.t = 0.0
     
     # Set aux arrays including bathymetry, wind field and linearized depths
-    ml.aux.set_jump_bathymetry(solution.state,0.5,[-1.0,-0.2])
+    if dry_state:
+        ml.aux.set_jump_bathymetry(solution.state,0.5,[-1.0,-0.2])
+    else:
+        ml.aux.set_jump_bathymetry(solution.state,0.5,[-1.0,-1.0])
     ml.aux.set_no_wind(solution.state)
     ml.aux.set_h_hat(solution.state,0.5,[0.0,-0.6],[0.0,-0.6])
     
@@ -145,8 +151,21 @@ if __name__ == "__main__":
             eig_methods.append(int(value))
     else:
         eig_methods = [1,2,3,4]
-        
-    for method in eig_methods:
-        wave_family(500,method,3,iplot=False,htmlplot=True)
-    for method in eig_methods:
-        wave_family(500,method,4,iplot=False,htmlplot=True)
+
+    # Display runs
+    resolution = 500
+    for family in [3,4]:
+        for dry_state in [False,True]:
+            for method in eig_methods:
+                wave_family(resolution,method,family,dry_state,iplot=False,htmlplot=True)
+
+    # Resolutions for tests
+    # resolutions = [64,128,256,512,5000]
+
+    # Run for comparison runs
+    # for family in [3,4]:
+    #     for dry_state in [False,True]:
+    #         for method in eig_methods:
+    #             for resolution in resolutions:
+    #                 print "Running family=%s dry=%s eigen=%s resolution=%s" % (family,dry_state,method,resolution)
+    #                 wave_family(resolution,method,family,dry_state,iplot=False,htmlplot=False)
