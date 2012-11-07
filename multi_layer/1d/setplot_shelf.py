@@ -179,7 +179,7 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
     plotaxes = plotfigure.new_plotaxes()
     plotaxes.title = 'Full Depths'
     plotaxes.xlimits = xlimits
-    plotaxes.ylimtis = [-4100,100]
+    plotaxes.ylimits = [-4100,100]
     plotaxes.afteraxes = bathy_axes
     
     fill_items(plotaxes)
@@ -200,7 +200,7 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
         
         # Draw velocity and kappa plot
         vel_axes = fig.add_subplot(111)     # the velocity scale
-        kappa_axes = vel_axes.twinx()              # the kappa scale
+        # kappa_axes = vel_axes.twinx()              # the kappa scale
         
         # Bottom layer velocity
         bottom_layer = vel_axes.plot(x,u_2(cd),'k-',label="Bottom Layer Velocity")
@@ -208,21 +208,21 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
         top_layer = vel_axes.plot(x,u_1(cd),'b--',label="Top Layer velocity")
         
         # Kappa
-        kappa_line = kappa_axes.plot(x,kappa(cd),'r-.',label="Kappa")
-        kappa_axes.plot(x,np.ones(x.shape),'r:')
+        # kappa_line = kappa_axes.plot(x,kappa(cd),'r-.',label="Kappa")
+        # kappa_axes.plot(x,np.ones(x.shape),'r:')
 
         vel_axes.set_xlabel('km')
         mpl.xticks([-300e3,-200e3,-100e3,-30e3],[300,200,100,30],fontsize=15)
         
         for ref_line in bathy_ref_lines:
             vel_axes.plot([ref_line,ref_line],ylimits_velocities,'k:')
-        plot.add_legend(vel_axes,'Kappa',location=3,color='r',linestyle='-.')
+        # plot.add_legend(vel_axes,'Kappa',location=3,color='r',linestyle='-.')
         vel_axes.set_title("Layer Velocities and Kappa at t = %4.1f s" % cd.t)
         vel_axes.set_ylabel('Velocities (m/s)')
-        kappa_axes.set_ylabel('Kappa')
+        # kappa_axes.set_ylabel('Kappa')
         vel_axes.set_xlim(xlimits)
         vel_axes.set_ylim(ylimits_velocities)
-        kappa_axes.set_ylim(ylimits_kappa)
+        # kappa_axes.set_ylim(ylimits_kappa)
         
         try:
             mpl.subplots_adjust(hspace=0.1)
@@ -280,8 +280,8 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
 
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    # plotdata.print_framenos = 'all'          # list of frames to print
-    plotdata.print_framenos = [0,30,100,200,300]
+    plotdata.print_framenos = 'all'          # list of frames to print
+    # plotdata.print_framenos = [0,30,100,200,300]
     plotdata.print_fignos = 'all'            # list of figures to print
     plotdata.html = True                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
