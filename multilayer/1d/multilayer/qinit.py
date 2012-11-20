@@ -71,7 +71,7 @@ def set_wave_family_init_condition(state,wave_family,jump_location,epsilon):
             state.q[3,i] += rho[1] * epsilon * eig_value * alpha
 
 
-def set_gaussian_init_condition(state,A,location,sigma,internal_layer=False):
+def set_gaussian_init_condition(state,A,location,sigma,internal_layer=True):
     """Set initial condition to a gaussian hump of water
     
     Sets the condition for what should act like a shallow water wave.  If a
@@ -81,7 +81,15 @@ def set_gaussian_init_condition(state,A,location,sigma,internal_layer=False):
     # Set stationary initial state, perturb off of that
     set_quiescent_init_condition(state)
     
-    raise NotImplemented("Gaussian initial condition not yet implemented!")
+    rho = state.problem_data['rho']
+    x = state.grid.dimensions[0].centers
+
+    d_eta = A * np.exp(-((x - location) / sigma)**2)
+    if internal_layer:
+        state.q[0,:] -= rho[0] * d_eta
+        state.q[2,:] += rho[1] * d_eta
+    else:
+        state.q[0,:] += rho[0] * d_eta
     
 
 def set_acta_numerica_init_condition(state,epsilon):
