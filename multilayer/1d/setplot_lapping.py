@@ -43,7 +43,7 @@ import multilayer.plot as plot
 
 
 #--------------------------
-def setplot(plotdata,wave_family,rho,dry_tolerance):
+def setplot(plotdata,rho,dry_tolerance):
 #--------------------------
     
     """ 
@@ -105,23 +105,15 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
     # Window Settings
     xlimits = [0.0,1.0]
     xlimits_zoomed = [0.45,0.55]
-    ylimits_momentum = [-0.004,0.004]
+    ylimits_momentum = [-0.025,0.025]
     
-    # External wave
-    if wave_family == 4:
-        ylimits_velocities = [-0.8,0.8]
-        ylimits_depth = [-1.0,0.3]
-        ylimits_depth_zoomed = [-1.0,0.4]
-        ylimits_velocities_zoomed = [-0.1,0.75]
-    # internal wave
-    elif wave_family == 3:
-        ylimits_velocities = [-0.15,0.15] 
-        ylimits_velocities_zoomed = ylimits_velocities
-        ylimits_depth = [-1.0,0.2]
-        ylimits_depth_zoomed = ylimits_depth
+    ylimits_velocities = [-0.15,0.15] 
+    ylimits_velocities_zoomed = ylimits_velocities
+    ylimits_depth = [-1.0,0.2]
+    ylimits_depth_zoomed = ylimits_depth
     
     # ========================================================================
-    #  Depth and Momentum Plot
+    #  Depth and Velocity Plot
     # ========================================================================
     plotfigure = plotdata.new_plotfigure(name='Depth and Momentum',figno=14)
     plotfigure.show = True
@@ -153,7 +145,7 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
         depth_axes.xaxis.set_ticklabels(["" for n in xrange(num_ticks)])
         
         # ax1.set_title('')
-        depth_axes.set_title('Wave Family %s Perturbation at t = %3.2f' % (wave_family,cd.t))
+        depth_axes.set_title('Depths and Velocities at t = %3.2f' % (cd.t))
         depth_axes.set_xlim(xlimits)
         depth_axes.set_ylim(ylimits_depth)
         # depth_axes.set_xlabel('x')
@@ -219,7 +211,7 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
         depth_axes.xaxis.set_ticklabels(["" for n in xrange(num_ticks)])
         
         # ax1.set_title('')
-        depth_axes.set_title('Wave Family %s Perturbation at t = %3.2f' % (wave_family,cd.t))
+        depth_axes.set_title('Depths and Velocities at t = %3.2f' % (cd.t))
         depth_axes.set_xlim(xlimits_zoomed)
         depth_axes.set_ylim(ylimits_depth_zoomed)
         # depth_axes.set_xlabel('x')

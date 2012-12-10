@@ -94,12 +94,13 @@ def before_step(solver,solution,wind_func=set_no_wind,dry_tolerance=1e-3,
     if np.any(aux[kappa_index,wet_index] > richardson_tolerance):
         # Actually calculate where the indices failed
         bad_indices = (aux[kappa_index,wet_index] > richardson_tolerance).nonzero()[0]
-        print "Hyperbolicity may have failed at the following points:"
-        for i in bad_indices:
-            print "\tkappa(%s) = %s" % (i,aux[kappa_index,i+1])
         if raise_on_richardson:
             solution.aux = aux
             raise RichardsonExceededError(bad_indices,solution)
+        else:
+            print "Hyperbolicity may have failed at the following points:"
+            for i in bad_indices:
+                print "\tkappa(%s) = %s" % (i,aux[kappa_index,i])
 
 
 

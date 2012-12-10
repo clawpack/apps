@@ -93,12 +93,12 @@ def internal_lapping(num_cells,eigen_method,**kargs):
     solution.t = 0.0
     
     # Set aux arrays including bathymetry, wind field and linearized depths
-    ml.aux.set_sloped_shelf_bathymetry(solution.state,0.2,0.8,-1.0,-0.2)
+    ml.aux.set_sloped_shelf_bathymetry(solution.state,0.4,0.6,-1.0,-0.2)
     ml.aux.set_no_wind(solution.state)
     ml.aux.set_h_hat(solution.state,0.5,[0.0,-0.6],[0.0,-0.6])
     
     # Set initial condition
-    ml.qinit.set_gaussian_init_condition(solution.state,0.1,0.2,0.01,
+    ml.qinit.set_gaussian_init_condition(solution.state,0.2,0.2,0.01,
                                                         internal_layer=True)
     
     # ================================
@@ -141,12 +141,10 @@ if __name__ == "__main__":
         eig_methods = [1,2,3,4]
 
     # Resolutions for tests
-    # resolutions = [64,128,256,512,1024,5000]
+    resolutions = [64,128,256,512,1024,5000]
 
     # Run for comparison runs
-    eig_methods = [4]
-    resolutions = [500]
     for method in eig_methods:
         for resolution in resolutions:
             print "Running internal lapping, eigen=%s resolution=%s" % (method,resolution)
-            internal_lapping(resolution,method,iplot=True,htmlplot=False)
+            internal_lapping(resolution,method,iplot=False,htmlplot=True)

@@ -27,7 +27,7 @@ matplotlib.rcParams['xtick.labelsize'] = 12
 matplotlib.rcParams['ytick.labelsize'] = 12
 
 # DPI of output images
-matplotlib.rcParams['savefig.dpi'] = 100
+matplotlib.rcParams['savefig.dpi'] = 300
 
 # Need to do this after the above
 import matplotlib.pyplot as mpl
@@ -85,6 +85,18 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
         u_2 = np.zeros(h_2(cd).shape)
         u_2[index] = cd.q[3,index] / cd.q[2,index]
         return u_2
+        
+    def hu_1(cd):
+        index = np.nonzero(h_1(cd) > dry_tolerance)
+        hu_1 = np.zeros(h_1(cd).shape)
+        hu_1[index] = cd.q[1,index] / rho[0]
+        return hu_1
+        
+    def hu_2(cd):
+        index = np.nonzero(h_2(cd) > dry_tolerance)
+        hu_2 = np.zeros(h_2(cd).shape)
+        hu_2[index] = cd.q[3,index] / rho[1]
+        return hu_2
             
     # ========================================================================
     #  Labels    
@@ -118,6 +130,7 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
     xlimits_zoomed = [-30e3-1e3,-30e3+1e3]
     ylimits_surface_zoomed = [eta[0] - 0.5,eta[0] + 0.5]
     ylimits_internal_zoomed = [eta[1] - 2.5,eta[1] + 2.5] 
+    ylimits_momentum = [-40,10]
     # ylimits_velocities = [-1.0,1.0]
     ylimits_velocities = [-0.04,0.04]
     ylimits_kappa = [0.0,1.2]
@@ -183,11 +196,47 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
     plotaxes.afteraxes = bathy_axes
     
     fill_items(plotaxes)
+
+    # ========================================================================
+    #  Momentum
+    # ========================================================================
+    plotfigure = plotdata.new_plotfigure(name="momentum")
+    plotfigure.show = True
+    
+    def momentum_axes(cd):
+        km_labels(cd)
+        mpl.xticks([-300e3,-200e3,-100e3,-30e3],[300,200,100,30],fontsize=15)
+        mpl.xlabel('km')
+        mpl.title("Layer Momenta at t = %4.1f s" % cd.t)
+
+        mpl.legend(['Top Layer Momentum','Bottom Layer Momentum'],loc=4)
+    
+    plotaxes = plotfigure.new_plotaxes()
+    plotaxes.title = "Momentum"
+    plotaxes.xlimits = xlimits
+    plotaxes.ylimits = ylimits_momentum
+    plotaxes.afteraxes = momentum_axes
+    
+    # Top layer
+    plotitem = plotaxes.new_plotitem(plot_type='1d')
+    plotitem.plot_var = hu_1
+    plotitem.plotstyle = 'b-'
+    plotitem.show = True
+    
+    # Bottom layer 
+    plotitem = plotaxes.new_plotitem(plot_type='1d')
+    plotitem.plot_var = hu_2
+    plotitem.plotstyle = 'k--'
+    plotitem.show = True
     
     # ========================================================================
     #  Velocities with Kappa
     # ========================================================================
-    plotfigure = plotdata.new_plotfigure(name='Velocity and Kappa',figno=14)
+    include_kappa = False
+    if include_kappa:
+        plotfigure = plotdata.new_plotfigure(name='Velocity and Kappa',figno=14)
+    else:
+        plotfigure = plotdata.new_plotfigure(name='Velocities',figno=14)
     plotfigure.show = True
     # plotfigure.kwargs = {'figsize':(7,6)}
     
@@ -207,23 +256,30 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
         # Top Layer velocity
         top_layer = vel_axes.plot(x,u_1(cd),'b--',label="Top Layer velocity")
         
-        # Kappa
-        # kappa_line = kappa_axes.plot(x,kappa(cd),'r-.',label="Kappa")
-        # kappa_axes.plot(x,np.ones(x.shape),'r:')
+        if include_kappa:
+            # Kappa
+            kappa_line = kappa_axes.plot(x,kappa(cd),'r-.',label="Kappa")
+            kappa_axes.plot(x,np.ones(x.shape),'r:')
 
         vel_axes.set_xlabel('km')
         mpl.xticks([-300e3,-200e3,-100e3,-30e3],[300,200,100,30],fontsize=15)
         
         for ref_line in bathy_ref_lines:
             vel_axes.plot([ref_line,ref_line],ylimits_velocities,'k:')
-        # plot.add_legend(vel_axes,'Kappa',location=3,color='r',linestyle='-.')
-        vel_axes.set_title("Layer Velocities and Kappa at t = %4.1f s" % cd.t)
+        if include_kappa:
+            vel_axes.set_title("Layer Velocities and Kappa at t = %4.1f s" % cd.t)
+        else:
+            vel_axes.set_title("Layer Velocities at t = %4.1f s" % cd.t)
         vel_axes.set_ylabel('Velocities (m/s)')
-        # kappa_axes.set_ylabel('Kappa')
         vel_axes.set_xlim(xlimits)
         vel_axes.set_ylim(ylimits_velocities)
-        # kappa_axes.set_ylim(ylimits_kappa)
-        
+
+        if include_kappa:
+            plot.add_legend(vel_axes,'Kappa',location=3,color='r',linestyle='-.')
+            kappa_axes.set_ylabel('Kappa')
+            kappa_axes.set_ylim(ylimits_kappa)
+        else:
+            vel_axes.legend(loc=3)
         try:
             mpl.subplots_adjust(hspace=0.1)
         except:
@@ -280,8 +336,8 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
 
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    plotdata.print_framenos = 'all'          # list of frames to print
-    # plotdata.print_framenos = [0,30,100,200,300]
+    # plotdata.print_framenos = 'all'          # list of frames to print
+    plotdata.print_framenos = [0,30,100,200,300]
     plotdata.print_fignos = 'all'            # list of figures to print
     plotdata.html = True                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index

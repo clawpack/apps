@@ -277,5 +277,5 @@ if __name__ == "__main__":
         
     for method in eig_methods:
         jump_shelf(2000,method,iplot=False,htmlplot=True)
-    for method in eig_methods:
-        sloped_shelf(2000,method,iplot=False,htmlplot=True)
+    # for method in eig_methods:
+    #     sloped_shelf(2000,method,iplot=False,htmlplot=True)
