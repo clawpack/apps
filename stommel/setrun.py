@@ -121,8 +121,8 @@ def setrun(claw_pkg='geoclaw'):
 
     if clawdata.output_style==1:
         # Output nout frames at equally spaced times up to tfinal:
-        clawdata.tfinal = days2seconds(100.0)
-        clawdata.num_output_times = 100
+        clawdata.tfinal = days2seconds(400.0)
+        clawdata.num_output_times = 25
 
         clawdata.output_t0 = True  # output at initial (or restart) time?
         
@@ -137,6 +137,11 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.total_steps = 1
         clawdata.output_t0 = True
 
+    clawdata.output_format == 'ascii'      # 'ascii' or 'netcdf' 
+
+    clawdata.output_q_components = 'all'   # could be list such as [True,True]
+    clawdata.output_aux_components = 'none'  # could be list
+    clawdata.output_aux_onlyonce = True    # output aux arrays only at t0
 
 
     # ---------------------------------------------------
@@ -254,7 +259,7 @@ def setrun(claw_pkg='geoclaw'):
     # This must be a list of length maux, each element of which is one of:
     #   'center',  'capacity', 'xleft', or 'yleft'  (see documentation).
 
-    clawdata.aux_type = ['center','capacity','yleft','center','center','center',
+    clawdata.aux_type = ['center','center','yleft','center','center','center',
                          'center', 'center', 'center']
 
 
@@ -348,7 +353,7 @@ def setgeo(rundata):
     geodata.speed_tolerance = [1e10,1e10,1e10,1e10,1e10]
     geodata.deep_depth = 2.e2
     geodata.max_level_deep = 4
-    geodata.friction_forcing = 1
+    geodata.friction_forcing = True
     geodata.manning_coefficient = 1e-6
     geodata.friction_depth = 1.e10
 
