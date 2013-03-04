@@ -32,7 +32,7 @@ class RichardsonExceededError(Exception):
 
 
 
-def before_step(solver,solution,wind_func=set_no_wind,dry_tolerance=1e-3,
+def before_step(solver,state,wind_func=set_no_wind,dry_tolerance=1e-3,
                     richardson_tolerance=0.95,raise_on_negative=False,
                     raise_on_richardson=False):
     r"""
@@ -56,15 +56,15 @@ def before_step(solver,solution,wind_func=set_no_wind,dry_tolerance=1e-3,
     """
     
     # Extract relevant data
-    num_layers = solution.states[0].problem_data['num_layers']
-    rho = solution.states[0].problem_data['rho']
-    g = solution.states[0].problem_data['g']
-    one_minus_r = solution.states[0].problem_data['one_minus_r']
-    x = solution.states[0].grid.dimensions[0].centers
+    num_layers = state.problem_data['num_layers']
+    rho = state.problem_data['rho']
+    g = state.problem_data['g']
+    one_minus_r = state.problem_data['one_minus_r']
+    x = state.grid.dimensions[0].centers
     
     # State arrays
-    q = solution.states[0].q
-    aux = solution.states[0].aux
+    q = state.q
+    aux = state.aux
     
     # Zero out negative values
     for layer in xrange(num_layers):
@@ -80,23 +80,23 @@ def before_step(solver,solution,wind_func=set_no_wind,dry_tolerance=1e-3,
     
     
     # Set wind field
-    wind_func(solution.state)
+    wind_func(state)
     
     # Calculate kappa
     h = np.zeros((num_layers,q.shape[1]))
     u = np.zeros(h.shape)
     for layer in xrange(num_layers):
         layer_index = 2*layer
-        h[layer,:] = solution.q[layer_index,:] / rho[layer]
+        h[layer,:] = state.q[layer_index,:] / rho[layer]
         wet_index = h[layer,:] > dry_tolerance
-        u[layer,wet_index] = solution.q[layer_index+1,wet_index] / solution.q[layer_index,wet_index]
+        u[layer,wet_index] = state.q[layer_index+1,wet_index] / state.q[layer_index,wet_index]
     aux[kappa_index,:] = (u[0,:] - u[1,:])**2 / (g * one_minus_r * (h[0,:] + h[1,:]))
     if np.any(aux[kappa_index,wet_index] > richardson_tolerance):
         # Actually calculate where the indices failed
         bad_indices = (aux[kappa_index,wet_index] > richardson_tolerance).nonzero()[0]
         if raise_on_richardson:
-            solution.aux = aux
-            raise RichardsonExceededError(bad_indices,solution)
+            state.aux = aux
+            raise RichardsonExceededError(bad_indices,state)
         else:
             print "Hyperbolicity may have failed at the following points:"
             for i in bad_indices:
@@ -106,7 +106,6 @@ def before_step(solver,solution,wind_func=set_no_wind,dry_tolerance=1e-3,
 
 def friction_source(solver,state,dt,TOLERANCE=1e-30):
     r""""""
-    num_layers = state.problem_data['num_layers']
     manning = state.problem_data['manning']
     g = state.problem_data['g']
     rho = state.problem_data['rho']
