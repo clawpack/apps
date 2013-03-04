@@ -1,0 +1,29 @@
+Multi-Layer Shallow Water Examples - 1D
+
+This directory contains a number of examples for solving the two layer shallow
+water equations in one dimension using PyClaw.  If you have a valid install of 
+PyClaw you should be able to run the examples from this directory with some
+tweaks such as where you want the output and plots to go (set the DATA_PATH
+environment variable).
+
+Note that many of these scripts were set up to make nice movies and output 
+much more often than is probably necessary.  In fact the output takes up a
+significant ammount of the wall clock time (as does the plotting).
+
+Examples
+========
+ - Simple Waves (wave_family.py):  Test which uses a pertubation on a steady
+   state in only one wave family.  Also includes a jump in bathymetry at 
+   x = 0.5 which causes the bottom layer to become dry.
+ - Oscillatory Wind in a Bath Tub (oscillatory.py):  Test demonstrating loss
+   of hyperbolicity.  Starts with the water at rest and a wind field applied
+   over the course of the simulation.  The boundaries are implemented as wall
+   boundaries in multilayer/bc.py.
+ - Oceanic Shelf (shelf.py):  Tests involving oceanic scale flows with a shelf
+   represented with either a jump discontinuity or sloping transition.  The
+   initial condition is a small hump of water away from the shelf.  The file
+   shelf_contour.py plots contours of the entire simulation.
+ - All Rarefaction Test (rarefaction.py):  Example intialized with an all
+   rarefaction solution as the expected Riemann solution.
+ - Dry State Tests (dry_state.py):  Example of the entropy violating
+   rarefaction case.
