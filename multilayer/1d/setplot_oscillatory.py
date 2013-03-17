@@ -13,6 +13,7 @@ import numpy as np
 
 # Plot customization
 import matplotlib
+import matplotlib.pyplot as plt
 
 # Markers and line widths
 matplotlib.rcParams['lines.linewidth'] = 2.0
@@ -176,8 +177,10 @@ def setplot(plotdata,xlower,xupper,rho,dry_tolerance):
     plotaxes.title = "Wind Velocity"
     plotaxes.xlimits = xlimits
     plotaxes.ylimits = ylimits_wind
-    plotaxes.xlabel = "x (m)"
-    plotaxes.ylabel = "Velocity (m/s)"
+    def wind_afteraxes(cd):
+        plt.xlabel("x (m)")
+        plt.ylabel("Velocity (m/s)")
+    plotaxes.afteraxes = wind_afteraxes
     
     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
     plotitem.plot_var = wind
