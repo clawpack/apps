@@ -11,6 +11,7 @@ time step.
 
 import numpy as np
 
+import pyclaw.solution as solution
 from aux import set_no_wind,kappa_index
 
 class NegativeDepthError(Exception):
