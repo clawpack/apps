@@ -127,8 +127,8 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
         state = controller.run()
     except ml.step.RichardsonExceededError as e:
         print e
-        print "Writing out last solution available to frame %s." % str(len(controller.frames))
-        e.solution.write(len(controller.frames),path=controller.outdir,write_aux=True)
+        # print "Writing out last solution available to frame %s." % str(len(controller.frames))
+        # e.solution.write(len(controller.frames),path=controller.outdir,write_aux=True)
     
     # ============
     # = Plotting =
