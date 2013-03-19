@@ -21,7 +21,8 @@ PLOTDIR = _plots               # Directory for plots
 
 # Environment variable FC should be set to fortran compiler, e.g. gfortran
 FC ?= gfortran
-FFLAGS ?= -W -Wall -fbounds-check -pedantic-errors -Wunderflow -ffpe-trap=zero,overflow -g
+FFLAGS ?= -W -Wall -fbounds-check -pedantic-errors -Wunderflow -ffpe-trap=invald,zero,overflow -g
+
 
 # Include LAPACK library flags
 ifeq ($(shell uname), Darwin)
@@ -62,61 +63,52 @@ MODULES = \
  $(GEOLIB)/geoclaw_module.f90 \
  $(GEOLIB)/topo_module.f90 \
  $(GEOLIB)/dtopo_module.f90 \
- $(GEOLIB)/qinit_module.f90 \
  $(GEOLIB)/refinement_module.f90 \
  $(GEOLIB)/fixedgrids_module.f90 \
- $(GEOLIB)/multilayer/multilayer_module.f90
+ $(GEOLIB)/storm_surge/holland_storm_module.f90 \
+ $(GEOLIB)/storm_surge/constant_storm_module.f90 \
+ $(GEOLIB)/storm_surge/stommel_storm_module.f90 \
+ $(GEOLIB)/storm_surge/storm_module.f90 \
+ $(GEOLIB)/storm_surge/friction_module.f90 \
+ $(GEOLIB)/multilayer/multilayer_module.f90 \
+ $(GEOLIB)/multilayer/qinit_module.f90
 
-	# $(ML_PATH)/src/2d/hurricane.f90 \
-	# $(ML_PATH)/src/2d/setaux.f \
-	# $(ML_PATH)/src/2d/b4step2.f \
-	# $(ML_PATH)/src/2d/setprob.f90 \
-	# $(ML_PATH)/src/2d/src2.f90 \
-	# $(ML_PATH)/src/2d/src1d.f90 \
-	# $(ML_PATH)/src/2d/qinit.f90 \
-	# $(ML_PATH)/src/2d/valout.f \
-	# $(ML_PATH)/src/2d/flag2refine.f \
-	# $(ML_PATH)/src/2d/rpn2_inundation_multilayer.f90 \
-	# $(ML_PATH)/src/2d/rpt2_dry_multilayer.f90 \
-	# $(ML_PATH)/src/2d/multilayer_eigen.f90 \
-	# $(ML_PATH)/src/2d/tick.f \
-	# $(ML_PATH)/src/2d/stepgrid.f \
-	# $(ML_PATH)/src/2d/flux2fw.f \
-	#     $(ML_PATH)/src/2d/dumpgauge.f \
+	# May not need these anymore
+	# dumpgauge.f
+	# tick.f
 
 SOURCES = \
-  $(GEOLIB)/setprob.f90 \
-  $(GEOLIB)/qinit.f90 \
+  $(GEOLIB)/multilayer/b4step2.f90 \
+  $(GEOLIB)/multilayer/setaux.f90 \
+  $(GEOLIB)/multilayer/setprob.f90 \
+  $(GEOLIB)/multilayer/stepgrid.f \
+  $(GEOLIB)/multilayer/flux2fw.f \
+  $(GEOLIB)/multilayer/flag2refine2.f90 \
+  $(GEOLIB)/multilayer/qinit.f90 \
+  $(GEOLIB)/multilayer/valout.f \
+  $(GEOLIB)/multilayer/src2.f90 \
+  $(GEOLIB)/multilayer/src1d.f90 \
+  $(GEOLIB)/multilayer/rpn2_multilayer.f90 \
+  $(GEOLIB)/multilayer/rpt2_multilayer.f90 \
+  $(GEOLIB)/riemannsolvers.f \
+  $(GEOLIB)/tick.f \
   $(GEOLIB)/movetopo.f \
   $(GEOLIB)/cellgridintegrate.f \
   $(GEOLIB)/topointegral.f \
   $(GEOLIB)/bilinearintegral.f \
-  $(GEOLIB)/stepgrid.f \
-  $(GEOLIB)/rpn2.f \
-  $(GEOLIB)/riemannsolvers.f \
-  $(GEOLIB)/rpt2.f \
-  $(GEOLIB)/src2.f90 \
-  $(GEOLIB)/src1d.f90 \
   $(GEOLIB)/step2.f90 \
-  $(GEOLIB)/flux2fw.f \
   $(GEOLIB)/qad.f \
-  $(GEOLIB)/valout.f \
-  $(GEOLIB)/filval_new.f90 \
-  $(GEOLIB)/filpatch_new.f90 \
-  $(AMRLIB)/prefilp_new.f90 \
-  $(AMRLIB)/trimbd_new.f \
-  $(AMRLIB)/bound_new.f \
-  $(AMRLIB)/intfil_new.f \
+  $(GEOLIB)/filval.f90 \
+  $(GEOLIB)/filpatch.f90 \
+  $(AMRLIB)/prefilp.f90 \
+  $(AMRLIB)/trimbd.f \
+  $(AMRLIB)/bound.f \
+  $(AMRLIB)/intfil.f \
   $(GEOLIB)/bc2amr.f \
   $(GEOLIB)/update.f \
-  $(GEOLIB)/setaux.f90 \
-  $(GEOLIB)/flag2refine.f90  \
-  $(GEOLIB)/flag2refine2.f90  \
   $(GEOLIB)/allowflag.f90  \
-  $(GEOLIB)/b4step2.f90 \
   $(GEOLIB)/dumpgauge.f \
   $(GEOLIB)/upbnd.f  \
-  $(GEOLIB)/tick.f \
   $(GEOLIB)/setgrd.f \
   $(GEOLIB)/gfixup.f \
   $(GEOLIB)/ginit.f \
@@ -126,31 +118,25 @@ SOURCES = \
   $(AMRLIB)/quick_sort1.f \
   $(AMRLIB)/estdt.f \
   $(AMRLIB)/check4nans.f90 \
-  $(AMRLIB)/spest.f  \
   $(AMRLIB)/spest2.f  \
   $(AMRLIB)/init_iflags.f \
   $(AMRLIB)/igetsp.f \
   $(AMRLIB)/reclam.f \
   $(AMRLIB)/birect.f \
   $(AMRLIB)/cleanup.f \
-  $(AMRLIB)/colate.f \
   $(AMRLIB)/colate2.f \
   $(AMRLIB)/errest.f \
-  $(AMRLIB)/bufnst.f \
   $(AMRLIB)/bufnst2.f \
   $(AMRLIB)/errf1.f \
   $(AMRLIB)/fixcapaq.f \
-  $(AMRLIB)/flglvl.f \
   $(AMRLIB)/flglvl2.f \
   $(AMRLIB)/fluxad.f \
   $(AMRLIB)/fluxsv.f \
   $(AMRLIB)/grdfit2.f \
   $(AMRLIB)/moment.f \
-  $(AMRLIB)/nestck.f \
   $(AMRLIB)/nestck2.f \
   $(AMRLIB)/prepc.f \
   $(AMRLIB)/prepf.f \
-  $(AMRLIB)/projec.f \
   $(AMRLIB)/projec2.f \
   $(AMRLIB)/signs.f \
   $(AMRLIB)/findcut.f \
@@ -173,7 +159,6 @@ SOURCES = \
   $(AMRLIB)/fss.f \
   $(AMRLIB)/zeroin.f \
   $(AMRLIB)/setflags.f \
-  $(AMRLIB)/shiftset.f \
   $(AMRLIB)/shiftset2.f \
   $(AMRLIB)/conck.f \
   $(AMRLIB)/domshrink.f \
@@ -207,7 +192,6 @@ SOURCES = \
   $(AMRLIB)/init_alloc.f90 \
   $(AMRLIB)/restrt_alloc.f90 \
   $(AMRLIB)/resize_alloc.f90
-	
 	
 #-------------------------------------------------------------------
 # Include Makefile containing standard definitions and make options:
