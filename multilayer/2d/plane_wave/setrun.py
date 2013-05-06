@@ -305,6 +305,12 @@ def setrun(claw_pkg='geoclaw'):
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
     # rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
 
+
+    #------------------------------------------------------------------
+    # GeoClaw specific parameters:
+    #------------------------------------------------------------------
+    rundata = setgeo(rundata)
+
     return rundata
     # end of function setrun
     # ----------------------
@@ -319,55 +325,54 @@ def setgeo(rundata):
     """
 
     try:
-        geodata = rundata.geodata
+        geo_data = rundata.geo_data
     except:
-        print "*** Error, this rundata has no geodata attribute"
-        raise AttributeError("Missing geodata attribute")
+        print "*** Error, this rundata has no geo_data attribute"
+        raise AttributeError("Missing geo_data attribute")
 
     # == setgeo.data values ==
-
-    geodata.variable_dt_refinement_ratios = False
-
-    geodata.gravity = 9.81
-    geodata.coordinate_system = 1
-    geodata.earth_radius = 6367.5e3
+    geo_data.gravity = 9.81
+    geo_data.coordinate_system = 1
+    geo_data.earth_radius = 6367.5e3
 
     # Forcing options
-    geodata.coriolis_forcing = False
-    geodata.friction_forcing = True
-    geodata.manning_coefficient = 0.025
-    geodata.friction_depth = 20.0
+    geo_data.coriolis_forcing = False
+    geo_data.friction_forcing = True
+    geo_data.manning_coefficient = 0.025
+    geo_data.friction_depth = 20.0
+    geo_data.dry_tolerance = 1.e-3
 
     # == settsunami.data values ==
-    geodata.dry_tolerance = 1.e-3
-    geodata.wave_tolerance = 0.1
-    geodata.speed_tolerance = [0.25,0.5,1.0,2.0,3.0,4.0]
-    geodata.depthdeep = 2.e2
-    geodata.maxleveldeep = 4
+    refinement_data = rundata.refinement_data
+    refinement_data.wave_tolerance = 0.1
+    refinement_data.speed_tolerance = [0.25,0.5,1.0,2.0,3.0,4.0]
+    refinement_data.deep_depth = 2.e2
+    refinement_data.max_level_deep = 4
+    refinement_data.variable_dt_refinement_ratios = False
 
     # == settopo.data values ==
-    geodata.topofiles = []
+    rundata.topo_data.topofiles = []
     # for topography, append lines of the form
     #   [topotype, minlevel, maxlevel, t1, t2, fname]
-    geodata.topofiles.append([2, 1, 5, 0., 1e10, 'topo.data'])
+    rundata.topo_data.topofiles.append([2, 1, 5, 0., 1e10, 'topo.data'])
     
     # == setdtopo.data values ==
     # Unsupported in the multilayer case
-    geodata.dtopofiles = []
+    rundata.dtopo_data.dtopofiles = []
 
     # == setqinit.data values ==
-    qinitdata = rundata.qinitdata
+    qinit_data = rundata.qinit_data
     # Note that this is a different sort of perturbation from the single-layer
     # version.  These are idealized perturbations for the time being
-    qinitdata.qinit_type = 6
-    qinitdata.init_location = [0.25,0.25]
-    qinitdata.wave_family = 4
-    qinitdata.epsilon = 0.02
-    qinitdata.angle = 0.0
-    qinitdata.sigma = 0.02
+    qinit_data.qinit_type = 6
+    qinit_data.init_location = [0.25,0.25]
+    qinit_data.wave_family = 4
+    qinit_data.epsilon = 0.02
+    qinit_data.angle = 0.0
+    qinit_data.sigma = 0.02
 
     # == setfixedgrids.data values ==
-    geodata.fixedgrids = []
+    rundata.fixed_grid_data = []
     # for fixed grids append lines of the form
     # [t1,t2,noutput,x1,x2,y1,y2,xpoints,ypoints,\
     #  ioutarrivaltimes,ioutsurfacemax]
