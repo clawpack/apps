@@ -177,7 +177,8 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
         plotitem.color = 'k'
         plotitem.plotstyle = plot.surface_linestyle
         plotitem.show = True
-    
+
+
     # ========================================================================
     #  Full Depths
     # ========================================================================
@@ -210,12 +211,42 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
         mpl.title("Layer Momenta at t = %4.1f s" % cd.t)
 
         mpl.legend(['Top Layer Momentum','Bottom Layer Momentum'],loc=4)
-    
+
+    def inset_momentum_axes(cd):
+        r"""This does not refresh correctly..."""
+        fig = mpl.figure(cd.plotfigure.figno)
+        axes = fig.add_subplot(111)
+
+        # Plot main figure
+        axes.plot(cd.x, hu_1(cd), 'b-')
+        axes.plot(cd.x, hu_2(cd), 'k--')
+        axes.set_xlim(xlimits)
+        axes.set_ylim(ylimits_momentum)
+        momentum_axes(cd)
+
+        # Create inset plot
+        from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+        from mpl_toolkits.axes_grid1.inset_locator import mark_inset
+        inset_axes = zoomed_inset_axes(axes, 0.5, loc=3)
+        inset_axes.plot(cd.x, hu_1(cd), 'b-')
+        inset_axes.plot(cd.x, hu_2(cd), 'k--')
+        inset_axes.set_xticklabels([])
+        inset_axes.set_yticklabels([])
+        x_zoom = [-120e3,-30e3]
+        y_zoom = [-10,10]
+        inset_axes.set_xlim(x_zoom)
+        inset_axes.set_ylim(y_zoom)
+        mark_inset(axes, inset_axes, loc1=2, loc2=4, fc='none', ec="0.5")
+        # mpl.ion()
+        mpl.draw()
+        # mpl.show()
+
+
     plotaxes = plotfigure.new_plotaxes()
     plotaxes.title = "Momentum"
     plotaxes.xlimits = xlimits
     plotaxes.ylimits = ylimits_momentum
-    plotaxes.afteraxes = momentum_axes
+    plotaxes.afteraxes = inset_momentum_axes
     
     # Top layer
     plotitem = plotaxes.new_plotitem(plot_type='1d')
