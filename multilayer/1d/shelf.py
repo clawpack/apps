@@ -112,9 +112,11 @@ def jump_shelf(num_cells,eigen_method,**kargs):
     controller.solver = solver
     
     # Output parameters
-    controller.output_style = 1
-    controller.tfinal = 7200.0
-    controller.num_output_times = 300
+    # controller.output_style = 1
+    # controller.tfinal = 7200.0
+    # controller.num_output_times = 300
+    controller.output_style = 2
+    controller.out_times = [0.0,720.0,2400.0,4800.0,7200.0]
     controller.write_aux_init = True
     controller.outdir = outdir
     controller.write_aux = True
@@ -243,6 +245,7 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
     controller.output_style = 1
     controller.tfinal = 7200.0
     controller.num_output_times = 300
+
     controller.write_aux_init = True
     controller.outdir = outdir
     controller.write_aux = True
@@ -276,6 +279,6 @@ if __name__ == "__main__":
         eig_methods = [2]
         
     for method in eig_methods:
-        jump_shelf(2000,method,iplot=False,htmlplot=True)
+        jump_shelf(2000,method,iplot=True,htmlplot=False)
     # for method in eig_methods:
     #     sloped_shelf(2000,method,iplot=False,htmlplot=True)
