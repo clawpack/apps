@@ -75,6 +75,7 @@ def set_jump_bathymetry(state,jump_location,depths):
     state.aux[bathy_index,...] = (x < jump_location) * depths[0]  + \
                                (x >= jump_location) * depths[1]
                                
+
 def set_sloped_shelf_bathymetry(state,x0,x1,basin_depth,shelf_depth):
     r"""
     Set bathymetry to a simple shelf with a slope coming up from the basin
@@ -95,3 +96,9 @@ def set_sloped_shelf_bathymetry(state,x0,x1,basin_depth,shelf_depth):
     state.aux[bathy_index,...] = (x < x0) * basin_depth
     state.aux[bathy_index,...] += (x0 <= x) * (x < x1) * slope
     state.aux[bathy_index,...] += (x1 <= x) * shelf_depth
+
+def set_gaussian_bathymetry(state,depth,A,sigma,x0):
+    r"""Set bathymetry to a gaussian sill"""
+
+    x = state.grid.dimensions[0].centers
+    state.aux[bathy_index,...] = -(depth - A * np.exp(-(x - x0)**2 / sigma**2))
