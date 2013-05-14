@@ -154,8 +154,8 @@ def setplot(plotdata,rho,dry_tolerance):
     
     def bathy_axes(cd):
         # km_labels(cd)
-        mpl.xlabel('m')
-        mpl.ylabel('m')
+        mpl.xlabel('Depth (m)')
+        mpl.ylabel('x (m)')
         mpl.title("Depths at t=%2.1f" % cd.t)
         # mpl.xticks([-300e3,-200e3,-100e3,-30e3],[300,200,100,30],fontsize=15)
         # mpl.xlabel('km')
