@@ -27,6 +27,7 @@ matplotlib.rcParams['ytick.labelsize'] = 12
 
 # DPI of output images
 matplotlib.rcParams['savefig.dpi'] = 100
+# matplotlib.rcParams['savefig.dpi'] = 300 # Publication quality
 
 # Need to do this after the above
 import matplotlib.pyplot as mpl

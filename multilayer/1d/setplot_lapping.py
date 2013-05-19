@@ -27,6 +27,7 @@ matplotlib.rcParams['ytick.labelsize'] = 12
 
 # DPI of output images
 matplotlib.rcParams['savefig.dpi'] = 100
+# matplotlib.rcParams['savefig.dpi'] = 300 # Print quality
 
 # Need to do this after the above
 import matplotlib.pyplot as mpl
@@ -268,8 +269,8 @@ def setplot(plotdata,rho,dry_tolerance):
 
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    # plotdata.print_framenos = [0,25,50]      # list of frames to print
-    plotdata.print_framenos = 'all'          # list of frames to print
+    plotdata.print_framenos = [0,25,50]      # list of frames to print
+    # plotdata.print_framenos = 'all'          # list of frames to print
     plotdata.print_fignos = 'all'            # list of figures to print
     plotdata.html = True                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
