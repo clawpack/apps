@@ -26,6 +26,7 @@ matplotlib.rcParams['xtick.labelsize'] = 12
 matplotlib.rcParams['ytick.labelsize'] = 12
 
 # DPI of output images
+# matplotlib.rcParams['savefig.dpi'] = 300 # Publication quality
 matplotlib.rcParams['savefig.dpi'] = 100
 
 # Need to do this after the above
