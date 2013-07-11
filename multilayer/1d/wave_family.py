@@ -153,20 +153,20 @@ if __name__ == "__main__":
         eig_methods = [1,2,3,4]
 
     # Display runs
-    # resolution = 500
-    # for family in [3,4]:
-    #     for dry_state in [False,True]:
-    #         for method in eig_methods:
-    #             print "Running family=%s dry=%s eigen=%s resolution=%s" % (family,dry_state,method,resolution)
-    #             wave_family(resolution,method,family,dry_state,iplot=False,htmlplot=True)
-
-    # Resolutions for tests
-    resolutions = [64,128,256,512,1024,5000]
-
-    # Run for comparison runs
+    resolution = 500
     for family in [3,4]:
         for dry_state in [False,True]:
             for method in eig_methods:
-                for resolution in resolutions:
-                    print "Running family=%s dry=%s eigen=%s resolution=%s" % (family,dry_state,method,resolution)
-                    wave_family(resolution,method,family,dry_state,iplot=False,htmlplot=False)
+                print "Running family=%s dry=%s eigen=%s resolution=%s" % (family,dry_state,method,resolution)
+                wave_family(resolution,method,family,dry_state,iplot=False,htmlplot=True)
+
+    # Resolutions for tests
+    # resolutions = [64,128,256,512,1024,5000]
+
+    # Run for comparison runs
+    # for family in [3,4]:
+    #     for dry_state in [False,True]:
+    #         for method in eig_methods:
+    #             for resolution in resolutions:
+    #                 print "Running family=%s dry=%s eigen=%s resolution=%s" % (family,dry_state,method,resolution)
+    #                 wave_family(resolution,method,family,dry_state,iplot=False,htmlplot=False)

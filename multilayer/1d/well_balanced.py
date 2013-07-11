@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-r"""Runs idealized jump and sloped 1d shelf tests"""
+r"""Test case for well balancing"""
 
 import sys
+import numpy
 
 import clawpack.riemann as riemann
 import clawpack.clawutil.runclaw as runclaw
@@ -11,12 +12,12 @@ from clawpack.pyclaw.plot import plot
 
 import multilayer as ml
         
-def jump_shelf(num_cells,eigen_method,**kargs):
-    r"""Shelf test"""
+def smooth_test(eigen_method, dry=False, **kargs):
+    r"""Smooth well-balanced test"""
 
     # Construct output and plot directory paths
-    prefix = 'ml_e%s_n%s' % (eigen_method,num_cells)
-    name = 'jump_shelf'
+    prefix = 'ml_e%s_d%s' % (eigen_method,dry)
+    name = 'well_balancing_smooth'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers
@@ -51,8 +52,7 @@ def jump_shelf(num_cells,eigen_method,**kargs):
     # Boundary conditions
     # Use wall boundary condition at beach
     solver.bc_lower[0] = 1
-    solver.bc_upper[0] = 0
-    solver.user_bc_upper = ml.bc.wall_qbc_upper
+    solver.bc_upper[0] = 1
     solver.aux_bc_lower[0] = 1
     solver.aux_bc_upper[0] = 1
     
@@ -72,7 +72,7 @@ def jump_shelf(num_cells,eigen_method,**kargs):
     # ============================
     num_layers = 2
     
-    x = pyclaw.Dimension('x',-400e3,0.0,num_cells)
+    x = pyclaw.Dimension('x',0.0,10.0,200)
     domain = pyclaw.Domain([x])
     state = pyclaw.State(domain,2*num_layers,3+num_layers)
     state.aux[ml.aux.kappa_index,:] = 0.0
@@ -81,7 +81,7 @@ def jump_shelf(num_cells,eigen_method,**kargs):
     state.problem_data['g'] = 9.8
     state.problem_data['manning'] = 0.0
     state.problem_data['rho_air'] = 1.15
-    state.problem_data['rho'] = [1025.0,1045.0]
+    state.problem_data['rho'] = [0.98,1.0]
     state.problem_data['r'] = state.problem_data['rho'][0] / state.problem_data['rho'][1]
     state.problem_data['one_minus_r'] = 1.0 - state.problem_data['r']
     state.problem_data['num_layers'] = num_layers
@@ -96,12 +96,15 @@ def jump_shelf(num_cells,eigen_method,**kargs):
     solution.t = 0.0
     
     # Set aux arrays including bathymetry, wind field and linearized depths
-    ml.aux.set_jump_bathymetry(solution.state,-30e3,[-4000.0,-100.0])
+    ml.aux.set_gaussian_bathymetry(solution.state,10.0,5,numpy.sqrt(5/2),5.0)
     ml.aux.set_no_wind(solution.state)
-    ml.aux.set_h_hat(solution.state,0.5,[0.0,-300.0],[0.0,-300.0])
-    
+    if dry:
+        ml.aux.set_h_hat(solution.state,0.5,[0.0,-6.0],[0.0,-6.0])
+    else:
+        ml.aux.set_h_hat(solution.state,0.5,[0.0,-4.0],[0.0,-4.0])
+
     # Set perturbation to sea at rest
-    ml.qinit.set_acta_numerica_init_condition(solution.state,0.4)
+    ml.qinit.set_quiescent_init_condition(solution.state)
     
     
     # ================================
@@ -112,11 +115,9 @@ def jump_shelf(num_cells,eigen_method,**kargs):
     controller.solver = solver
     
     # Output parameters
-    # controller.output_style = 1
-    # controller.tfinal = 7200.0
-    # controller.num_output_times = 300
-    controller.output_style = 2
-    controller.out_times = [0.0,720.0,2400.0,4800.0,7200.0]
+    controller.output_style = 1
+    controller.tfinal = 10.0
+    controller.num_output_times = 1
     controller.write_aux_init = True
     controller.outdir = outdir
     controller.write_aux = True
@@ -129,22 +130,20 @@ def jump_shelf(num_cells,eigen_method,**kargs):
     # ============
     # = Plotting =
     # ============
-    plot_kargs = {"eta":[0.0,-300.0],
-                  "rho":solution.state.problem_data['rho'],
-                  "g":solution.state.problem_data['g'],
-                  "dry_tolerance":solution.state.problem_data['dry_tolerance'],
-                  "bathy_ref_lines":[-30e3]}
-    plot(setplot_path="./setplot_shelf.py",outdir=outdir,plotdir=plotdir,
-         htmlplot=kargs.get('htmlplot',False),iplot=kargs.get('iplot',False),
+    plot_kargs = {"rho":solution.state.problem_data['rho'],
+                  "dry_tolerance":solution.state.problem_data['dry_tolerance']}
+    plot(setplot_path="./setplot_well_balanced.py",outdir=outdir,
+         plotdir=plotdir, htmlplot=kargs.get('htmlplot',False),
+         iplot=kargs.get('iplot',False),
          file_format=controller.output_format,**plot_kargs)
 
-         
-def sloped_shelf(num_cells,eigen_method,**kargs):
-    r"""Shelf test"""
+
+def jump_test(eigen_method, dry=False, **kargs):
+    r"""Bathymetry with jump discontinuity"""
 
     # Construct output and plot directory paths
-    prefix = 'ml_e%s_n%s' % (eigen_method,num_cells)
-    name = 'sloped_shelf'
+    prefix = 'ml_e%s_d%s' % (eigen_method,dry)
+    name = 'well_balancing_jump'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers
@@ -157,8 +156,7 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
         import clawpack.petclaw as pyclaw
     else:
         import clawpack.pyclaw as pyclaw
-        
-    
+
     # =================
     # = Create Solver =
     # =================
@@ -180,8 +178,7 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
     # Boundary conditions
     # Use wall boundary condition at beach
     solver.bc_lower[0] = 1
-    solver.bc_upper[0] = 0
-    solver.user_bc_upper = ml.bc.wall_qbc_upper
+    solver.bc_upper[0] = 1
     solver.aux_bc_lower[0] = 1
     solver.aux_bc_upper[0] = 1
     
@@ -189,7 +186,8 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
     solver.rp = riemann.rp1_layered_shallow_water
 
     # Set the before step function
-    solver.before_step = lambda solver,solution:ml.step.before_step(solver,solution)
+    solver.before_step = lambda solver,solution:ml.step.before_step(solver,
+                                                                    solution)
                                             
     # Use simple friction source term
     solver.step_source = ml.step.friction_source
@@ -200,7 +198,7 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
     # ============================
     num_layers = 2
     
-    x = pyclaw.Dimension('x',-400e3,0.0,num_cells)
+    x = pyclaw.Dimension('x',0.0,10.0,200)
     domain = pyclaw.Domain([x])
     state = pyclaw.State(domain,2*num_layers,3+num_layers)
     state.aux[ml.aux.kappa_index,:] = 0.0
@@ -209,7 +207,7 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
     state.problem_data['g'] = 9.8
     state.problem_data['manning'] = 0.0
     state.problem_data['rho_air'] = 1.15
-    state.problem_data['rho'] = [1025.0,1045.0]
+    state.problem_data['rho'] = [0.98,1.0]
     state.problem_data['r'] = state.problem_data['rho'][0] / state.problem_data['rho'][1]
     state.problem_data['one_minus_r'] = 1.0 - state.problem_data['r']
     state.problem_data['num_layers'] = num_layers
@@ -224,14 +222,15 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
     solution.t = 0.0
     
     # Set aux arrays including bathymetry, wind field and linearized depths
-    x0 = -130e3
-    x1 = -30e3
-    ml.aux.set_sloped_shelf_bathymetry(solution.state,x0,x1,-4000.0,-100.0)
+    ml.aux.set_jump_bathymetry(solution.state,5.0,[-10.0,-5.0])
     ml.aux.set_no_wind(solution.state)
-    ml.aux.set_h_hat(solution.state,0.5,[0.0,-300.0],[0.0,-300.0])
-    
+    if dry:
+        ml.aux.set_h_hat(solution.state,0.5,[0.0,-6.0],[0.0,-6.0])
+    else:
+        ml.aux.set_h_hat(solution.state,0.5,[0.0,-4.0],[0.0,-4.0])
+
     # Set perturbation to sea at rest
-    ml.qinit.set_acta_numerica_init_condition(solution.state,0.4)
+    ml.qinit.set_quiescent_init_condition(solution.state)
     
     
     # ================================
@@ -243,9 +242,8 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
     
     # Output parameters
     controller.output_style = 1
-    controller.tfinal = 7200.0
-    controller.num_output_times = 300
-
+    controller.tfinal = 10.0
+    controller.num_output_times = 1
     controller.write_aux_init = True
     controller.outdir = outdir
     controller.write_aux = True
@@ -255,17 +253,14 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
     # ==================
     state = controller.run()
     
-    
     # ============
     # = Plotting =
     # ============
-    plot_kargs = {"eta":[0.0,-300.0],
-                  "rho":solution.state.problem_data['rho'],
-                  "g":solution.state.problem_data['g'],
-                  "dry_tolerance":solution.state.problem_data['dry_tolerance'],
-                  "bathy_ref_lines":[x0,x1]}
-    plot(setplot_path="./setplot_shelf.py",outdir=outdir,plotdir=plotdir,
-         htmlplot=kargs.get('htmlplot',False),iplot=kargs.get('iplot',False),
+    plot_kargs = {"rho":solution.state.problem_data['rho'],
+                  "dry_tolerance":solution.state.problem_data['dry_tolerance']}
+    plot(setplot_path="./setplot_well_balanced.py",outdir=outdir,
+         plotdir=plotdir, htmlplot=kargs.get('htmlplot',False),
+         iplot=kargs.get('iplot',False),
          file_format=controller.output_format,**plot_kargs)
 
 
@@ -277,8 +272,8 @@ if __name__ == "__main__":
             eig_methods.append(int(value))
     else:
         eig_methods = [2]
-        
-    for method in eig_methods:
-        jump_shelf(2000,method,iplot=True,htmlplot=False)
-    # for method in eig_methods:
-    #     sloped_shelf(2000,method,iplot=False,htmlplot=True)
+    
+    for dry in [True, False]:    
+        for method in eig_methods:
+            smooth_test(method, dry=dry, iplot=False, htmlplot=True)
+            jump_test(method, dry=dry, iplot=False, htmlplot=True)

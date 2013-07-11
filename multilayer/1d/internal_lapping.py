@@ -141,10 +141,18 @@ if __name__ == "__main__":
         eig_methods = [1,2,3,4]
 
     # Resolutions for tests
-    resolutions = [64,128,256,512,1024,5000]
 
-    # Run for comparison runs
+    # Display runs
+    resolution = 128
     for method in eig_methods:
-        for resolution in resolutions:
-            print "Running internal lapping, eigen=%s resolution=%s" % (method,resolution)
-            internal_lapping(resolution,method,iplot=False,htmlplot=True)
+        print "Running internal lapping, eigen=%s resolution=%s" % (method,resolution)
+        internal_lapping(resolution,method,iplot=False,htmlplot=True)
+
+    # # Resolutions for tests
+    # resolutions = [64,128,256,512,1024,5000]
+
+    # # Run for comparison runs
+    # for method in eig_methods:
+    #     for resolution in resolutions:
+    #         print "Running internal lapping, eigen=%s resolution=%s" % (method,resolution)
+    #         internal_lapping(resolution,method,iplot=False,htmlplot=True)
