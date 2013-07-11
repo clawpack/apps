@@ -66,25 +66,59 @@ y_labels = ['Depth','Top Velocity','Bottom Velocity']
 eigen_labels = ['linearized static','linearized dynamic',
                 'velocity difference','LAPACK']
 
-def row_output(field="",method="",order=""):
-    output = "|" + str(field).rjust(25)
-    output += " | " + str(method).rjust(25)
-    output += " | " + str(order).rjust(25)
-    output += " |\n"
+def row_output(field="",method="",order="",latex=False):
+    if latex:
+        column_delimiter = "&"
+        new_line = r"\\" + " \n"
+    else:
+        column_delimiter = r"|"
+        new_line = "\n"
+    output = column_delimiter + str(field).rjust(25)
+    output += " %s " % column_delimiter + str(method).rjust(25)
+    if isinstance(order,float):
+        output += " %s " % column_delimiter + str(round(order,2)).rjust(25)
+    else:
+        output += " %s " % column_delimiter + str(order).rjust(25)
+    output += " %s%s" % (column_delimiter, new_line)
     return output
 
-def make_table(methods,fields,order,title):
+
+def make_table(methods,fields,order,title,latex=False):
+    r"""Make a convergence table comparing each method"""
+
     output = "Convergence Orders - %s".center(80) % title
-    output += "\n"
-    output += "="*(25*3+9) + "\n"
-    output += row_output("Field","Method","Order")
-    output += "="*(25*3+9) + "\n"
+
+    if latex:
+        minor_row_delimiter = "\hline"
+        major_row_delimiter = "\hline \hline"
+        new_line = r"\\" + " \n"
+        output += "\n"
+        output += r"""\begin{table}[tb]
+    \label{table:convergence_%s}
+    \begin{center}
+        \begin{tabular}{|l|l|l|}""" % title
+        output += "\n"
+    else:
+        minor_row_delimiter = "-" * (25 * 3 + 9)
+        major_row_delimiter = "=" * (25 * 3 + 9)
+        new_line = "\n"
+    output += new_line
+    output += major_row_delimiter + new_line
+    output += row_output("Field","Method","Order",latex)
+    output += major_row_delimiter + new_line
     for (i,field) in enumerate(fields):
-        output += row_output(field,methods[0],order[i][0])
+        output += row_output(field,methods[0],order[i][0],latex)
         for (m,method) in enumerate(methods[1:]):
-            output += row_output("",method,order[i][m])
-        output += "-"*(25*3+9) + "\n"
+            output += row_output("",method,order[i][m],latex)
+        output += minor_row_delimiter + new_line
+
+    if latex:
+        output += """        
+        \end{tabular}
+    \end{center}
+\end{table}"""
     return output
+
 
 def extract_data(sol,rho=[0.95,1.0],dry_tolerance=1e-3):
     r"""Extract relevant quantities from solution object sol"""
@@ -116,7 +150,13 @@ def extract_data(sol,rho=[0.95,1.0],dry_tolerance=1e-3):
 
     return x,b,h,eta,u
 
-def create_convergence_plot(base_path,eigen_methods=[1,2,3,4],resolutions=[64]):
+
+def create_convergence_plot(base_path, eigen_methods=[1,2,3,4], 
+                                       resolutions=[64], 
+                                       table_file=None, latex_tables=False):
+    r"""Create plots comparing each eigenspace method 
+
+    """
 
     # Parameters
     fields = 4
@@ -161,7 +201,6 @@ def create_convergence_plot(base_path,eigen_methods=[1,2,3,4],resolutions=[64]):
     for field in xrange(fields):
         for (m,method) in enumerate(eigen_methods):
             order[field].append(-polyfit(np.log(resolutions),np.log(error[field,m,:]),1)[1])
-    print make_table(eigen_labels,plot_titles,order,base_path)
 
     # Create figures and axes
     figs_list = [plt.figure() for n in xrange(fields)]
@@ -189,6 +228,13 @@ def create_convergence_plot(base_path,eigen_methods=[1,2,3,4],resolutions=[64]):
         os.makedirs(out_path)
     for (i,fig) in enumerate(figs_list):
         fig.savefig(os.path.join(out_path,'.'.join((file_names[i],'pdf'))))        
+
+    # Make table, latex is saved to a file
+    if table_file:
+        table_file.write(make_table(eigen_labels,plot_titles,order,base_path,latex_tables))
+        table_file.write("\n"*2)
+    else:
+        print make_table(eigen_labels,plot_titles,order,base_path,latex_tables)
 
 
 def create_eigen_plot(base_path,eigen_methods=[1,2,3,4],resolution=64):
@@ -300,27 +346,26 @@ if __name__ == "__main__":
     eigen_methods = [1,2,3,4]
 
     # Create convergence plots
-    create_convergence_plot('wet_wave_3',eigen_methods=eigen_methods,resolutions=resolutions)
-    create_convergence_plot('wet_wave_4',eigen_methods=eigen_methods,resolutions=resolutions)
-    create_convergence_plot('dry_wave_3',eigen_methods=eigen_methods,resolutions=resolutions)
-    create_convergence_plot('dry_wave_4',eigen_methods=[1,2,4],resolutions=resolutions)
+    make_latex_tables = True
+    table_file = None
+    table_file = open('./convergence_tables.tex','w')
+    print "Writing tables to %s" % table_file.name
+    create_convergence_plot('wet_wave_3',eigen_methods=eigen_methods,resolutions=resolutions,table_file=table_file,latex_tables=make_latex_tables)
+    create_convergence_plot('wet_wave_4',eigen_methods=eigen_methods,resolutions=resolutions,table_file=table_file,latex_tables=make_latex_tables)
+    create_convergence_plot('dry_wave_3',eigen_methods=eigen_methods,resolutions=resolutions,table_file=table_file,latex_tables=make_latex_tables)
+    create_convergence_plot('dry_wave_4',eigen_methods=[1,2,4],resolutions=resolutions,table_file=table_file,latex_tables=make_latex_tables)
+    table_file.close()
 
-    # # Compare eigen_methods at each resolution
+    # Compare eigen_methods at each resolution
     for n in resolutions:
         create_eigen_plot('wet_wave_3',eigen_methods=eigen_methods,resolution=n)
         create_eigen_plot('wet_wave_4',eigen_methods=eigen_methods,resolution=n)
         create_eigen_plot('dry_wave_3',eigen_methods=eigen_methods,resolution=n)
         create_eigen_plot('dry_wave_4',eigen_methods=eigen_methods,resolution=n)
 
-    # # Compare resolutions of each eigen_method
+    # Compare resolutions of each eigen_method
     for method in eigen_methods:
         create_resolution_plot('wet_wave_3',method=method,resolutions=resolutions)
         create_resolution_plot('wet_wave_4',method=method,resolutions=resolutions)
         create_resolution_plot('dry_wave_3',method=method,resolutions=resolutions)
         create_resolution_plot('dry_wave_4',method=method,resolutions=resolutions)
-    
-
-
-
-
-

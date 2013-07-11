@@ -26,6 +26,7 @@ matplotlib.rcParams['xtick.labelsize'] = 12
 matplotlib.rcParams['ytick.labelsize'] = 12
 
 # DPI of output images
+# matplotlib.rcParams['savefig.dpi'] = 300 # Publication quality
 matplotlib.rcParams['savefig.dpi'] = 100
 
 # Need to do this after the above
@@ -174,8 +175,8 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
         vel_axes.set_ylim(ylimits_velocities)
         
         # Add axis labels (not sure why this needs to be done)
-        # locs = vel_axes.xaxis.get_ticklocs()
-        # vel_axes.xaxis.set_ticklabels([str(loc) for loc in locs])
+        locs = vel_axes.xaxis.get_ticklocs()
+        vel_axes.xaxis.set_ticklabels([str(loc) for loc in locs])
         
         # This does not work on all versions of matplotlib
         try:
@@ -239,6 +240,10 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
         vel_axes.set_xlim(xlimits_zoomed)
         vel_axes.set_ylim(ylimits_velocities_zoomed)
         
+        # Add axis labels (not sure why this needs to be done)
+        locs = vel_axes.xaxis.get_ticklocs()
+        vel_axes.xaxis.set_ticklabels([str(loc) for loc in locs])
+        
         # This does not work on all versions of matplotlib
         try:
             mpl.subplots_adjust(hspace=0.1)
@@ -276,8 +281,8 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
 
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    # plotdata.print_framenos = [0,25,50]      # list of frames to print
-    plotdata.print_framenos = 'all'          # list of frames to print
+    plotdata.print_framenos = [0,20,25,30,50]      # list of frames to print
+    # plotdata.print_framenos = 'all'          # list of frames to print
     plotdata.print_fignos = 'all'            # list of figures to print
     plotdata.html = True                     # create html files of plots?
     plotdata.html_homelink = '../README.html'   # pointer for top of index
