@@ -7,6 +7,22 @@ function setplot is called to set the plot parameters.
     
 """ 
 
+from clawpack.clawutil.data import ClawData
+setprob_data = ClawData()
+setprob_data.add_attribute('gamma')
+setprob_data.read('setprob.data')
+gamma = setprob_data.gamma
+
+def pressure(current_data):
+    q = current_data.q
+    rho = q[0,:,:]
+    u = q[1,:,:] / rho
+    v = q[2,:,:] / rho
+    E = q[3,:,:]
+    p = (gamma - 1.) * (E - 0.5*rho*(u**2 + v**2))
+    return p
+
+
 #--------------------------
 def setplot(plotdata):
 #--------------------------
@@ -24,10 +40,11 @@ def setplot(plotdata):
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
 
-    # Figure for pressure
+    # Figure for density
     # -------------------
 
     plotfigure = plotdata.new_plotfigure(name='Density', figno=0)
+    plotfigure.kwargs = {'figsize':(16,5)}
 
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes()
@@ -43,11 +60,13 @@ def setplot(plotdata):
     plotitem.schlieren_cmax = 1.0
     plotitem.plot_var = 0
     plotitem.add_colorbar = False
+    plotitem.colorbar_shrink = 0.7
     plotitem.show = True       # show on plot?
-    plotitem.amr_patchedges_show = [1,1,1]
+    plotitem.amr_patchedges_show = [0]
     
 
     plotfigure = plotdata.new_plotfigure(name='Tracer', figno=1)
+    plotfigure.kwargs = {'figsize':(16,5)}
 
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes()
@@ -68,30 +87,88 @@ def setplot(plotdata):
     plotitem.plot_var = 4
     plotitem.pcolor_cmap = colormaps.yellow_red_blue
     plotitem.add_colorbar = False
+    plotitem.colorbar_shrink = 0.7
     plotitem.show = True       # show on plot?
-    plotitem.amr_patchedges_show = [1,1,1]
+    plotitem.amr_patchedges_show = [0]
     
 
-    plotfigure = plotdata.new_plotfigure(name='Energy', figno=2)
+    plotfigure = plotdata.new_plotfigure(name='Pressure', figno=2)
+    plotfigure.kwargs = {'figsize':(16,5)}
+
 
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes()
     plotaxes.xlimits = 'auto'
     plotaxes.ylimits = 'auto'
-    plotaxes.title = 'Energy'
+    plotaxes.title = 'Pressure'
     plotaxes.scaled = True      # so aspect ratio is 1
     plotaxes.afteraxes = label_axes
 
     # Set up for item on these axes:
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
-    plotitem.pcolor_cmin = 2.
-    plotitem.pcolor_cmax=18.0
-    plotitem.plot_var = 3
-    plotitem.pcolor_cmap = colormaps.yellow_red_blue
-    plotitem.add_colorbar = False
+    plotitem.pcolor_cmin = 1.
+    plotitem.pcolor_cmax = 6.
+    plotitem.plot_var = pressure
+    cmap = colormaps.make_colormap({0.:'w', 0.5:'y', 0.8: 'b', 
+                0.9:'#ffaaaa', 1.:'#ff0000'})
+    plotitem.pcolor_cmap = cmap
+    plotitem.add_colorbar = True
+    plotitem.colorbar_shrink = 0.7
     plotitem.show = True       # show on plot?
-    plotitem.amr_patchedges_show = [1,1,1]
+    plotitem.amr_patchedges_show = [0]
     
+
+    plotfigure = plotdata.new_plotfigure(name='u-velocity', figno=3)
+    plotfigure.kwargs = {'figsize':(16,5)}
+
+    # Set up for axes in this figure:
+    plotaxes = plotfigure.new_plotaxes()
+    plotaxes.xlimits = 'auto'
+    plotaxes.ylimits = 'auto'
+    plotaxes.title = 'u-velocity'
+    plotaxes.scaled = True      # so aspect ratio is 1
+    plotaxes.afteraxes = label_axes
+
+    # Set up for item on these axes:
+    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    plotitem.pcolor_cmin = 1.
+    plotitem.pcolor_cmax = 2.
+    def u(current_data):
+        q = current_data.q
+        rho = q[0,:,:]
+        u = q[1,:,:] / rho
+        return u
+    plotitem.plot_var = u
+    #cmap = colormaps.make_colormap({0.:'w', 0.5:'y', 0.8: 'b', 
+    #            0.9:'#ffaaaa', 1.:'#ff0000'})
+    #plotitem.pcolor_cmap = cmap
+    plotitem.add_colorbar = True
+    plotitem.colorbar_shrink = 0.7
+    plotitem.show = True       # show on plot?
+    plotitem.amr_patchedges_show = [0]
+
+    # Figure for grid cells
+    plotfigure = plotdata.new_plotfigure(name='cells', figno=4)
+    plotfigure.kwargs = {'figsize':(16,5)}
+
+
+    # Set up for axes in this figure:
+    plotaxes = plotfigure.new_plotaxes()
+    plotaxes.xlimits = 'auto'
+    plotaxes.ylimits = 'auto'
+    plotaxes.title = 'Grid patches'
+    plotaxes.scaled = True
+
+    # Set up for item on these axes:
+    plotitem = plotaxes.new_plotitem(plot_type='2d_patch')
+    linecolors, bgcolors = colormaps.make_amrcolors(nlevels=4)
+    #plotitem.amr_patch_bgcolor = ['#ffeeee', '#eeeeff', '#eeffee', 'w']
+    plotitem.amr_patch_bgcolor = bgcolors
+    plotitem.amr_patchedges_color = linecolors
+    plotitem.amr_celledges_show = [1,0]
+    plotitem.amr_patchedges_show = [1]
+
+
 
     #-----------------------------------------
     # Figures for gauges

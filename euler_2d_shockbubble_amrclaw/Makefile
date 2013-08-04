@@ -158,3 +158,5 @@ SOURCES = \
 # Include Makefile containing standard definitions and make options:
 include $(CLAWMAKE)
 
+test:
+	echo $(FFLAGS)

@@ -24,13 +24,13 @@ def setrun(claw_pkg='amrclaw'):
     
     """ 
     
-    from clawpack.clawutil import clawdata 
+    from clawpack.clawutil import data 
     
     
     assert claw_pkg.lower() == 'amrclaw',  "Expected claw_pkg = 'amrclaw'"
 
     num_dim = 2
-    rundata = clawdata.ClawRunData(claw_pkg, num_dim)
+    rundata = data.ClawRunData(claw_pkg, num_dim)
 
     #------------------------------------------------------------------
     # Problem-specific parameters to be written to setprob.data:
@@ -278,12 +278,12 @@ def setrun(claw_pkg='amrclaw'):
     amrdata = rundata.amrdata
 
     # max number of refinement levels:
-    amrdata.amr_levels_max = 3
+    amrdata.amr_levels_max = 4
 
     # List of refinement ratios at each level (length at least amr_level_max-1)
-    amrdata.refinement_ratios_x = [4, 4, 2, 2]
-    amrdata.refinement_ratios_y = [4, 4, 2, 2]
-    amrdata.refinement_ratios_t = [4, 4, 2, 2]
+    amrdata.refinement_ratios_x = [4, 4, 4]
+    amrdata.refinement_ratios_y = [4, 4, 4]
+    amrdata.refinement_ratios_t = [4, 4, 4]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
@@ -298,7 +298,7 @@ def setrun(claw_pkg='amrclaw'):
     
     # Flag for refinement using routine flag2refine:
     amrdata.flag2refine = True      # use this?
-    amrdata.flag2refine_tol = 5.000000e-02  # tolerance used in this routine
+    amrdata.flag2refine_tol = 0.2  # tolerance used in this routine
     # User can modify flag2refine to change the criterion for flagging.
     # Default: check maximum absolute difference of first component of q
     # between a cell and each of its neighbors.
