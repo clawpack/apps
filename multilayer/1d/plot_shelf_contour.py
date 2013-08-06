@@ -12,7 +12,11 @@ rho = [1025.0,1045.0]
 eta_init = [0.0,-300.0]
 
 def plot_contour(data_dir="./_output",out_dir='./',num_layers=2,num_frames=1000,ref_lines=[-130e3,-30e3],color=True):
-    """Plot a contour plot of a shelf based simluation"""
+    """Plot a contour plot of a shelf based simluation
+
+    Note that to get a nice contour you may have to change the number of output
+    times a solution is written out in `shelf.py`
+    """
     
     # Create plot data
     plot_data = data.ClawPlotData()
