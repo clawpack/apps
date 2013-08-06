@@ -7,7 +7,7 @@ import sys
 
 import clawpack.riemann as riemann
 import clawpack.clawutil.runclaw as runclaw
-from clawpack.pyclaw.plot import plot
+import clawpack.pyclaw.plot as plot
 
 import multilayer as ml
         
@@ -61,7 +61,7 @@ def dry_state(num_cells,eigen_method,entropy_fix,**kargs):
     solver.aux_bc_upper[0] = 1
     
     # Set the Riemann solver
-    solver.rp = riemann.rp1_layered_shallow_water
+    solver.rp = riemann.layered_shallow_water_1D
 
     # Set the before step function
     solver.before_step = lambda solver,solution:ml.step.before_step(solver,solution)
@@ -137,9 +137,11 @@ def dry_state(num_cells,eigen_method,entropy_fix,**kargs):
     # ============
     plot_kargs = {'rho':solution.state.problem_data['rho'],
                   'dry_tolerance':solution.state.problem_data['dry_tolerance']}
-    plot(setplot_path="./setplot_drystate.py",outdir=outdir,plotdir=plotdir,
-         htmlplot=kargs.get('htmlplot',False),iplot=kargs.get('iplot',False),
-         file_format=controller.output_format,**plot_kargs)
+    plot.plot(setplot_path="./setplot_drystate.py", outdir=outdir, 
+              plotdir=plotdir, htmlplot=kargs.get('htmlplot',False), 
+              iplot=kargs.get('iplot',False),
+              file_format=controller.output_format,
+              **plot_kargs)
 
 if __name__ == "__main__":
     # Run test case for eigen method = 2 turning on and off entropy fix

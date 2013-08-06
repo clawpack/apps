@@ -33,8 +33,6 @@ matplotlib.rcParams['savefig.dpi'] = 100
 import matplotlib.pyplot as mpl
 
 from clawpack.pyclaw.solution import Solution
-from clawpack.visclaw import geoplot, colormaps
-from clawpack.clawutil.oldclawdata import Data
 
 from multilayer.aux import bathy_index,kappa_index,wind_index
 import multilayer.plot as plot

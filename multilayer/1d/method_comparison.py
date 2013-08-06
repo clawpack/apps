@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-r"""Plot convergence plots for wet and dry wave family tests."""
+r"""Plot convergence plots for wet and dry wave family tests.
+
+Note that in order to use this data the individual runs must be executed using
+`wave_family.py` and located at `$DATA_PATH`
+
+"""
 
 import os
 
@@ -338,6 +343,7 @@ def create_resolution_plot(base_path,method=2,resolutions=[64,128,256,512]):
     fig_list[0].savefig(os.path.join(out_path,'surfaces_m%s.pdf' % method))
     fig_list[1].savefig(os.path.join(out_path,'u_top_m%s.pdf' % method))
     fig_list[2].savefig(os.path.join(out_path,'u_bottom_m%s.pdf' % method))
+
 
 if __name__ == "__main__":
 

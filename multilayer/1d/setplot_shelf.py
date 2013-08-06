@@ -33,7 +33,6 @@ matplotlib.rcParams['savefig.dpi'] = 300
 import matplotlib.pyplot as mpl
 
 from clawpack.pyclaw.solution import Solution
-from clawpack.visclaw import geoplot, colormaps
 
 from multilayer.aux import bathy_index,kappa_index,wind_index
 import multilayer.plot as plot
@@ -213,7 +212,8 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
         mpl.legend(['Top Layer Momentum','Bottom Layer Momentum'],loc=4)
 
     def inset_momentum_axes(cd):
-        r"""This does not refresh correctly..."""
+
+        # TODO: This plot does not refresh correctly, skip the inset
         fig = mpl.figure(cd.plotfigure.figno)
         axes = fig.add_subplot(111)
 
@@ -246,7 +246,7 @@ def setplot(plotdata,eta=[0.0,-300.0],rho=[1025.0,1045.0],g=9.81,dry_tolerance=1
     plotaxes.title = "Momentum"
     plotaxes.xlimits = xlimits
     plotaxes.ylimits = ylimits_momentum
-    plotaxes.afteraxes = inset_momentum_axes
+    # plotaxes.afteraxes = inset_momentum_axes
     
     # Top layer
     plotitem = plotaxes.new_plotitem(plot_type='1d')
