@@ -4,7 +4,7 @@
 r"""Plot convergence plots for wet and dry wave family tests.
 
 Note that in order to use this data the individual runs must be executed using
-`wave_family.py` and located at `$DATA_PATH`
+`wave_family.py` and located at `$DATA_PATH`.
 
 """
 
