@@ -1,0 +1,21 @@
+Notes on converting a 4.x version to 5.0...
+
+Copy files from $CLAW/clawpack-4.x/book/...  
+  to corresponding directory in $CLAW/apps/fvmbook
+
+Copy apps/fvmbook/README_template.rst  new_directory/README.rst
+Modify this file based on what's in README.txt
+
+python $CLAW/clawutil/src/python/clawutil/conversion/convert46to50.py
+
+Fix Makefile based on what's in Makefile_4.x:
+  do not need driver.f
+  change to use Riemann solver from $(CLAW)/riemann/src/
+  for any local files, remove pointers to library version
+
+Fix setrun.py based on setrun.py_4.x:
+  if probdata is set, these lines must be copied over.
+
+Check all *.f files to make sure indices were properly reordered.
+
+Also need to modify calling sequences and declaration statements in qinit.f (and setaux.f, b4stepN.f, perhaps other routines in the directory) to remove maxmx, etc.
