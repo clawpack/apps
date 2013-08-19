@@ -146,9 +146,9 @@ def setrun(claw_pkg='classic'):
     # Time stepping:
     # --------------
 
-    # if dt_variable==1:  variable time steps used based on cfl_desired,
+    # if dt_variable==True:  variable time steps used based on cfl_desired,
     # if dt_variable==False: fixed time steps dt = dt_initial always used.
-    clawdata.dt_variable = 1
+    clawdata.dt_variable = True
     
     # Initial time step for variable dt.  
     # (If dt_variable==0 then dt=dt_initial for all steps)
