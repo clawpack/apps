@@ -17,5 +17,9 @@ Check all *.f files to make sure indices were properly reordered.
 
 Also need to modify calling sequences and declaration statements in qinit.f (and setaux.f, b4stepN.f, perhaps other routines in the directory) to remove maxmx, etc.
 
+Check if aux(*,...) appears in declaration, if so change to aux(maux,...)
+
+Check if there are tab characters in .f file and if so expand to spaces
+
 Copy $CLAW/apps/fvmbook/README_template.rst  new_directory/README.rst
 Modify this file based on what's in README.txt
