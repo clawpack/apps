@@ -3,7 +3,7 @@ c
 c
 c     =====================================================
       subroutine rpn2(ixy,maxm,meqn,mwaves,mbc,mx,ql,qr,auxl,auxr,
-     &                  wave,s,amdq,apdq)
+     &                  wave,s,amdq,apdq,num_aux)
 c     =====================================================
 c
 c     # Riemann solver for Burgers' equation in 2d:
@@ -26,12 +26,12 @@ c
 c
       implicit double precision (a-h,o-z)
 c
-      dimension wave(1-mbc:maxm+mbc, meqn, mwaves)
-      dimension    s(1-mbc:maxm+mbc, mwaves)
-      dimension   ql(1-mbc:maxm+mbc, meqn)
-      dimension   qr(1-mbc:maxm+mbc, meqn)
-      dimension  apdq(1-mbc:maxm+mbc, meqn)
-      dimension  amdq(1-mbc:maxm+mbc, meqn)
+      dimension wave(meqn, mwaves,1-mbc:maxm+mbc)
+      dimension    s(mwaves, 1-mbc:maxm+mbc)
+      dimension   ql(meqn, 1-mbc:maxm+mbc)
+      dimension   qr(meqn, 1-mbc:maxm+mbc)
+      dimension  apdq(meqn, 1-mbc:maxm+mbc)
+      dimension  amdq(meqn, 1-mbc:maxm+mbc)
       logical efix
       common /comrp/ theta
 c
@@ -46,20 +46,20 @@ c
 c
       do 10 i = 2-mbc, mx+mbc
 c        # wave is jump in q, speed comes from R-H condition:
-         wave(i,1,1) = ql(i,1) - qr(i-1,1)
-         s(i,1) = a*(qr(i-1,1) + ql(i,1))
+         wave(1,1,i) = ql(1,i) - qr(1,i-1)
+         s(1,i) = a*(qr(1,i-1) + ql(1,i))
 c
 c        # compute left-going and right-going flux differences:
 c        ------------------------------------------------------
 c
-         amdq(i,1) = dmin1(s(i,1), 0.d0) * wave(i,1,1)
-         apdq(i,1) = dmax1(s(i,1), 0.d0) * wave(i,1,1)
+         amdq(1,i) = dmin1(s(1,i), 0.d0) * wave(1,1,i)
+         apdq(1,i) = dmax1(s(1,i), 0.d0) * wave(1,1,i)
 c
          if (efix) then
 c           # entropy fix for transonic rarefactions:
-            if (qr(i-1,1).lt.0.d0 .and. ql(i,1).gt.0.d0) then
-               amdq(i,1) = - a*qr(i-1,1)**2
-               apdq(i,1) =   a*ql(i,1)**2
+            if (qr(1,i-1).lt.0.d0 .and. ql(1,i).gt.0.d0) then
+               amdq(1,i) = - a*qr(1,i-1)**2
+               apdq(1,i) =   a*ql(1,i)**2
                endif
             endif
    10   continue
