@@ -36,8 +36,8 @@ MODULES = \
 SOURCES = \
   qinit.f \
   setprob.f90 \
-  $(CLAW)/riemann/src/rpn2_burgers.f90 \
-  $(CLAW)/riemann/src/rpt2_burgers.f90 \
+  rpn2bu.f \
+  rpt2bu.f \
   $(CLAW)/classic/src/2d/setaux.f90 \
   $(CLAW)/classic/src/2d/driver.f90 \
   $(CLAW)/classic/src/2d/claw2ez.f \
