@@ -1,7 +1,7 @@
 
-.. _fvmbook_chapX_XX:
+.. _fvmbook_chap3/acousimple:
 
-TitleXX
+1D Acoustics with simple waves 
 ------------------------------------------
 
     
@@ -14,14 +14,14 @@ Converted to Clawpack 5.0 form in 2013.
         
 
 1d acoustics in a constant medium.
-          :math:`q_t + A q_x = 0`
+
+.. math:: q_t + A q_x = 0
+
 where
-          :math:`q(x,t) = \vector{ p(x,t)\\ u(x,t)}`
-and the coefficient matrix is
-          :math:`A = \begin{matrix}
-                        0         & K\\
-                        1/\rho & 0
-                        \end{matrix}.`
+
+.. math:: q(x,t) = (p(x,t),~ u(x,t))^T
+
+and the coefficient matrix is :math:`A = [0,K; 1/\rho,0]`.
          
 
 
