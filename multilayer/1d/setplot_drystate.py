@@ -32,11 +32,9 @@ matplotlib.rcParams['savefig.dpi'] = 100
 # Need to do this after the above
 import matplotlib.pyplot as mpl
 
-from clawpack.pyclaw.solution import Solution
-from clawpack.visclaw import geoplot, colormaps
-from clawpack.clawutil.oldclawdata import Data
+import clawpack.pyclaw.solution
 
-from multilayer.aux import bathy_index,kappa_index,wind_index
+from multilayer.aux import bathy_index, kappa_index
 import multilayer.plot as plot
 
 # matplotlib.rcParams['figure.figsize'] = [6.0,10.0]
@@ -51,15 +49,6 @@ def setplot(plotdata,rho,dry_tolerance):
     Output: a modified version of plotdata.
     
     """
-
-    # problem_data = Data(os.path.join(plotdata.outdir,'problem.data'))
-
-    bathy_ref_lines = []
-    # if problem_data.bathy_type == 1:
-    #     bathy_ref_lines.append(problem_data.bathy_location)
-    # elif problem_data.bathy_type == 2:
-    #     bathy_ref_lines.append(problem_data.x0)
-    #     bathy_ref_lines.append(problem_data.x1)
     
     def jump_afteraxes(current_data):
         # Plot position of jump on plot
@@ -70,20 +59,21 @@ def setplot(plotdata,rho,dry_tolerance):
         mpl.title('Layer Velocities')
         
     # Load bathymetery
-    b = Solution(0,path=plotdata.outdir,read_aux=True).state.aux[bathy_index,:]
-        
+    b = clawpack.pyclaw.solution.Solution(0, path=plotdata.outdir, 
+                                         read_aux=True).state.aux[bathy_index,:]
+
     def bathy(cd):
         return b
-    
+
     def kappa(cd):
         return Solution(cd.frameno,path=plotdata.outdir,read_aux=True).state.aux[kappa_index,:]
 
     def wind(cd):
         return Solution(cd.frameno,path=plotdata.outdir,read_aux=True).state.aux[wind_index,:]
-    
+
     def h_1(cd):
         return cd.q[0,:] / rho[0]
-    
+
     def h_2(cd):
         return cd.q[2,:] / rho[1]
         
@@ -119,7 +109,7 @@ def setplot(plotdata,rho,dry_tolerance):
     # ========================================================================
     #  Depth and Momentum Plot
     # ========================================================================
-    plotfigure = plotdata.new_plotfigure(name='Depth and Momentum',figno=14)
+    plotfigure = plotdata.new_plotfigure(name='Depth and Momentum')
     plotfigure.show = True
     
     def twin_axes(cd,xlimits):
@@ -182,82 +172,15 @@ def setplot(plotdata,rho,dry_tolerance):
     # ========================================================================
     #  Fill plot zoom
     # ========================================================================
-    plotfigure = plotdata.new_plotfigure(name='full_zoom',figno=1)
+    plotfigure = plotdata.new_plotfigure(name='full_zoom')
     
     plotaxes = plotfigure.new_plotaxes()
     plotaxes.afteraxes = lambda cd:twin_axes(cd,xlimits_zoomed)
     
-    # def fill_zoom_afteraxes(cd):
-    #         mpl.title('Multilayer Surfaces at t = %3.2f' % cd.t)
-    #     
-    #     plotaxes = plotfigure.new_plotaxes()
-    #     plotaxes.axescmd = 'subplot(2,1,1)'
-    #     plotaxes.title = 'Multilayer Surfaces'
-    #     plotaxes.xlimits = xlimits_zoomed
-    #     plotaxes.ylimits = ylimits_depth_zoomed
-    #     plotaxes.afteraxes = fill_zoom_afteraxes
-    #      
-    #     # Top layer
-    #     plotitem = plotaxes.new_plotitem(plot_type='1d_fill_between')
-    #     plotitem.plot_var = eta_1
-    #     plotitem.plot_var2 = eta_2
-    #     plotitem.color = plot.top_color
-    #     plotitem.show = True
-    #     
-    #     # Bottom Layer
-    #     plotitem = plotaxes.new_plotitem(plot_type='1d_fill_between')
-    #     plotitem.plot_var = eta_2
-    #     plotitem.plot_var2 = bathy
-    #     plotitem.color = plot.bottom_color
-    #     plotitem.show = True
-    #     
-    #     # Plot bathy
-    #     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    #     plotitem.plot_var = bathy
-    #     plotitem.color = 'k'
-    #     plotitem.plotstyle = plot.bathy_linestyle
-    #     plotitem.show = True
-    #     
-    #     # Plot line in between layers
-    #     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    #     plotitem.plot_var = eta_2
-    #     plotitem.color = 'k'
-    #     plotitem.plotstyle = '+'
-    #     plotitem.show = True
-    #     
-    #     # Plot line on top layer
-    #     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    #     plotitem.plot_var = eta_1
-    #     plotitem.color = 'k'
-    #     plotitem.plotstyle = 'x'
-    #     plotitem.show = True
-    #     
-    #     # Layer Velocities
-    #     plotaxes = plotfigure.new_plotaxes()
-    #     plotaxes.axescmd = 'subplot(2,1,2)'
-    #     plotaxes.title = "Layer Velocities"
-    #     plotaxes.xlimits = xlimits_zoomed
-    #     plotaxes.ylimits = ylimits_velocities_zoomed
-    #     plotaxes.afteraxes = jump_afteraxes
-    #     
-    #     # Bottom layer
-    #     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    #     plotitem.plot_var = u_2
-    #     plotitem.color = 'b'
-    #     plotitem.plotstyle = '+-'
-    #     plotitem.show = True
-    # 
-    #     # Top layer
-    #     plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    #     plotitem.color = (0.2,0.8,1.0)
-    #     plotitem.plot_var = u_1
-    #     plotitem.plotstyle = 'x-'
-    #     plotitem.show = True
-    
     # ========================================================================
     #  Momentum
     # ========================================================================
-    plotfigure = plotdata.new_plotfigure(name="momentum",figno=134)
+    plotfigure = plotdata.new_plotfigure(name="momentum")
     plotfigure.show = True
     
     plotaxes = plotfigure.new_plotaxes()
@@ -280,7 +203,7 @@ def setplot(plotdata,rho,dry_tolerance):
     # ========================================================================
     #  h-values
     # ========================================================================
-    plotfigure = plotdata.new_plotfigure(name='depths',figno=2)
+    plotfigure = plotdata.new_plotfigure(name='depths')
     plotfigure.show = False
     
     plotaxes = plotfigure.new_plotaxes()
@@ -334,55 +257,27 @@ def setplot(plotdata,rho,dry_tolerance):
     # ========================================================================
     #  Plot Layer Velocities
     # ========================================================================
-    # plotfigure = plotdata.new_plotfigure(name='velocities',figno=1)
-    # plotfigure.show = True
-    # 
-    # plotaxes = plotfigure.new_plotaxes()
-    # plotaxes.axescmd = 'subplot(1,2,1)'
-    # plotaxes.title = "Layer Velocities"
-    # plotaxes.xlimits = 'auto'
-    # plotaxes.ylimits = 'auto'
-    # 
-    # # Top layer
-    # plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    # plotitem.plot_var = u_1
-    # plotitem.color = 'b'
-    # plotitem.show = True
-    # 
-    # # Bottom layer
-    # plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    # plotitem.color = (0.2,0.8,1.0)
-    # plotitem.plot_var = u_2
-    # plotitem.show = True
+    plotfigure = plotdata.new_plotfigure(name='velocities')
+    plotfigure.show = False
     
-    # Wind plot
-    # plotaxes = plotfigure.new_plotaxes()
-    # plotaxes.axescmd = 'subplot(1,2,2)'
-    # plotaxes.title = "Wind Velocity"
-    # plotaxes.xlimits = 'auto'
-    # plotaxes.ylimits = 'auto'
-    # 
-    # plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    # plotitem.plot_var = 4
-    # plotitem.color = 'r'
-    # plotitem.show = True
+    plotaxes = plotfigure.new_plotaxes()
+    plotaxes.axescmd = 'subplot(1,2,1)'
+    plotaxes.title = "Layer Velocities"
+    plotaxes.xlimits = 'auto'
+    plotaxes.ylimits = 'auto'
     
-    # ========================================================================
-    #  Plot Wind Velocity
-    # ========================================================================
-    # plotfigure = plotdata.new_plotfigure(name='wind',figno=2)
-    # plotfigure.show = True
-    # 
-    # plotaxes = plotfigure.new_plotaxes()
-    # plotaxes.title = "Wind Velocity"
-    # plotaxes.xlimits = 'auto'
-    # plotaxes.ylimits = [-5.0,5.0]
-    # 
-    # plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
-    # plotitem.plot_var = 4
-    # plotitem.color = 'r'
-    # plotitem.show = True
+    # Top layer
+    plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
+    plotitem.plot_var = u_1
+    plotitem.color = 'b'
+    plotitem.show = True
     
+    # Bottom layer
+    plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
+    plotitem.color = (0.2,0.8,1.0)
+    plotitem.plot_var = u_2
+    plotitem.show = True
+
     # Parameters used only when creating html and/or latex hardcopy
     # e.g., via pyclaw.plotters.frametools.printframes:
 
