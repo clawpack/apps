@@ -60,7 +60,7 @@ def rarefaction(num_cells,eigen_method,entropy_fix,**kargs):
     solver.aux_bc_upper[0] = 1
     
     # Set the Riemann solver
-    solver.rp = riemann.rp1_layered_shallow_water
+    solver.rp = riemann.layered_shallow_water_1D
 
     # Set the before step function
     solver.before_step = lambda solver,solution:ml.step.before_step(solver,solution)

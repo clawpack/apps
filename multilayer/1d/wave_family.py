@@ -58,7 +58,7 @@ def wave_family(num_cells,eigen_method,wave_family,dry_state=True,**kargs):
     solver.aux_bc_upper[0] = 1
 
     # Set the Riemann solver
-    solver.rp = riemann.rp1_layered_shallow_water
+    solver.rp = riemann.layered_shallow_water_1D
 
     # Set the before step functioning including the wind forcing
     solver.before_step = lambda solver,solution:ml.step.before_step(solver,solution)
