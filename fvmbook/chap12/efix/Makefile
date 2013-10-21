@@ -35,7 +35,7 @@ MODULES = \
 
 SOURCES = \
   qinit.f \
-  $(CLAW)/riemann/src/rp1_burgers.f90 \
+  rp1_burgers.f90 \
   $(CLAW)/classic/src/1d/setprob.f \
   $(CLAW)/classic/src/1d/setaux.f \
   $(CLAW)/classic/src/1d/bc1.f \
