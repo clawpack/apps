@@ -57,7 +57,7 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
     solver.aux_bc_upper[0] = 1
     
     # Set the Riemann solver
-    solver.rp = riemann.rp1_layered_shallow_water
+    solver.rp = riemann.layered_shallow_water_1D
 
     # Set the before step functioning including the wind forcing
     wind_func = lambda state:ml.aux.set_oscillatory_wind(state,

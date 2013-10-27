@@ -5,13 +5,11 @@ Entropy Fix Examples with Burger's Eqn
 --------------------------------------------
 
     
-Example [book/chapX/XX] to accompany the book 
-`Finite Volume 
-Methods for Hyperbolic Problems <http://www.clawpack.org/book>`_
+Example [book/chap12/efix] to accompany the book 
+`Finite Volume Methods for Hyperbolic Problems <http://www.clawpack.org/book>`_
 by R. J. LeVeque.
 
 Converted to Clawpack 5.0 form in 2013.
-        
 
 Burgers' equation with a transonic rarefaction wave.
 
@@ -24,5 +22,5 @@ Then there is one grid cell with the value 0.5 at x=0 and a different
 weak solution is obtained.
 
 Note: The solution also looks much smoother if you set order=2 in setrun.py
-instead of order=1.
+instead of order=1. 
 

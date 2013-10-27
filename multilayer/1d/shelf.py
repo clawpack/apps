@@ -57,7 +57,7 @@ def jump_shelf(num_cells,eigen_method,**kargs):
     solver.aux_bc_upper[0] = 1
     
     # Set the Riemann solver
-    solver.rp = riemann.rp1_layered_shallow_water
+    solver.rp = riemann.layered_shallow_water_1D
 
     # Set the before step function
     solver.before_step = lambda solver,solution:ml.step.before_step(solver,
@@ -186,7 +186,7 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
     solver.aux_bc_upper[0] = 1
     
     # Set the Riemann solver
-    solver.rp = riemann.rp1_layered_shallow_water
+    solver.rp = riemann.layered_shallow_water_1D
 
     # Set the before step function
     solver.before_step = lambda solver,solution:ml.step.before_step(solver,solution)
@@ -279,6 +279,6 @@ if __name__ == "__main__":
         eig_methods = [2]
         
     for method in eig_methods:
-        jump_shelf(2000,method,iplot=True,htmlplot=False)
+        jump_shelf(2000,method,iplot=False,htmlplot=True)
     # for method in eig_methods:
     #     sloped_shelf(2000,method,iplot=False,htmlplot=True)

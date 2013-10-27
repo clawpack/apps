@@ -36,12 +36,12 @@ def setrun(claw_pkg='geoclaw'):
 
     """
 
-    from clawpack.clawutil import clawdata
+    from clawpack.clawutil import data
 
     assert claw_pkg.lower() == 'geoclaw',  "Expected claw_pkg = 'geoclaw'"
 
     num_dim = 2
-    rundata = clawdata.ClawRunData(claw_pkg, num_dim)
+    rundata = data.ClawRunData(claw_pkg, num_dim)
 
     #------------------------------------------------------------------
     # Problem-specific parameters to be written to setprob.data:
@@ -145,8 +145,8 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.output_format == 'ascii'      # 'ascii' or 'netcdf' 
 
     clawdata.output_q_components = 'all'   # could be list such as [True,True]
-    clawdata.output_aux_components = 'None' # could be list
-    clawdata.output_aux_onlyonce = True    # output aux arrays only at t0
+    clawdata.output_aux_components = 'all' # could be list
+    clawdata.output_aux_onlyonce = False    # output aux arrays only at t0
 
 
 
