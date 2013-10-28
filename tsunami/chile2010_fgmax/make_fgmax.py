@@ -23,9 +23,8 @@ def make_fgmax_grid():
               abs((my-1)*dy + ylower - yupper)
     tstart_max =   0.      # when to start monitoring max values
     tend_max = 1.e10       # when to stop monitoring max values
-    dt_for_max = 60.       # target time increment between updating max values
-    minlevel_for_max = 2   # which levels to monitor max on
-    minlevel_for_arrival = 2   # which levels to monitor arrival of tsunami
+    dt_check = 60.       # target time increment between updating max values
+    min_level_check = 2   # which levels to monitor 
     arrival_tol = 1.e-2        # tolerance for flagging arrival
 
 
@@ -37,9 +36,8 @@ def make_fgmax_grid():
     fid = open(fname,'w')
     fid.write("%g                 # tstart_max\n"  % tstart_max)
     fid.write("%g                 # tend_max\n"  % tend_max)
-    fid.write("%g                 # dt_for_max\n" % dt_for_max)
-    fid.write("%i                 # minlevel_for_max\n" % minlevel_for_max)
-    fid.write("%i                 # minlevel_for_arrival\n" % minlevel_for_arrival)
+    fid.write("%g                 # dt_check\n" % dt_check)
+    fid.write("%i                 # min_level_check\n" % min_level_check)
     fid.write("%g                 # arrival_tol\n" % arrival_tol)
 
     fid.write("%g  %g  %g                  # npts, mx, my \n" % (npts,mx,my))
@@ -64,18 +62,16 @@ def make_fgmax_transect():
     print "Creating fixed grid transect with  %s points" % npts
     tstart_max =   0.      # when to start monitoring max values
     tend_max = 1.e10       # when to stop monitoring max values
-    dt_for_max = 60.       # target time increment between updating max values
-    minlevel_for_max = 2   # which levels to monitor max on
-    minlevel_for_arrival = 2   # which levels to monitor arrival of tsunami
+    dt_check = 60.       # target time increment between updating max values
+    min_level_check = 2   # which levels to monitor 
     arrival_tol = 1.e-2        # tolerance for flagging arrival
 
     fname = 'fgmax_transect.txt'
     fid = open(fname,'w')
     fid.write("%g                 # tstart_max\n"  % tstart_max)
     fid.write("%g                 # tend_max\n"  % tend_max)
-    fid.write("%g                 # dt_for_max\n" % dt_for_max)
-    fid.write("%i                 # minlevel_for_max\n" % minlevel_for_max)
-    fid.write("%i                 # minlevel_for_arrival\n" % minlevel_for_arrival)
+    fid.write("%g                 # dt_check\n" % dt_check)
+    fid.write("%i                 # min_level_check\n" % min_level_check)
     fid.write("%g                 # arrival_tol\n" % arrival_tol)
 
     fid.write("%g                   # npts\n" % npts)

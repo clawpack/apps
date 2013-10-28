@@ -18,6 +18,8 @@ def make_plots(outdir='_output', plotdir='_plots'):
     plot_zeta_times = True
     plot_arrival_times = True
 
+    sea_level = 0.
+
     #clines_zeta = None  # can set to desired contours of zeta 
     clines_zeta = [0.01] + list(linspace(0.05,0.3,6)) + [0.5,1.0,10.0]
 
@@ -43,7 +45,7 @@ def make_plots(outdir='_output', plotdir='_plots'):
         raise Exception("cannot open %s" % fgmax_input_file)
 
     # skip some lines:
-    for i in range(6):
+    for i in range(5):
         line = fid.readline()
 
     line = fid.readline().split()
@@ -86,7 +88,8 @@ def make_plots(outdir='_output', plotdir='_plots'):
     h = where(eta_tilde > B, eta_tilde - B, 0.)
 
     # zeta = max h on land or max eta offshore:
-    zeta = where(B>0, h, eta_tilde)
+    zeta = where(B>sea_level, h, eta_tilde)
+    zeta = where(zeta > -1e20, zeta, sea_level)
 
     tzeta = reshape(d[:,4],(mx,my),order='F')  # Time maximum h recorded
     tzeta = ma.masked_where(tzeta < -1e50, tzeta)      

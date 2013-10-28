@@ -12,11 +12,10 @@ import matplotlib.pyplot as plt
 
 from clawpack.geoclaw import topotools
 
-# try:
-#     from setplotfg import setplotfg
-# except:
-#     print "Did not find setplotfg.py"
-#     setplotfg = None
+try:
+    TG32412 = np.loadtxt('32412_notide.txt')
+except:
+    print "*** Could not load DART data file"
 
 #--------------------------
 def setplot(plotdata):
@@ -44,38 +43,6 @@ def setplot(plotdata):
         gaugetools.plot_gauge_locations(current_data.plotdata, \
              gaugenos='all', format_string='ko', add_labels=True)
     
-    # ========================================================================
-    #  Water helper functions
-    # ========================================================================
-    def b(cd):
-        return cd.q[3,:,:] - cd.q[0,:,:]
-        
-    def extract_eta(h,eta,DRY_TOL=10**-3):
-        index = np.nonzero((np.abs(h) < DRY_TOL) + (h == np.nan))
-        eta[index[0],index[1]] = np.nan
-        return eta
-    
-    def extract_velocity(h,hu,DRY_TOL=10**-8):
-        u = np.zeros(hu.shape)
-        index = np.nonzero((np.abs(h) > DRY_TOL) * (h != np.nan))
-        u[index[0],index[1]] = hu[index[0],index[1]] / h[index[0],index[1]]
-        return u
-    
-    def eta(cd):
-        return extract_eta(cd.q[0,:,:],cd.q[3,:,:])
-        
-    def water_u(cd):
-        return extract_velocity(cd.q[0,:,:],cd.q[1,:,:])
-        
-    def water_v(cd):
-        return extract_velocity(cd.q[0,:,:],cd.q[2,:,:])
-        
-    def water_speed(current_data):
-        u = water_u(current_data)
-        v = water_v(current_data)
-            
-        return np.sqrt(u**2+v**2)
-
 
     #-----------------------------------------
     # Figure for surface
@@ -99,65 +66,11 @@ def setplot(plotdata):
 
     # Water
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
-    # plotitem.plot_var = geoplot.surface
+    #plotitem.plot_var = geoplot.surface
     plotitem.plot_var = geoplot.surface_or_depth
     plotitem.pcolor_cmap = geoplot.tsunami_colormap
-    plotitem.pcolor_cmin = -0.2e0
-    plotitem.pcolor_cmax = 0.2e0
-    plotitem.add_colorbar = True
-    plotitem.amr_celledges_show = [0,0,0]
-    plotitem.patchedges_show = 1
-
-    # Land
-    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
-    plotitem.plot_var = geoplot.land
-    plotitem.pcolor_cmap = geoplot.land_colors
-    plotitem.pcolor_cmin = 0.0
-    plotitem.pcolor_cmax = 100.0
-    plotitem.add_colorbar = False
-    plotitem.amr_celledges_show = [0,0,0]
-    plotitem.patchedges_show = 1
-    plotaxes.xlimits = [-120,-60]
-    plotaxes.ylimits = [-60,0]
-
-    # add contour lines of bathy if desired:
-    plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
-    plotitem.show = False
-    plotitem.plot_var = geoplot.topo
-    plotitem.contour_levels = linspace(-3000,-3000,1)
-    plotitem.amr_contour_colors = ['y']  # color on each level
-    plotitem.kwargs = {'linestyles':'solid','linewidths':2}
-    plotitem.amr_contour_show = [1,0,0]  
-    plotitem.celledges_show = 0
-    plotitem.patchedges_show = 0
-
-    #-----------------------------------------
-    # Figure for velocities
-    #-----------------------------------------
-    plotfigure = plotdata.new_plotfigure(name='Speeds', figno=1)
-    plotfigure.show = False
-
-    # Set up for axes in this figure:
-    plotaxes = plotfigure.new_plotaxes('speeds')
-    plotaxes.title = 'Speeds'
-    plotaxes.scaled = True
-
-    def fixup(current_data):
-        import pylab
-        addgauges(current_data)
-        t = current_data.t
-        t = t / 3600.  # hours
-        pylab.title('Speeds at %4.2f hours' % t, fontsize=20)
-        pylab.xticks(fontsize=15)
-        pylab.yticks(fontsize=15)
-    plotaxes.afteraxes = fixup
-
-    # Speed
-    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
-    plotitem.plot_var = water_speed
-    plotitem.pcolor_cmap = plt.get_cmap('PuBu')
-    plotitem.pcolor_cmin = 0.0
-    plotitem.pcolor_cmax = 0.01
+    plotitem.pcolor_cmin = -0.2
+    plotitem.pcolor_cmax = 0.2
     plotitem.add_colorbar = True
     plotitem.amr_celledges_show = [0,0,0]
     plotitem.patchedges_show = 1
@@ -174,11 +87,22 @@ def setplot(plotdata):
     plotaxes.xlimits = [-120,-60]
     plotaxes.ylimits = [-60,0]
 
+    # add contour lines of bathy if desired:
+    plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
+    plotitem.show = False
+    plotitem.plot_var = geoplot.topo
+    plotitem.contour_levels = linspace(-3000,-3000,1)
+    plotitem.amr_contour_colors = ['y']  # color on each level
+    plotitem.kwargs = {'linestyles':'solid','linewidths':2}
+    plotitem.amr_contour_show = [1,0,0]  
+    plotitem.celledges_show = 0
+    plotitem.patchedges_show = 0
+
 
     #-----------------------------------------
     # Figures for gauges
     #-----------------------------------------
-    plotfigure = plotdata.new_plotfigure(name='Surface & topo', figno=300, \
+    plotfigure = plotdata.new_plotfigure(name='Surface at gauges', figno=300, \
                     type='each_gauge')
     plotfigure.clf_each_gauge = True
 
@@ -204,29 +128,28 @@ def setplot(plotdata):
         topo = eta - h
         return topo
         
-    # plotitem.plot_var = gaugetopo
-    # plotitem.plotstyle = 'g-'
+    plotitem.plot_var = gaugetopo
+    plotitem.plotstyle = 'g-'
 
     def add_zeroline(current_data):
-        from pylab import plot, legend, xticks, floor
-        t = current_data.t
-        #legend(('surface','topography'),loc='lower left')
+        from pylab import plot, legend, xticks, floor, axis, xlabel
+        t = current_data.t 
+        gaugeno = current_data.gaugeno
+
+        if gaugeno == 32412:
+            try:
+                plot(TG32412[:,0], TG32412[:,1], 'r')
+                legend(['GeoClaw','Obs'],'lower right')
+            except: pass
+            axis((0,t.max(),-0.3,0.3))
+
         plot(t, 0*t, 'k')
         n = int(floor(t.max()/3600.) + 2)
-        xticks([3600*i for i in range(n)])
+        xticks([3600*i for i in range(n)], ['%i' % i for i in range(n)])
+        xlabel('time (hours)')
 
     plotaxes.afteraxes = add_zeroline
 
-    # ---------------------------------------------------
-    # fgmax plot of max elevation and arrival times:
-    # ---------------------------------------------------
-
-    otherfig = plotdata.new_otherfigure('Amplitude / Arrivals')
-    otherfig.fname = 'zeta.png'
-    def make_fgmax_plot(plotdata):
-        import plot_fgmax_grid
-        plot_fgmax_grid.make_plots(plotdata.outdir,plotdata.plotdir)
-    otherfig.makefig = make_fgmax_plot
 
 
     #-----------------------------------------
@@ -236,7 +159,7 @@ def setplot(plotdata):
 
     plotdata.printfigs = True                # print figures
     plotdata.print_format = 'png'            # file format
-    plotdata.print_framenos = [0]            # list of frames to print
+    plotdata.print_framenos = 'all'          # list of frames to print
     plotdata.print_gaugenos = 'all'          # list of gauges to print
     plotdata.print_fignos = 'all'            # list of figures to print
     plotdata.html = True                     # create html files of plots?

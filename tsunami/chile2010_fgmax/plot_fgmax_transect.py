@@ -17,6 +17,7 @@ def make_plots(outdir='_output', plotdir='_plots'):
 
     fgmax_input_file = 'fgmax_transect.txt'
 
+    sea_level = 0.
 
 
     if not os.path.isdir(outdir):
@@ -35,7 +36,7 @@ def make_plots(outdir='_output', plotdir='_plots'):
         raise Exception("cannot open %s" % fgmax_input_file)
 
     # skip some lines:
-    for i in range(6):
+    for i in range(5):
         line = fid.readline()
 
     line = fid.readline().split()
@@ -65,7 +66,7 @@ def make_plots(outdir='_output', plotdir='_plots'):
     nlevels = daux.shape[1]
     for i in range(2,nlevels):
         topoi = daux[:,i]
-        topoi = ma.masked_where(topoi < -1e50, topoi)
+        topoi = ma.masked_where(topoi < -1e20, topoi)
         topo.append(topoi)
 
     B = ma.masked_where(level==0, topo[0])  # level==0 ==> never updated
@@ -73,20 +74,21 @@ def make_plots(outdir='_output', plotdir='_plots'):
     for i in range(levelmax):
         B = where(level==i+1, topo[i], B)
 
+
     h = where(eta_tilde > B, eta_tilde - B, 0.)
 
-
     # zeta = max h on land or max eta offshore:
-    zeta = where(B>0, h, eta_tilde)
-
+    zeta = where(B>sea_level, h, eta_tilde)
+    zeta = where(zeta > -1e20, zeta, sea_level)
+    
     tzeta = d[:,4]  # Time maximum h recorded
-    tzeta = ma.masked_where(tzeta < -1e50, tzeta)      
+    tzeta = ma.masked_where(tzeta < -1e20, tzeta)      
     tzeta = ma.masked_where(zeta == 0., tzeta) / 3600.  # hours 
 
     inundated = logical_and((B>0), (h>0))
 
     atimes = d[:,5]
-    atimes = ma.masked_where(atimes < -1e50, atimes)  
+    atimes = ma.masked_where(atimes < -1e20, atimes)  
     atimes = ma.masked_where(zeta == 0., atimes) / 3600.  # hours 
 
     if plot_zeta:
@@ -98,7 +100,6 @@ def make_plots(outdir='_output', plotdir='_plots'):
         subplot(211)
         plot(x,zeta)
         title("Zeta Maximum at Latitude %g" % y[0])
-        xlabel("Longitude")
 
         subplot(212)
         plot(x,zeta)
