@@ -7,7 +7,8 @@
     
 Example [book/chap3/acousimple]
 to accompany Figure 3.1 of the book 
-`Finite Volume Methods for Hyperbolic Problems <http://www.clawpack.org/book>`_
+`Finite Volume Methods for Hyperbolic Problems
+<http://www.clawpack.org/book.html>`_
 by R. J. LeVeque.
 
 Converted to Clawpack 5.0 form in 2013.
@@ -21,7 +22,9 @@ where
 
 .. math:: q(x,t) = (p(x,t),~ u(x,t))^T
 
-and the coefficient matrix is :math:`A = [0,K; 1/\rho,0]`.
+and the coefficient matrix is 
+
+.. math:: A = \left[\begin{array}{cc} 0&K\\ 1/\rho & 0\end{array}\right].
          
 
 
