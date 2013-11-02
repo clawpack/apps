@@ -5,8 +5,9 @@ TVB Method of Shu on Advection
 ------------------------------------------
 
     
-Example [book/chapX/XX] to accompany the book 
-`Finite Volume Methods for Hyperbolic Problems <http://www.clawpack.org/book>`_
+Example [book/chap10/tvb] to accompany the book 
+`Finite Volume Methods for Hyperbolic Problems
+<http://www.clawpack.org/book.html>`_
 by R. J. LeVeque.
 
 Converted to Clawpack 5.0 form in 2013.
@@ -16,7 +17,8 @@ TVB method of Shu as an extension of the second-order minmod method.
 
 The value of phiM, set in setrun.py, 
 should be chosen as an approximation to
-q_{xx} at the extrema to be captured.   The grid should be fine enough that 
+:math:`q_{xx}` at the extrema to be captured.   
+The grid should be fine enough that 
 phiM*dx is small or the method will be dispersive.  
 
 For the wave-packet problem used here, you might experiment with:
