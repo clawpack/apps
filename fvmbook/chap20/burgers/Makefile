@@ -35,20 +35,25 @@ MODULES = \
 
 SOURCES = \
   qinit.f \
-  rp1_burgers.f90 \
-  $(CLAW)/classic/src/1d/setprob.f \
-  $(CLAW)/classic/src/1d/setaux.f \
-  $(CLAW)/classic/src/1d/bc1.f \
-  $(CLAW)/classic/src/1d/b4step1.f \
-  $(CLAW)/classic/src/1d/driver.f90 \
-  $(CLAW)/classic/src/1d/claw1ez.f \
-  $(CLAW)/classic/src/1d/claw1.f \
-  $(CLAW)/classic/src/1d/copyq1.f \
-  $(CLAW)/classic/src/1d/inlinelimiter.f90 \
-  $(CLAW)/classic/src/1d/opendatafile.f \
-  $(CLAW)/classic/src/1d/out1.f \
-  $(CLAW)/classic/src/1d/src1.f \
-  $(CLAW)/classic/src/1d/step1.f90
+  setprob.f \
+  rpn2bu.f \
+  rpt2bu.f \
+  $(CLAW)/classic/src/2d/setaux.f \
+  $(CLAW)/classic/src/2d/driver.f90 \
+  $(CLAW)/classic/src/2d/claw2ez.f \
+  $(CLAW)/classic/src/2d/claw2.f \
+  $(CLAW)/classic/src/2d/bc2.f \
+  $(CLAW)/classic/src/2d/b4step2.f \
+  $(CLAW)/classic/src/2d/step2.f90 \
+  $(CLAW)/classic/src/2d/step2ds.f90 \
+  $(CLAW)/classic/src/2d/dimsp2.f \
+  $(CLAW)/classic/src/2d/flux2.f90 \
+  $(CLAW)/classic/src/2d/copyq2.f \
+  $(CLAW)/classic/src/2d/inlinelimiter.f90 \
+  $(CLAW)/classic/src/2d/src2.f \
+  $(CLAW)/classic/src/2d/out2.f \
+  $(CLAW)/classic/src/2d/restart2.f \
+  $(CLAW)/classic/src/2d/opendatafile.f
 
 #-------------------------------------------------------------------
 # Include Makefile containing standard definitions and make options:

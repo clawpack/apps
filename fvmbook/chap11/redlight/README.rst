@@ -4,9 +4,10 @@
 Chapter 11
 ----------
 
-Example [book/chap11/burgers/redlight:]
+Example [book/chap11/burgers/redlight]
 to accompany Figure 11.2 of the book 
-`Finite Volume Methods for Hyperbolic Problems <http://www.clawpack.org/book>`_
+`Finite Volume Methods for Hyperbolic Problems
+<http://www.clawpack.org/book.html>`_
 by R. J. LeVeque.
 
 Converted to Clawpack 5.0 form in 2013.

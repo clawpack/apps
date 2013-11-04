@@ -29,16 +29,15 @@ def setrun(claw_pkg='classic'):
     
     assert claw_pkg.lower() == 'classic',  "Expected claw_pkg = 'classic'"
 
-    num_dim = 1
+    num_dim = 2
     rundata = data.ClawRunData(claw_pkg, num_dim)
 
     #------------------------------------------------------------------
     # Problem-specific parameters to be written to setprob.data:
     #------------------------------------------------------------------
-    # MUST BE ADDED BY USER IF DESIRED !!
-    #probdata = rundata.new_UserData(name='probdata',fname='setprob.data')
-    # For example:
-    #probdata.add_param('u',     1.0,  'advection velocity')
+    
+    probdata = rundata.new_UserData(name='probdata',fname='setprob.data')
+    probdata.add_param('theta',     0.7854,  'angle relative to x-axis')
     
     #------------------------------------------------------------------
     # Standard Clawpack parameters to be written to claw.data:
@@ -55,11 +54,14 @@ def setrun(claw_pkg='classic'):
     clawdata.num_dim = num_dim
     
     # Lower and upper edge of computational domain:
-    clawdata.lower[0] = -6.000000e+01          # xlower
-    clawdata.upper[0] = 4.000000e+01          # xupper
+    clawdata.lower[0] = -1.000000e+00          # xlower
+    clawdata.upper[0] = 2.000000e+00          # xupper
+    clawdata.lower[1] = -1.000000e+00          # ylower
+    clawdata.upper[1] = 2.000000e+00          # yupper
     
     # Number of grid cells:
     clawdata.num_cells[0] = 100      # mx
+    clawdata.num_cells[1] = 100      # my
     
 
     # ---------------
@@ -70,7 +72,7 @@ def setrun(claw_pkg='classic'):
     clawdata.num_eqn = 1
 
     # Number of auxiliary variables in the aux array (initialized in setaux)
-    clawdata.num_aux = 1
+    clawdata.num_aux = 0
     
     # Index of aux array corresponding to capacity function, if there is one:
     clawdata.capa_index = 0
@@ -106,8 +108,8 @@ def setrun(claw_pkg='classic'):
     if clawdata.output_style==1:
         # Output ntimes frames at equally spaced times up to tfinal:
         # Can specify num_output_times = 0 for no output
-        clawdata.num_output_times = 10
-        clawdata.tfinal = 40.000000
+        clawdata.num_output_times = 5
+        clawdata.tfinal = 2.000000
         clawdata.output_t0 = True  # output at initial (or restart) time?
         
     elif clawdata.output_style == 2:
@@ -161,7 +163,7 @@ def setrun(claw_pkg='classic'):
     clawdata.cfl_max = 1.000000
     
     # Maximum number of time steps to allow between output times:
-    clawdata.steps_max = 1000
+    clawdata.steps_max = 500
 
 
     # ------------------
@@ -170,6 +172,15 @@ def setrun(claw_pkg='classic'):
 
     # Order of accuracy:  1 => Godunov,  2 => Lax-Wendroff plus limiters
     clawdata.order = 2
+    
+    # Use dimensional splitting? (not yet available for AMR)
+    clawdata.dimensional_split = 'unsplit'
+    
+    # For unsplit method, transverse_waves can be 
+    #  0 or 'none'      ==> donor cell (only normal solver used)
+    #  1 or 'increment' ==> corner transport of waves
+    #  2 or 'all'       ==> corner transport of 2nd order corrections too
+    clawdata.transverse_waves = 2
     
     
     # Number of waves in the Riemann solution:
@@ -207,8 +218,11 @@ def setrun(claw_pkg='classic'):
     #   2 or 'periodic' => periodic (must specify this at both boundaries)
     #   3 or 'wall'     => solid wall for systems where q(2) is normal velocity
     
-    clawdata.bc_lower[0] = 'extrap'   # at xlower
-    clawdata.bc_upper[0] = 'extrap'   # at xupper
+    clawdata.bc_lower[0] = 'periodic'   # at xlower
+    clawdata.bc_upper[0] = 'periodic'   # at xupper
+
+    clawdata.bc_lower[1] = 'periodic'   # at ylower
+    clawdata.bc_upper[1] = 'periodic'   # at yupper
                   
     return rundata
 

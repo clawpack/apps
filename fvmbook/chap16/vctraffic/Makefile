@@ -38,7 +38,7 @@ SOURCES = \
   setaux.f \
   b4step1.f \
   setprob.f \
-  $(CLAW)/riemann/src/rp1_trafficvc.f90 \
+  $(CLAW)/riemann/src/rp1_traffic_vc.f90 \
   $(CLAW)/classic/src/1d/bc1.f \
   $(CLAW)/classic/src/1d/driver.f90 \
   $(CLAW)/classic/src/1d/claw1ez.f \
