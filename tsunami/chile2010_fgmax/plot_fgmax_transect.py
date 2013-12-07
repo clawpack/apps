@@ -99,11 +99,15 @@ def make_plots(outdir='_output', plotdir='_plots'):
         zeta = ma.masked_where(zeta==0.,zeta)
         subplot(211)
         plot(x,zeta)
+        xlim(x.min(),x.max())
+        xticks([])
         title("Zeta Maximum at Latitude %g" % y[0])
 
         subplot(212)
-        plot(x,zeta)
+        eta_tilde = ma.masked_where(eta_tilde<-1e20,eta_tilde)
+        plot(y,eta_tilde)   # h+B also onshore for transect
         plot(x,B,'g')  # topo
+        xlim(x.min(),x.max())
         title("Topography at Latitude %g" % y[0])
         xlabel("Longitude")
         

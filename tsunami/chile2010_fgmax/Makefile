@@ -176,7 +176,12 @@ SOURCES = \
 include $(CLAWMAKE)
 
 # Construct the topography data
-.PHONY: topo
+.PHONY: topo all
 topo: 
 	python maketopo.py
 
+all:
+	make topo
+	make .plots
+	python plot_fgmax_grid.py
+	python plot_fgmax_transect.py
