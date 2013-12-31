@@ -1,12 +1,12 @@
 c
 c
 c =========================================================
-      subroutine src2(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
+      subroutine src2(meqn,mbc,mx,my,xlower,ylower,
      &                 dx,dy,q,maux,aux,t,dt)
 c =========================================================
       implicit double precision(a-h,o-z)
-      dimension    q(meqn,1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc)
-      dimension  aux(maux,1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc)
+      dimension    q(meqn,1-mbc:mx+mbc, 1-mbc:my+mbc)
+      dimension  aux(maux,1-mbc:mx+mbc, 1-mbc:my+mbc)
 c
 c     # source terms for cylindrical symmetry in 2d Euler equations
 c     # about y = 0, so radius = y
