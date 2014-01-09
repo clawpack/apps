@@ -40,9 +40,9 @@ SOURCES = \
   src1.f \
   setprob.f \
   $(CLAW)/riemann/src/rp1_traffic.f90 \
-  $(CLAW)/classic/src/1d/setaux.f \
+  $(CLAW)/classic/src/1d/setaux.f90 \
   $(CLAW)/classic/src/1d/bc1.f \
-  $(CLAW)/classic/src/1d/b4step1.f \
+  $(CLAW)/classic/src/1d/b4step1.f90 \
   $(CLAW)/classic/src/1d/driver.f90 \
   $(CLAW)/classic/src/1d/claw1ez.f \
   $(CLAW)/classic/src/1d/claw1.f \

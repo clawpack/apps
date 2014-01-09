@@ -3,14 +3,14 @@ c
 c
 c
 c     =====================================================
-       subroutine qinit(maxmx,maxmy,meqn,mbc,mx,my,xlower,ylower,
+       subroutine qinit(meqn,mbc,mx,my,xlower,ylower,
      &                   dx,dy,q,maux,aux)
 c     =====================================================
 c
 c     # Set initial conditions for q.
 c
        implicit double precision (a-h,o-z)
-       dimension q(meqn,1-mbc:maxmx+mbc, 1-mbc:maxmy+mbc)
+       dimension q(meqn,1-mbc:mx+mbc, 1-mbc:my+mbc)
        common /comic/ qin(5),qout(5)
        common /cominf/ rinf,vinf,einf
 c
