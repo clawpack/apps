@@ -7,7 +7,6 @@ function setplot is called to set the plot parameters.
     
 """ 
 
-import os
 import numpy as np
 
 # Plot customization
@@ -51,8 +50,6 @@ def setplot(plotdata,wave_family,rho,dry_tolerance):
     Output: a modified version of plotdata.
     
     """
-    
-    bathy_ref_lines = []
     
     # Load bathymetry
     b = Solution(0,path=plotdata.outdir,read_aux=True).state.aux[bathy_index,:]

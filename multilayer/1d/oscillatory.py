@@ -137,7 +137,7 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
                   'xupper':solution.state.grid.x.upper,
                   'rho':solution.state.problem_data['rho'],
                   'dry_tolerance':solution.state.problem_data['dry_tolerance']}
-    plot(setplot_path="./setplot_oscillatory.py",outdir=outdir,
+    plot(setplot="./setplot_oscillatory.py",outdir=outdir,
          plotdir=plotdir,htmlplot=kargs.get('htmlplot',False),
          iplot=kargs.get('iplot',False),file_format=controller.output_format,
          **plot_kargs)

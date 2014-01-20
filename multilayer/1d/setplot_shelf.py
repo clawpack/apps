@@ -7,8 +7,6 @@ function setplot is called to set the plot parameters.
     
 """ 
 
-import os
-
 import numpy as np
 
 # Plot customization

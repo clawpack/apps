@@ -134,7 +134,7 @@ def jump_shelf(num_cells,eigen_method,**kargs):
                   "g":solution.state.problem_data['g'],
                   "dry_tolerance":solution.state.problem_data['dry_tolerance'],
                   "bathy_ref_lines":[-30e3]}
-    plot(setplot_path="./setplot_shelf.py",outdir=outdir,plotdir=plotdir,
+    plot(setplot="./setplot_shelf.py",outdir=outdir,plotdir=plotdir,
          htmlplot=kargs.get('htmlplot',False),iplot=kargs.get('iplot',False),
          file_format=controller.output_format,**plot_kargs)
 
@@ -264,7 +264,7 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
                   "g":solution.state.problem_data['g'],
                   "dry_tolerance":solution.state.problem_data['dry_tolerance'],
                   "bathy_ref_lines":[x0,x1]}
-    plot(setplot_path="./setplot_shelf.py",outdir=outdir,plotdir=plotdir,
+    plot(setplot="./setplot_shelf.py",outdir=outdir,plotdir=plotdir,
          htmlplot=kargs.get('htmlplot',False),iplot=kargs.get('iplot',False),
          file_format=controller.output_format,**plot_kargs)
 

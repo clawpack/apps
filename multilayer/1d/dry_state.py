@@ -137,7 +137,7 @@ def dry_state(num_cells,eigen_method,entropy_fix,**kargs):
     # ============
     plot_kargs = {'rho':solution.state.problem_data['rho'],
                   'dry_tolerance':solution.state.problem_data['dry_tolerance']}
-    plot.plot(setplot_path="./setplot_drystate.py", outdir=outdir, 
+    plot.plot(setplot="./setplot_drystate.py", outdir=outdir, 
               plotdir=plotdir, htmlplot=kargs.get('htmlplot',False), 
               iplot=kargs.get('iplot',False),
               file_format=controller.output_format,

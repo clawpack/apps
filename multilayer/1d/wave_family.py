@@ -138,7 +138,7 @@ def wave_family(num_cells,eigen_method,wave_family,dry_state=True,**kargs):
     plot_kargs = {'wave_family':wave_family,
                   'rho':solution.state.problem_data['rho'],
                   'dry_tolerance':solution.state.problem_data['dry_tolerance']}
-    plot(setplot_path="./setplot_wave_family.py",outdir=outdir,plotdir=plotdir,
+    plot(setplot="./setplot_wave_family.py",outdir=outdir,plotdir=plotdir,
          htmlplot=kargs.get('htmlplot',False),iplot=kargs.get('iplot',False),
          file_format=controller.output_format,**plot_kargs)
 

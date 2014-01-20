@@ -132,7 +132,7 @@ def smooth_test(eigen_method, dry=False, **kargs):
     # ============
     plot_kargs = {"rho":solution.state.problem_data['rho'],
                   "dry_tolerance":solution.state.problem_data['dry_tolerance']}
-    plot(setplot_path="./setplot_well_balanced.py",outdir=outdir,
+    plot(setplot="./setplot_well_balanced.py",outdir=outdir,
          plotdir=plotdir, htmlplot=kargs.get('htmlplot',False),
          iplot=kargs.get('iplot',False),
          file_format=controller.output_format,**plot_kargs)
@@ -258,7 +258,7 @@ def jump_test(eigen_method, dry=False, **kargs):
     # ============
     plot_kargs = {"rho":solution.state.problem_data['rho'],
                   "dry_tolerance":solution.state.problem_data['dry_tolerance']}
-    plot(setplot_path="./setplot_well_balanced.py",outdir=outdir,
+    plot(setplot="./setplot_well_balanced.py",outdir=outdir,
          plotdir=plotdir, htmlplot=kargs.get('htmlplot',False),
          iplot=kargs.get('iplot',False),
          file_format=controller.output_format,**plot_kargs)

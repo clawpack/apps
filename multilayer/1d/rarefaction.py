@@ -3,8 +3,6 @@
 
 r""" Run the suite of tests for the 1d two-layer equations"""
 
-import sys
-
 import clawpack.riemann as riemann
 import clawpack.clawutil.runclaw as runclaw
 from clawpack.pyclaw.plot import plot
@@ -146,7 +144,7 @@ def rarefaction(num_cells,eigen_method,entropy_fix,**kargs):
     # ============
     plot_kargs = {'rho':solution.state.problem_data['rho'],
                   'dry_tolerance':solution.state.problem_data['dry_tolerance']}
-    plot(setplot_path="./setplot_drystate.py",outdir=outdir,plotdir=plotdir,
+    plot(setplot="./setplot_drystate.py",outdir=outdir,plotdir=plotdir,
          htmlplot=kargs.get('htmlplot',False),iplot=kargs.get('iplot',False),
          file_format=controller.output_format,**plot_kargs)
 
