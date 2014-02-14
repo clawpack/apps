@@ -80,7 +80,7 @@ def setplot(plotdata):
 
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes()
-    plotaxes.axescmd = 'subplot(211)'
+    #plotaxes.axescmd = 'subplot(211)'
     plotaxes.xlimits = 'auto'
     plotaxes.ylimits = [-0.1,3.5]
     plotaxes.title = 'Depth and Tracer'
@@ -121,11 +121,15 @@ def setplot(plotdata):
         frameno = string.zfill(current_data.frameno,4)
         #plot_approx_Rsoln(current_data)
         ylim([0,3.5])
+        xticks(fontsize=20)
+        yticks(fontsize=20)
+        title("Depth and tracer at t = %6.3f" % current_data.t, fontsize=30)
         #axis('off')
 
     plotaxes.afteraxes = fill_with_cmap
 
     plotaxes = plotfigure.new_plotaxes('velocity')
+    plotaxes.show = False
     plotaxes.axescmd = 'subplot(212)'
     plotaxes.xlimits = 'auto'
     plotaxes.ylimits = 'auto'
