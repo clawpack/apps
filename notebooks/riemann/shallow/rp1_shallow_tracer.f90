@@ -40,35 +40,34 @@ subroutine rp1(maxmx,meqn,mwaves,maux,mbc,mx,ql,qr,auxl,auxr,wave,s,amdq,apdq)
     dimension amdq(meqn,           1-mbc:maxmx+mbc)
     dimension apdq(meqn,           1-mbc:maxmx+mbc)
 
-!     # Gravity constant set in the shallow1D.py file
+!   # Gravity constant set in the shallow1D.py file
     common /cparam/ grav
 
-!     # Local storage
-!     ---------------
+!   # Local storage
+!   ---------------
     dimension delta(2)
     logical :: efix
 
-    data efix /.false./    !# Use entropy fix for transonic rarefactions
+    data efix /.true./    !# Use entropy fix for transonic rarefactions
 
 
-!     # Main loop of the Riemann solver.
+!   # Main loop of the Riemann solver.
     do 30 i=2-mbc,mx+mbc
     
-    
-    !     # compute  Roe-averaged quantities:
+    !   # compute  Roe-averaged quantities:
         ubar = (qr(2,i-1)/dsqrt(qr(1,i-1)) + ql(2,i)/dsqrt(ql(1,i)))/ &
         ( dsqrt(qr(1,i-1)) + dsqrt(ql(1,i)) )
         cbar=dsqrt(0.5d0*grav*(qr(1,i-1) + ql(1,i)))
                  
-    !     # delta(1)=h(i)-h(i-1) and  delta(2)=hu(i)-hu(i-1)
+    !   # delta(1)=h(i)-h(i-1) and  delta(2)=hu(i)-hu(i-1)
         delta(1) = ql(1,i) - qr(1,i-1)
         delta(2) = ql(2,i) - qr(2,i-1)
 
-    !     # Compute coeffs in the evector expansion of delta(1),delta(2)
+    !   # Compute coeffs in the evector expansion of delta(1),delta(2)
         a1 = 0.5d0*(-delta(2) + (ubar + cbar) * delta(1))/cbar
         a2 = 0.5d0*( delta(2) - (ubar - cbar) * delta(1))/cbar
 
-    !     # Finally, compute the waves.
+    !   # Finally, compute the waves.
         wave(1,1,i) = a1
         wave(2,1,i) = a1*(ubar - cbar)
         wave(3,1,i) = 0.d0
@@ -126,83 +125,96 @@ subroutine rp1(maxmx,meqn,mwaves,maux,mbc,mx,ql,qr,auxl,auxr,wave,s,amdq,apdq)
     do 200 i=2-mbc,mx+mbc
               
     ! ------------------------------------------------------
-    !        # check 1-wave:
-    !        ---------------
+    !   # check 1-wave:
+    !   ---------------
     
-    !        # u-c in left state (cell i-1)
+    !   # u-c in left state (cell i-1)
         s0 = qr(2,i-1)/qr(1,i-1) - dsqrt(grav*qr(1,i-1))
                  
-    !        # check for fully supersonic case:
+    !   # check for fully supersonic case:
         if (s0 >= 0.d0 .AND. s(1,i) > 0.d0)  then
-        !            # everything is right-going
-            do 60 m=1,2
+        !   # everything is right-going
+            do m=1,meqn
                 amdq(m,i) = 0.d0
-            60 END DO
+                enddo
             go to 200
         endif
     
-    !        # u-c to right of 1-wave
+        ! u-c to right of 1-wave
         hr1  = qr(1,i-1) + wave(1,1,i)
         uhr1 = qr(2,i-1) + wave(2,1,i)
         s1 =  uhr1/hr1 - dsqrt(grav*hr1)
                          
         if (s0 < 0.d0 .AND. s1 > 0.d0) then
-        !            # transonic rarefaction in the 1-wave
+            ! transonic rarefaction in the 1-wave
             sfract = s0 * (s1-s(1,i)) / (s1-s0)
         else if (s(1,i) < 0.d0) then
-        !	     # 1-wave is leftgoing
+            ! 1-wave is leftgoing
             sfract = s(1,i)
         else
-        !	     # 1-wave is rightgoing
+            ! 1-wave is rightgoing
             sfract = 0.d0   !# this shouldn't happen since s0 < 0
         endif
 
-        do 120 m=1,2
+        do m=1,meqn
             amdq(m,i) = sfract*wave(m,1,i)
-        120 END DO
+            enddo 
           
     ! -------------------------------------------------------
-    !        # check 2-wave:
-    !        ---------------
-    !        # u+c in right state  (cell i)
+    !   # check 2-wave:
+    !   ---------------
+    !   # u+c in right state  (cell i)
         s3 = ql(2,i)/ql(1,i) + dsqrt(grav*ql(1,i))
                       
-    !        # u+c to left of 2-wave
+    !   # u+c to left of 2-wave
         hl2  = ql(1,i) - wave(1,2,i)
         uhl2 = ql(2,i) - wave(2,2,i)
         s2 = uhl2/hl2 + dsqrt(grav*hl2)
                           
         if (s2 < 0.d0 .AND. s3 > 0.d0) then
-        !            # transonic rarefaction in the 2-wave
+            ! transonic rarefaction in the 2-wave
             sfract = s2 * (s3-s(2,i)) / (s3-s2)
         else if (s(2,i) < 0.d0) then
-        !            # 2-wave is leftgoing
+            ! 2-wave is leftgoing
             sfract = s(2,i)
         else
-        !            # 2-wave is rightgoing
-            go to 200
+            ! 2-wave is rightgoing
+            sfract = 0.d0
         endif
     
-        do 160 m=1,meqn
+        do m=1,meqn
             amdq(m,i) = amdq(m,i) + sfract*wave(m,2,i)
-        160 END DO
-    200 END DO
+            enddo
 
 
-!     # compute the rightgoing flux differences:
-!     # df = SUM s*wave   is the total flux difference and apdq = df - amdq
+    ! -------------------------------------------------------
+    !   # check 3-wave:
+    !   ---------------
+        if (s(3,i) < 0.d0) then
+            ! add tracer wave into amdp
+            do m=1,meqn
+                amdq(m,i) = amdq(m,i) + s(3,i)*wave(m,3,i)
+                enddo
+            endif
+
+   200 end do
+
+
+!   # compute the rightgoing flux differences:
+!   # df = SUM s*wave   is the total flux difference and apdq = df - amdq
 
     do 220 m=1,meqn
         do 220 i = 2-mbc, mx+mbc
             df = 0.d0
-            do 210 mw=1,mwaves
+            do mw=1,mwaves
                 df = df + s(mw,i)*wave(m,mw,i)
-            210 END DO
+                enddo
             apdq(m,i) = df - amdq(m,i)
     220 END DO
 
     900 continue
     return
+
     end subroutine rp1
 
 

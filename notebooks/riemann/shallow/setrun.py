@@ -40,9 +40,9 @@ def setrun(claw_pkg='classic'):
     probdata.add_param('g',   1.0,  'Gravitational constant')
     probdata.add_param('sloc',    0.0,   'Initial discontinuity location')
     probdata.add_param('hl', 3.,  'Value of water height to left')
-    probdata.add_param('ul', -0.5,  'Value of water velocity to right')
+    probdata.add_param('ul', 0.,  'Value of water velocity to right')
     probdata.add_param('hr', 1.,  'Value of water height to left')
-    probdata.add_param('ur', 0.5,  'Value of water velocity to right')
+    probdata.add_param('ur', 0.,  'Value of water velocity to right')
 
     
     #------------------------------------------------------------------

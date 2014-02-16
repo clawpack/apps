@@ -17,10 +17,10 @@ c
         xcenter = xlower + (i - 0.5d0) * dx
         if (xcenter < sloc) then
             q(1,i) = hl
-            q(2,i) = ul
+            q(2,i) = hl*ul
         else
             q(1,i) = hr
-            q(2,i) = ur
+            q(2,i) = hr*ur
         endif
       q(3,i) = xcenter
       enddo

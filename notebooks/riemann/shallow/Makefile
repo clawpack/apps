@@ -54,4 +54,3 @@ SOURCES = \
 # Include Makefile containing standard definitions and make options:
 include $(CLAWMAKE)
 
-  #$(CLAW)/riemann/src/rp1_shallow_tracer.f90 \
