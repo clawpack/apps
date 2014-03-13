@@ -16,7 +16,7 @@ def jump_shelf(num_cells,eigen_method,**kargs):
 
     # Construct output and plot directory paths
     prefix = 'ml_e%s_n%s' % (eigen_method,num_cells)
-    name = 'jump_shelf'
+    name = 'multilayer/jump_shelf'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers
@@ -144,7 +144,7 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
 
     # Construct output and plot directory paths
     prefix = 'ml_e%s_n%s' % (eigen_method,num_cells)
-    name = 'sloped_shelf'
+    name = 'multilayer/sloped_shelf'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers

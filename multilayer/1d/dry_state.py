@@ -15,7 +15,7 @@ def dry_state(num_cells,eigen_method,entropy_fix,**kargs):
     r"""Run and plot a multi-layer dry state problem"""
     
     # Construct output and plot directory paths
-    name = 'dry_state'
+    name = 'multilayer/dry_state'
     prefix = 'ml_e%s_m%s_fix' % (eigen_method,num_cells)
     
     if entropy_fix:

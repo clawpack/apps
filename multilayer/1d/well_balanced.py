@@ -17,7 +17,7 @@ def smooth_test(eigen_method, dry=False, **kargs):
 
     # Construct output and plot directory paths
     prefix = 'ml_e%s_d%s' % (eigen_method,dry)
-    name = 'well_balancing_smooth'
+    name = 'multilayer/well_balancing_smooth'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers
@@ -143,7 +143,7 @@ def jump_test(eigen_method, dry=False, **kargs):
 
     # Construct output and plot directory paths
     prefix = 'ml_e%s_d%s' % (eigen_method,dry)
-    name = 'well_balancing_jump'
+    name = 'multilayer/well_balancing_jump'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers

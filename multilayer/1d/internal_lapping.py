@@ -16,7 +16,7 @@ def internal_lapping(num_cells,eigen_method,**kargs):
 
     # Construct output and plot directory paths
     prefix = 'ml_e%s_n%s' % (eigen_method,num_cells)
-    name = 'lapping'
+    name = 'multilayer/lapping'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers

@@ -17,9 +17,9 @@ def wave_family(num_cells,eigen_method,wave_family,dry_state=True,**kargs):
     # Construct output and plot directory paths
     prefix = 'ml_e%s_n%s' % (eigen_method,num_cells)
     if dry_state:
-        name = 'dry_wave_%s' % wave_family
+        name = 'multilayer/dry_wave_%s' % wave_family
     else:
-        name = 'wet_wave_%s' % wave_family
+        name = 'multilayer/wet_wave_%s' % wave_family
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers

@@ -18,7 +18,7 @@ def rarefaction(num_cells,eigen_method,entropy_fix,**kargs):
         prefix = "".join((prefix,"T"))
     else:
         prefix = "".join((prefix,"F"))
-    name = 'all_rare'
+    name = 'multilayer/all_rare'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers

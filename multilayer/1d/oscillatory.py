@@ -14,7 +14,7 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
 
     # Construct output and plot directory paths
     prefix = 'ml_e%s_n%s' % (eigen_method,num_cells)
-    name = 'oscillatory_wind'
+    name = 'multilayer/oscillatory_wind'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers
