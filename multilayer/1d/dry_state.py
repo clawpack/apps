@@ -5,7 +5,7 @@ r""" Run the suite of tests for the 1d two-layer equations"""
 
 import sys
 
-import clawpack.riemann as riemann
+from clawpack.riemann import layered_shallow_water_1D
 import clawpack.clawutil.runclaw as runclaw
 import clawpack.pyclaw.plot as plot
 
@@ -15,7 +15,7 @@ def dry_state(num_cells,eigen_method,entropy_fix,**kargs):
     r"""Run and plot a multi-layer dry state problem"""
     
     # Construct output and plot directory paths
-    name = 'dry_state'
+    name = 'multilayer/dry_state'
     prefix = 'ml_e%s_m%s_fix' % (eigen_method,num_cells)
     
     if entropy_fix:
@@ -61,7 +61,7 @@ def dry_state(num_cells,eigen_method,entropy_fix,**kargs):
     solver.aux_bc_upper[0] = 1
     
     # Set the Riemann solver
-    solver.rp = riemann.layered_shallow_water_1D
+    solver.rp = layered_shallow_water_1D
 
     # Set the before step function
     solver.before_step = lambda solver,solution:ml.step.before_step(solver,solution)
@@ -137,7 +137,7 @@ def dry_state(num_cells,eigen_method,entropy_fix,**kargs):
     # ============
     plot_kargs = {'rho':solution.state.problem_data['rho'],
                   'dry_tolerance':solution.state.problem_data['dry_tolerance']}
-    plot.plot(setplot_path="./setplot_drystate.py", outdir=outdir, 
+    plot.plot(setplot="./setplot_drystate.py", outdir=outdir, 
               plotdir=plotdir, htmlplot=kargs.get('htmlplot',False), 
               iplot=kargs.get('iplot',False),
               file_format=controller.output_format,

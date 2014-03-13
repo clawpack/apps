@@ -32,9 +32,9 @@ matplotlib.rcParams['savefig.dpi'] = 100
 # Need to do this after the above
 import matplotlib.pyplot as mpl
 
-import clawpack.pyclaw.solution
+from clawpack.pyclaw.solution import Solution
 
-from multilayer.aux import bathy_index, kappa_index
+from multilayer.aux import bathy_index, kappa_index, wind_index
 import multilayer.plot as plot
 
 # matplotlib.rcParams['figure.figsize'] = [6.0,10.0]
@@ -59,8 +59,7 @@ def setplot(plotdata,rho,dry_tolerance):
         mpl.title('Layer Velocities')
         
     # Load bathymetery
-    b = clawpack.pyclaw.solution.Solution(0, path=plotdata.outdir, 
-                                         read_aux=True).state.aux[bathy_index,:]
+    b = Solution(0, path=plotdata.outdir,read_aux=True).state.aux[bathy_index,:]
 
     def bathy(cd):
         return b

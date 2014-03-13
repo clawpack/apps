@@ -3,7 +3,7 @@
 
 r""" Run the suite of tests for the 1d two-layer equations"""
 
-import clawpack.riemann as riemann
+from clawpack.riemann import layered_shallow_water_1D
 import clawpack.clawutil.runclaw as runclaw
 from clawpack.pyclaw.plot import plot
 
@@ -14,7 +14,7 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
 
     # Construct output and plot directory paths
     prefix = 'ml_e%s_n%s' % (eigen_method,num_cells)
-    name = 'oscillatory_wind'
+    name = 'multilayer/oscillatory_wind'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers
@@ -57,7 +57,7 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
     solver.aux_bc_upper[0] = 1
     
     # Set the Riemann solver
-    solver.rp = riemann.layered_shallow_water_1D
+    solver.rp = layered_shallow_water_1D
 
     # Set the before step functioning including the wind forcing
     wind_func = lambda state:ml.aux.set_oscillatory_wind(state,
@@ -137,7 +137,7 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
                   'xupper':solution.state.grid.x.upper,
                   'rho':solution.state.problem_data['rho'],
                   'dry_tolerance':solution.state.problem_data['dry_tolerance']}
-    plot(setplot_path="./setplot_oscillatory.py",outdir=outdir,
+    plot(setplot="./setplot_oscillatory.py",outdir=outdir,
          plotdir=plotdir,htmlplot=kargs.get('htmlplot',False),
          iplot=kargs.get('iplot',False),file_format=controller.output_format,
          **plot_kargs)

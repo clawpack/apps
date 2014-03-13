@@ -3,9 +3,7 @@
 
 r""" Run the suite of tests for the 1d two-layer equations"""
 
-import sys
-
-import clawpack.riemann as riemann
+from clawpack.riemann import layered_shallow_water_1D
 import clawpack.clawutil.runclaw as runclaw
 from clawpack.pyclaw.plot import plot
 
@@ -20,7 +18,7 @@ def rarefaction(num_cells,eigen_method,entropy_fix,**kargs):
         prefix = "".join((prefix,"T"))
     else:
         prefix = "".join((prefix,"F"))
-    name = 'all_rare'
+    name = 'multilayer/all_rare'
     outdir,plotdir,log_path = runclaw.create_output_paths(name,prefix,**kargs)
     
     # Redirect loggers
@@ -60,7 +58,7 @@ def rarefaction(num_cells,eigen_method,entropy_fix,**kargs):
     solver.aux_bc_upper[0] = 1
     
     # Set the Riemann solver
-    solver.rp = riemann.layered_shallow_water_1D
+    solver.rp = layered_shallow_water_1D
 
     # Set the before step function
     solver.before_step = lambda solver,solution:ml.step.before_step(solver,solution)
@@ -146,7 +144,7 @@ def rarefaction(num_cells,eigen_method,entropy_fix,**kargs):
     # ============
     plot_kargs = {'rho':solution.state.problem_data['rho'],
                   'dry_tolerance':solution.state.problem_data['dry_tolerance']}
-    plot(setplot_path="./setplot_drystate.py",outdir=outdir,plotdir=plotdir,
+    plot(setplot="./setplot_drystate.py",outdir=outdir,plotdir=plotdir,
          htmlplot=kargs.get('htmlplot',False),iplot=kargs.get('iplot',False),
          file_format=controller.output_format,**plot_kargs)
 

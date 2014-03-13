@@ -11,7 +11,6 @@ time step.
 
 import numpy as np
 
-import pyclaw.solution as solution
 from aux import set_no_wind,kappa_index
 
 class NegativeDepthError(Exception):
@@ -107,23 +106,30 @@ def before_step(solver,state,wind_func=set_no_wind,dry_tolerance=1e-3,
 
 def friction_source(solver,state,dt,TOLERANCE=1e-30):
     r""""""
-    manning = state.problem_data['manning']
-    g = state.problem_data['g']
-    rho = state.problem_data['rho']
-    dry_tolerance = state.problem_data['dry_tolerance']
-    
-    if manning > TOLERANCE:
-        for i in xrange(state.q.shape[1]):
-            h = state.q[2,i] / rho[1]
-            if h < dry_tolerance:
-                h = state.q[0,i] / rho[0]
-                u = state.q[1,i] / rho[0]
-                layer_index = 0
-            else:
-                u = state.q[2,i] / rho[1]
-                layer_index = 1
-        
-            gamma = u * g * manning**2 / h**(4/3)
-            dgamma = 1.0 + dt * gamma
-            hu_index = 2 * (layer_index) + 1
-            state.q[hu_index,i] = state.q[hu_index,i] / dgamma * rho[layer_index]
+
+    if state.problem_data['manning'] != 0.0:
+        if isinstance(solver, ClawSolver):
+            manning = state.problem_data['manning']
+            g = state.problem_data['g']
+            rho = state.problem_data['rho']
+            dry_tolerance = state.problem_data['dry_tolerance']
+            
+            if manning > TOLERANCE:
+                for i in xrange(state.q.shape[1]):
+                    h = state.q[2,i] / rho[1]
+                    if h < dry_tolerance:
+                        h = state.q[0,i] / rho[0]
+                        u = state.q[1,i] / rho[0]
+                        layer_index = 0
+                    else:
+                        u = state.q[2,i] / rho[1]
+                        layer_index = 1
+                
+                    gamma = u * g * manning**2 / h**(4/3)
+                    dgamma = 1.0 + dt * gamma
+                    hu_index = 2 * (layer_index) + 1
+                    state.q[hu_index,i] = state.q[hu_index,i] / dgamma * rho[layer_index]
+        elif isinstance(solver, SharpClawSolver):
+            pass
+        else:
+            raise ValueError("Solver type %s not supported." % type(solver))
