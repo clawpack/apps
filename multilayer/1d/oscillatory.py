@@ -3,7 +3,7 @@
 
 r""" Run the suite of tests for the 1d two-layer equations"""
 
-import clawpack.riemann as riemann
+from clawpack.riemann import layered_shallow_water_1D
 import clawpack.clawutil.runclaw as runclaw
 from clawpack.pyclaw.plot import plot
 
@@ -57,7 +57,7 @@ def oscillatory_wind(num_cells,eigen_method,**kargs):
     solver.aux_bc_upper[0] = 1
     
     # Set the Riemann solver
-    solver.rp = riemann.layered_shallow_water_1D
+    solver.rp = layered_shallow_water_1D
 
     # Set the before step functioning including the wind forcing
     wind_func = lambda state:ml.aux.set_oscillatory_wind(state,

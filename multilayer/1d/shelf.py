@@ -5,7 +5,7 @@ r"""Runs idealized jump and sloped 1d shelf tests"""
 
 import sys
 
-import clawpack.riemann as riemann
+from clawpack.riemann import layered_shallow_water_1D
 import clawpack.clawutil.runclaw as runclaw
 from clawpack.pyclaw.plot import plot
 
@@ -57,7 +57,7 @@ def jump_shelf(num_cells,eigen_method,**kargs):
     solver.aux_bc_upper[0] = 1
     
     # Set the Riemann solver
-    solver.rp = riemann.layered_shallow_water_1D
+    solver.rp = layered_shallow_water_1D
 
     # Set the before step function
     solver.before_step = lambda solver,solution:ml.step.before_step(solver,
@@ -112,11 +112,11 @@ def jump_shelf(num_cells,eigen_method,**kargs):
     controller.solver = solver
     
     # Output parameters
-    # controller.output_style = 1
-    # controller.tfinal = 7200.0
-    # controller.num_output_times = 300
-    controller.output_style = 2
-    controller.out_times = [0.0,720.0,2400.0,4800.0,7200.0]
+    controller.output_style = 1
+    controller.tfinal = 7200.0
+    controller.num_output_times = 300
+    # controller.output_style = 2
+    # controller.out_times = [0.0,720.0,2400.0,4800.0,7200.0]
     controller.write_aux_init = True
     controller.outdir = outdir
     controller.write_aux = True
@@ -186,7 +186,7 @@ def sloped_shelf(num_cells,eigen_method,**kargs):
     solver.aux_bc_upper[0] = 1
     
     # Set the Riemann solver
-    solver.rp = riemann.layered_shallow_water_1D
+    solver.rp = layered_shallow_water_1D
 
     # Set the before step function
     solver.before_step = lambda solver,solution:ml.step.before_step(solver,solution)
@@ -280,5 +280,5 @@ if __name__ == "__main__":
         
     for method in eig_methods:
         jump_shelf(2000,method,iplot=False,htmlplot=True)
-    # for method in eig_methods:
-    #     sloped_shelf(2000,method,iplot=False,htmlplot=True)
+    for method in eig_methods:
+        sloped_shelf(2000,method,iplot=False,htmlplot=True)
