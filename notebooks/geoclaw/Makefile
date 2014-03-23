@@ -176,8 +176,14 @@ include $(CLAWMAKE)
 
 # Construct the topography data
 .PHONY: topo all
-topo:
-	python maketopo.py
+
+npacific.tt3:
+	python get_bathy.py
+
+hawaii.tt3:
+	python get_bathy.py
+
+topo: npacific.tt3 hawaii.tt3
 
 all: 
 	$(MAKE) topo
