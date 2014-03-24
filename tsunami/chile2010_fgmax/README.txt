@@ -1,8 +1,9 @@
 
 Test case for fgmax routines.  
 
-Version required:  Modified to run with geoclaw commit fe6136f4657f0
-which should go in 5.2.0.
+Version required:  Modified to run with geoclaw commit 9e0ddece0
+which should go in 5.2.0.  (new style of specifying fgmax grids and updates
+for moving dtopo from 5.1.0)
 
 Illustrates how to set up a grid of points to monitor maximum amplitude of
 wave, and also a 1-dimensional transect.  

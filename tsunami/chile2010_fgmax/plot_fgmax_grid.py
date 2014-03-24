@@ -45,13 +45,13 @@ def make_plots(outdir='_output', plotdir='_plots'):
         raise Exception("cannot open %s" % fgmax_input_file)
 
     # skip some lines:
-    for i in range(5):
+    for i in range(6):
         line = fid.readline()
 
     line = fid.readline().split()
     fid.close()
-    mx = int(line[1])
-    my = int(line[2])
+    mx = int(line[0])
+    my = int(line[1])
 
 
     fname = outdir + '/fort.FG1.valuemax' 
