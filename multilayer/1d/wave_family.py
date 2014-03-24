@@ -24,7 +24,7 @@ def wave_family(num_cells,eigen_method,wave_family,dry_state=True,**kargs):
     
     # Redirect loggers
     # This is not working for all cases, see comments in runclaw.py
-    for logger_name in ['pyclaw.io','spyclaw.olution','plot','pyclaw.solver','f2py','data']:
+    for logger_name in ['pyclaw.io','pyclaw.solution','plot','pyclaw.solver','f2py','data']:
         runclaw.replace_stream_handlers(logger_name,log_path,log_file_append=False)
 
     # Load in appropriate PyClaw version
