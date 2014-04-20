@@ -53,7 +53,7 @@ def make_plots(outdir='_output', plotdir='_plots'):
     x = d[:,0]
     y = d[:,1]
     y0 = 0.5*(y.min() + y.max())   # mid-latitude for scaling plots
-    eta_tilde = d[:,3]
+    h = d[:,3]
 
     # AMR level used for each zeta value:
     level = array(d[:,2], int)
@@ -75,10 +75,10 @@ def make_plots(outdir='_output', plotdir='_plots'):
         B = where(level==i+1, topo[i], B)
 
 
-    h = where(eta_tilde > B, eta_tilde - B, 0.)
+    eta = h+B
 
     # zeta = max h on land or max eta offshore:
-    zeta = where(B>sea_level, h, eta_tilde)
+    zeta = where(B>sea_level, h, eta)
     zeta = where(zeta > -1e20, zeta, sea_level)
     
     tzeta = d[:,4]  # Time maximum h recorded
@@ -104,8 +104,8 @@ def make_plots(outdir='_output', plotdir='_plots'):
         title("Zeta Maximum at Latitude %g" % y[0])
 
         subplot(212)
-        eta_tilde = ma.masked_where(eta_tilde<-1e20,eta_tilde)
-        plot(y,eta_tilde)   # h+B also onshore for transect
+        eta = ma.masked_where(eta<-1e20,eta)
+        plot(y,eta)   # h+B also onshore for transect
         plot(x,B,'g')  # topo
         xlim(x.min(),x.max())
         title("Topography at Latitude %g" % y[0])

@@ -64,7 +64,8 @@ def make_plots(outdir='_output', plotdir='_plots'):
     x = reshape(d[:,0],(mx,my),order='F')
     y = reshape(d[:,1],(mx,my),order='F')
     y0 = 0.5*(y.min() + y.max())   # mid-latitude for scaling plots
-    eta_tilde = reshape(d[:,3],(mx,my),order='F')
+    #eta_tilde = reshape(d[:,3],(mx,my),order='F')
+    h = reshape(d[:,3],(mx,my),order='F')
 
     # AMR level used for each zeta value:
     level = reshape(d[:,2].astype('int'),(mx,my),order='F')
@@ -85,11 +86,13 @@ def make_plots(outdir='_output', plotdir='_plots'):
     for i in range(levelmax):
         B = where(level==i+1, topo[i], B)
 
-    h = where(eta_tilde > B, eta_tilde - B, 0.)
+    #h = where(eta_tilde > B, eta_tilde - B, 0.)
+    eta = h+B
 
     # zeta = max h on land or max eta offshore:
-    zeta = where(B>sea_level, h, eta_tilde)
-    zeta = where(zeta > -1e20, zeta, sea_level)
+    zeta = where(B>sea_level, h, eta)
+    #zeta = where(zeta > -1e20, zeta, sea_level)
+
 
     tzeta = reshape(d[:,4],(mx,my),order='F')  # Time maximum h recorded
     tzeta = ma.masked_where(tzeta < -1e50, tzeta)      
