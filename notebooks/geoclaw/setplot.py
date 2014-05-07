@@ -82,10 +82,10 @@ def setplot(plotdata):
     plotitem.pcolor_cmin = 0.0
     plotitem.pcolor_cmax = 100.0
     plotitem.add_colorbar = False
-    plotitem.amr_celledges_show = [1,1,0]
+    plotitem.amr_celledges_show = [0,0,0]
     plotitem.patchedges_show = 1
-    plotaxes.xlimits = [-120,-60]
-    plotaxes.ylimits = [-60,0]
+    plotaxes.xlimits = [140,210]
+    plotaxes.ylimits = [15,50]
 
     # add contour lines of bathy if desired:
     plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
@@ -94,10 +94,61 @@ def setplot(plotdata):
     plotitem.contour_levels = linspace(-3000,-3000,1)
     plotitem.amr_contour_colors = ['y']  # color on each level
     plotitem.kwargs = {'linestyles':'solid','linewidths':2}
-    plotitem.amr_contour_show = [1,0,0]  
+    plotitem.amr_contour_show = [0,0,0]  
     plotitem.celledges_show = 0
     plotitem.patchedges_show = 0
 
+
+    plotfigure = plotdata.new_plotfigure(name='Surface - Hawaii', figno=1)
+
+    # Set up for axes in this figure:
+    plotaxes = plotfigure.new_plotaxes('pcolor')
+    plotaxes.title = 'Surface'
+    plotaxes.scaled = True
+
+    def fixup(current_data):
+        import pylab
+        addgauges(current_data)
+        t = current_data.t
+        t = t / 3600.  # hours
+        pylab.title('Surface at %4.2f hours' % t, fontsize=20)
+        pylab.xticks(fontsize=15)
+        pylab.yticks(fontsize=15)
+    plotaxes.afteraxes = fixup
+
+    # Water
+    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    #plotitem.plot_var = geoplot.surface
+    plotitem.plot_var = geoplot.surface_or_depth
+    plotitem.pcolor_cmap = geoplot.tsunami_colormap
+    plotitem.pcolor_cmin = -0.2
+    plotitem.pcolor_cmax = 0.2
+    plotitem.add_colorbar = True
+    plotitem.amr_celledges_show = [0,0,0]
+    plotitem.patchedges_show = 1
+
+    # Land
+    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    plotitem.plot_var = geoplot.land
+    plotitem.pcolor_cmap = geoplot.land_colors
+    plotitem.pcolor_cmin = 0.0
+    plotitem.pcolor_cmax = 100.0
+    plotitem.add_colorbar = False
+    plotitem.amr_celledges_show = [0,0,0]
+    plotitem.patchedges_show = 1
+    plotaxes.xlimits = [199,207]
+    plotaxes.ylimits = [18,23]
+
+    # add contour lines of bathy if desired:
+    plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
+    plotitem.show = False
+    plotitem.plot_var = geoplot.topo
+    plotitem.contour_levels = linspace(-3000,-3000,1)
+    plotitem.amr_contour_colors = ['y']  # color on each level
+    plotitem.kwargs = {'linestyles':'solid','linewidths':2}
+    plotitem.amr_contour_show = [0,0,0]  
+    plotitem.celledges_show = 0
+    plotitem.patchedges_show = 0
 
     #-----------------------------------------
     # Figures for gauges
