@@ -182,6 +182,7 @@ topo:
 
 all:
 	make topo
+	python make_fgmax.py
 	make .plots
 	python plot_fgmax_grid.py
 	python plot_fgmax_transect.py
