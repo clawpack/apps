@@ -1,26 +1,33 @@
 
-Test case for fgmax routines.  
+.. _apps_tsunami_chile2010_fgmax:
 
-Version required:  Modified to run with geoclaw commit 9e0ddece0
-which should go in 5.2.0.  (new style of specifying fgmax grids and updates
-for moving dtopo from 5.1.0)
+Test case for fgmax routines  
+=============================
 
 Illustrates how to set up a grid of points to monitor maximum amplitude of
 wave, and also a 1-dimensional transect.  
 
-To test:
+To test::
 
-python make_fgmax.py   # to create fgmax_grid.txt and fgmax_transect.txt
-make .output
-python plot_fgmax_grid.py
-python plot_fgmax_transect.py
+    python make_fgmax.py   # to create fgmax_grid.txt and fgmax_transect.txt
+    make .output
+    python plot_fgmax_grid.py
+    python plot_fgmax_transect.py
+    make plots
+
+Or simply::
+
+    make all
 
 
-This should produce the following files in ./_plots:
-   zeta.png             maximum amplitude along with contours of arrival times
-   arrival_times.png    color map of arrival times
-   zetatimes.png        color map of time of maximum amplitude
+This should produce the following files in `./_plots`:
 
-   zeta_transect.png           1d plot of solution on a transect (from FG2)
-   arrival_times_transect.png  arrival times along transect
+ - `zeta.png`             maximum amplitude along with contours of arrival times
+ - `arrival_times.png`    color map of arrival times
+ - `zetatimes.png`        color map of time of maximum amplitude
+
+ - `zeta_transect.png`           1d plot of solution on a transect (from FG2)
+ - `arrival_times_transect.png`  arrival times along transect
+
+These should also show up in `_plots/_PlotIndex.html`
 
