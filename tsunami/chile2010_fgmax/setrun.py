@@ -444,3 +444,6 @@ if __name__ == '__main__':
     rundata = setrun(*sys.argv[1:])
     rundata.write()
 
+    from clawpack.geoclaw import kmltools
+    kmltools.regions2kml()
+    kmltools.gauges2kml()

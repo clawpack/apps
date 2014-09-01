@@ -181,8 +181,9 @@ topo:
 	python maketopo.py
 
 all:
-	make topo
+	$(MAKE) topo
 	python make_fgmax.py
-	make .plots
+	$(MAKE) .output
 	python plot_fgmax_grid.py
 	python plot_fgmax_transect.py
+	$(MAKE) plots
