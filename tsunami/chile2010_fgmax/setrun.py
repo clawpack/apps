@@ -120,9 +120,9 @@ def setrun(claw_pkg='geoclaw'):
 
     if clawdata.output_style==1:
         # Output nout frames at equally spaced times up to tfinal:
-        clawdata.num_output_times = 2
-        clawdata.tfinal = 8*3600.0
-        clawdata.output_t0 = True  # output at initial (or restart) time?
+        clawdata.num_output_times = 4
+        clawdata.tfinal = 15*3600.0
+        clawdata.output_t0 = False  # output at initial (or restart) time?
 
     elif clawdata.output_style == 2:
         # Specify a list of output times.
@@ -347,8 +347,8 @@ def setrun(claw_pkg='geoclaw'):
     rundata.regiondata.regions = []
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
-    rundata.regiondata.regions.append([3, 3, 0., 10000., -85,-72,-38,-25])
-    rundata.regiondata.regions.append([3, 3, 8000., 26000., -90,-80,-30,-15])
+    rundata.regiondata.regions.append([2, 2, 0., 10000., -85,-72,-38,-25])
+    rundata.regiondata.regions.append([2, 2, 8000., 26000., -90,-80,-30,-15])
 
     # ---------------
     # Gauges:
@@ -395,7 +395,7 @@ def setgeo(rundata):
     # Refinement settings
     refinement_data = rundata.refinement_data
     refinement_data.variable_dt_refinement_ratios = True
-    refinement_data.wave_tolerance = 1.e-1
+    refinement_data.wave_tolerance = 1.e-2
     refinement_data.deep_depth = 1e2
     refinement_data.max_level_deep = 3
 
