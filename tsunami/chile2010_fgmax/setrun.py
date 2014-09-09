@@ -9,6 +9,14 @@ that will be read in by the Fortran code.
 import os
 import numpy as np
 
+try:
+    CLAW = os.environ['CLAW']
+except:
+    raise Exception("*** Must first set CLAW enviornment variable")
+
+# Scratch directory for storing topo and dtopo files:
+scratch_dir = os.path.join(CLAW, 'geoclaw', 'scratch')
+
 
 #------------------------------
 def setrun(claw_pkg='geoclaw'):
@@ -135,7 +143,7 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.output_t0 = True
         
 
-    clawdata.output_format == 'ascii'      # 'ascii' or 'netcdf' 
+    clawdata.output_format = 'ascii'      # 'ascii' or 'netcdf' 
 
     clawdata.output_q_components = 'all'   # need all
     clawdata.output_aux_components = 'none'  # eta=h+B is in q
@@ -164,7 +172,7 @@ def setrun(claw_pkg='geoclaw'):
 
     # Initial time step for variable dt.
     # If dt_variable==0 then dt=dt_initial for all steps:
-    clawdata.dt_initial = 2.
+    clawdata.dt_initial = 0.2
 
     # Max time step to be allowed if variable dt used:
     clawdata.dt_max = 1e+99
@@ -237,27 +245,6 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.bc_lower[1] = 'extrap'
     clawdata.bc_upper[1] = 'extrap'
 
-    # Specify when checkpoint files should be created that can be
-    # used to restart a computation.
-
-    clawdata.checkpt_style = 1
-
-    if clawdata.checkpt_style == 0:
-        # Do not checkpoint at all
-        pass
-
-    elif clawdata.checkpt_style == 1:
-        # Checkpoint only at tfinal.
-        pass
-
-    elif clawdata.checkpt_style == 2:
-        # Specify a list of checkpoint times.  
-        clawdata.checkpt_times = [0.1,0.15]
-
-    elif clawdata.checkpt_style == 3:
-        # Checkpoint every checkpt_interval timesteps (on Level 1)
-        # and at the final time.
-        clawdata.checkpt_interval = 5
 
 
     # --------------
@@ -403,13 +390,16 @@ def setgeo(rundata):
     topo_data = rundata.topo_data
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
-    topo_data.topofiles.append([2, 1, 3, 0., 1.e10, 'etopo10min120W60W60S0S.asc'])
+    topo_path = os.path.join(scratch_dir, 'etopo10min120W60W60S0S.asc')
+    topo_data.topofiles.append([2, 1, 3, 0., 1.e10, topo_path])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
     #   [topotype, minlevel,maxlevel,fname]
-    dtopo_data.dtopofiles.append([1,3,3,'usgs100227.tt1'])
+    dtopo_path = os.path.join(scratch_dir, 'dtopo_usgs100227.tt3')
+    dtopo_data.dtopofiles.append([3,3,3,dtopo_path])
+    dtopo_data.dt_max_dtopo = 0.2
 
 
     # == setqinit.data values ==
@@ -418,18 +408,16 @@ def setgeo(rundata):
     # for qinit perturbations, append lines of the form: (<= 1 allowed for now!)
     #   [minlev, maxlev, fname]
 
-    # == fixedgrids.data values ==
-    fixedgrids = rundata.fixed_grid_data.fixedgrids
+    # == setfixedgrids.data values ==
+    fixed_grids = rundata.fixed_grid_data
     # for fixed grids append lines of the form
     # [t1,t2,noutput,x1,x2,y1,y2,xpoints,ypoints,\
     #  ioutarrivaltimes,ioutsurfacemax]
-    #fixedgrids.append([0,1,2,0,1,0,1,3,3,0,0])
 
     # == fgmax.data values ==
     fgmax_files = rundata.fgmax_data.fgmax_files
     # for fixed grids append to this list names of any fgmax input files
     fgmax_files.append('fgmax_grid.txt')
-    fgmax_files.append('fgmax_transect.txt')
 
 
     return rundata
@@ -444,6 +432,3 @@ if __name__ == '__main__':
     rundata = setrun(*sys.argv[1:])
     rundata.write()
 
-    from clawpack.geoclaw import kmltools
-    kmltools.regions2kml()
-    kmltools.gauges2kml()
