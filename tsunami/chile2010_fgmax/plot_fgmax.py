@@ -17,21 +17,22 @@ def plot_fgmax_grid():
     colors = geoplot.discrete_cmap_1(clines_zeta)
     plt.figure(1)
     plt.clf()
-    plt.contourf(fg.x,fg.y,fg.zeta,clines_zeta,colors=colors)
-    plt.contour(fg.x,fg.y,fg.B,[0.],colors='k')  # coastline
+    zeta = numpy.where(fg.B>0, fg.h, fg.h+fg.B)   # surface elevation in ocean
+    plt.contourf(fg.X,fg.Y,zeta,clines_zeta,colors=colors)
+    plt.contour(fg.X,fg.Y,fg.B,[0.],colors='k')  # coastline
 
     # plot arrival time contours and label:
     arrival_t = fg.arrival_time/3600.  # arrival time in hours
     clines_t = numpy.linspace(0,8,17)  # hours
     clines_t_label = clines_t[::2]  # which ones to label 
     clines_t_colors = [.5,.5,.5]
-    con_t = plt.contour(fg.x,fg.y,arrival_t, clines_t,colors=clines_t_colors) 
+    con_t = plt.contour(fg.X,fg.Y,arrival_t, clines_t,colors=clines_t_colors) 
     plt.clabel(con_t, clines_t_label)
 
     # fix axes:
     plt.ticklabel_format(format='plain',useOffset=False)
     plt.xticks(rotation=20)
-    plt.gca().set_aspect(1./numpy.cos(fg.y.mean()*numpy.pi/180.))
+    plt.gca().set_aspect(1./numpy.cos(fg.Y.mean()*numpy.pi/180.))
     plt.title("Maximum amplitude / arrival times")
 
 
