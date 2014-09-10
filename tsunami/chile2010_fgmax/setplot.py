@@ -154,16 +154,8 @@ def setplot(plotdata):
     #-----------------------------------------
     # Figures for fgmax - max values on fixed grids
     #-----------------------------------------
-    otherfigure = plotdata.new_otherfigure(name='zeta max on grid', 
-                    fname='zeta.png')
-    otherfigure = plotdata.new_otherfigure(name='time of max zeta',
-                    fname='zetatimes.png')
-    otherfigure = plotdata.new_otherfigure(name='arrival time',
-                    fname='arrival_times.png')
-    otherfigure = plotdata.new_otherfigure(name='zeta max on transect', 
-                    fname='zeta_transect.png')
-    otherfigure = plotdata.new_otherfigure(name='arrival time on transect',
-                    fname='arrival_times_transect.png')
+    otherfigure = plotdata.new_otherfigure(name='max amplitude and arrival times', 
+                    fname='amplitude_times.png')
 
 
 

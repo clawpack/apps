@@ -38,6 +38,6 @@ def plot_fgmax_grid():
 
 if __name__=="__main__":
     plot_fgmax_grid()
-    fname = "amplitude_times.png"
+    fname = "_plots/amplitude_times.png"
     plt.savefig(fname)
     print "Created ",fname
