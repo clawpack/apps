@@ -21,30 +21,11 @@ def make_fgmax_grid():
     fg.min_level_check = 2    # which levels to monitor max on
     fg.arrival_tol = 1.e-2    # tolerance for flagging arrival
 
-    fg.fname = 'fgmax_grid.txt'
+    fg.input_file_name = 'fgmax_grid.txt'
     fg.write_input_data()
 
-def make_fgmax_transect():
-    fg = fgmax_tools.FGmaxGrid()
-    fg.point_style = 1       # will specify a 1d grid of points
-    fg.x1 = -120
-    fg.x2 = -70
-    fg.y1 = -17.975
-    fg.y2 = -17.975
-    fg.npts = 500
-    fg.tstart_max =  0.     # when to start monitoring max values
-    fg.tend_max = 1.e10       # when to stop monitoring max values
-    fg.dt_check = 60.         # target time (sec) increment between updating 
-                               # max values
-    fg.min_level_check = 2    # which levels to monitor max on
-    fg.arrival_tol = 1.e-2    # tolerance for flagging arrival
-
-    fg.fname = 'fgmax_transect.txt'
-    fg.write_input_data()
-    
 
 if __name__ == "__main__":
     make_fgmax_grid()
-    make_fgmax_transect()
 
 
