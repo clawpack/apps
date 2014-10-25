@@ -19,6 +19,7 @@ def plot_fgmax_grid():
     plt.clf()
     zeta = numpy.where(fg.B>0, fg.h, fg.h+fg.B)   # surface elevation in ocean
     plt.contourf(fg.X,fg.Y,zeta,clines_zeta,colors=colors)
+    plt.colorbar()
     plt.contour(fg.X,fg.Y,fg.B,[0.],colors='k')  # coastline
 
     # plot arrival time contours and label:

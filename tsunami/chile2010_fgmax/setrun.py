@@ -134,7 +134,7 @@ def setrun(claw_pkg='geoclaw'):
 
     elif clawdata.output_style == 2:
         # Specify a list of output times.
-        clawdata.output_times = [0.5, 1.0]
+        clawdata.output_times = [30., 60., 300., 600.]
 
     elif clawdata.output_style == 3:
         # Output every iout timesteps with a total of ntot time steps:
@@ -280,12 +280,12 @@ def setrun(claw_pkg='geoclaw'):
     amrdata = rundata.amrdata
 
     # max number of refinement levels:
-    amrdata.amr_levels_max = 2
+    amrdata.amr_levels_max = 3
 
     # List of refinement ratios at each level (length at least mxnest-1)
-    amrdata.refinement_ratios_x = [6,6]
-    amrdata.refinement_ratios_y = [6,6]
-    amrdata.refinement_ratios_t = [6,6]
+    amrdata.refinement_ratios_x = [4,3]
+    amrdata.refinement_ratios_y = [4,3]
+    amrdata.refinement_ratios_t = [4,3]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
@@ -334,8 +334,8 @@ def setrun(claw_pkg='geoclaw'):
     rundata.regiondata.regions = []
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
-    rundata.regiondata.regions.append([2, 2, 0., 10000., -85,-72,-38,-25])
-    rundata.regiondata.regions.append([2, 2, 8000., 26000., -90,-80,-30,-15])
+    #rundata.regiondata.regions.append([1, 2, 0., 1e9, -360,360,-90,90])
+    rundata.regiondata.regions.append([3, 3, 0., 600., -76,-72,-38,-33])
 
     # ---------------
     # Gauges:
