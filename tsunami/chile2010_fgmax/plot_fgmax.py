@@ -38,7 +38,11 @@ def plot_fgmax_grid():
 
 
 if __name__=="__main__":
+    import os
     plot_fgmax_grid()
-    fname = "_plots/amplitude_times.png"
+    plotdir = '_plots'
+    if not os.path.isdir(plotdir): 
+        os.mkdir(plotdir)
+    fname = os.path.join(plotdir, "amplitude_times.png")
     plt.savefig(fname)
     print "Created ",fname

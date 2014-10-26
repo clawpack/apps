@@ -182,7 +182,8 @@ topo:
 all: 
 	$(MAKE) topo
 	python make_fgmax.py
-	$(MAKE) .plots
+	$(MAKE) .output
 	python plot_fgmax.py
+	$(MAKE) .plots
 	$(MAKE) .htmls
 

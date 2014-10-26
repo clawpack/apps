@@ -186,3 +186,4 @@ all:
 	$(MAKE) .output
 	python plot_fgmax.py
 	$(MAKE) plots
+	$(MAKE) .htmls

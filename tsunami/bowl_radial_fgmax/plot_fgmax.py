@@ -93,26 +93,31 @@ def plot_fgmax_transects():
 
 if __name__=="__main__":
 
+    import os
+    plotdir = '_plots'
+    if not os.path.isdir(plotdir): 
+        os.mkdir(plotdir)
+
     plot_fgmax_grid(1)
     plt.figure(1)
-    fname = "_plots/fgmax_grid1.png"
+    fname = os.path.join(plotdir, "fgmax_grid1.png")
     plt.savefig(fname)
     print "Created ",fname
 
     plot_fgmax_grid(2)
     plt.figure(2)
-    fname = "_plots/fgmax_grid2.png"
+    fname = os.path.join(plotdir, "fgmax_grid2.png")
     plt.savefig(fname)
     print "Created ",fname
 
     plot_fgmax_transects()
     plt.figure(3)
-    fname = "_plots/fgmax_transects.png"
+    fname = os.path.join(plotdir, "fgmax_transects.png")
     plt.savefig(fname)
     print "Created ",fname
 
     plt.figure(5)
-    fname = "_plots/fgmax_along_shore.png"
+    fname = os.path.join(plotdir, "fgmax_along_shore.png")
     plt.savefig(fname)
     print "Created ",fname
 
