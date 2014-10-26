@@ -1,8 +1,8 @@
 
 .. _apps_tsunami_chile2010_fgmax:
 
-Test case for fgmax routines  
-=============================
+Chile 2010 test case for fgmax routines  
+=======================================
 
 Illustrates how to set up a grid of points to monitor the maximum amplitude of
 the wave at each point in the domain and the arrival times.

@@ -1,8 +1,8 @@
 
 .. _apps_tsunami_bowl_radial_fgmax:
 
-Test case for fgmax routines  
-=============================
+Radial bowl test case for fgmax routines  
+========================================
 
 Illustrates how to set up a grid of points to monitor the maximum amplitude of
 the wave at each point on a grid of points, a transect, and a curve along
