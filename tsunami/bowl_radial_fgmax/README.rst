@@ -49,6 +49,10 @@ In addition to the usual time frame plots in
 
 *Note:*
 
+- This example is based on `$CLAW/geoclaw/examples/tsunami/bowl-radial` but
+  with some changes to parameters and the topography is adjusted so the 
+  shoreline is at radius 90 meters.
+
 - See http://www.clawpack.org/fgmax.html for more information about
   specifying fgmax parameters.
 
