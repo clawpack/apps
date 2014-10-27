@@ -151,6 +151,13 @@ def setplot(plotdata):
     plotaxes.afteraxes = add_zeroline
 
 
+    #-----------------------------------------
+    # Figures for fgmax - max values on fixed grids
+    #-----------------------------------------
+    otherfigure = plotdata.new_otherfigure(name='max amplitude and arrival times', 
+                    fname='amplitude_times.png')
+
+
 
     #-----------------------------------------
     

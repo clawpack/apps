@@ -1,3 +1,4 @@
+
 # Makefile for Clawpack code in this directory.
 # This version only sets the local files and frequently changed
 # options, and then includes the standard makefile pointed to by CLAWMAKE.
@@ -18,13 +19,11 @@ OUTDIR = _output               # Directory for output
 SETPLOT_FILE = setplot.py      # File containing function to set plots
 PLOTDIR = _plots               # Directory for plots
 
-OVERWRITE ?= True                   # False ==> make a copy of OUTDIR first
-RESTART ?= False                    # Should = clawdata.restart in setrun
-
 # Environment variable FC should be set to fortran compiler, e.g. gfortran
 
 # Compiler flags can be specified here or set as an environment variable
 FFLAGS ?=
+
 
 # ---------------------------------
 # List of sources for this program:
@@ -72,8 +71,8 @@ SOURCES = \
   $(GEOLIB)/update.f \
   $(GEOLIB)/setaux.f90 \
   $(GEOLIB)/flag2refine2.f90  \
-  $(AMRLIB)/flagregions2.f90  \
   $(GEOLIB)/allowflag.f90  \
+  $(AMRLIB)/flagregions2.f90  \
   $(GEOLIB)/b4step2.f90 \
   $(GEOLIB)/dumpgauge.f \
   $(GEOLIB)/upbnd.f  \
@@ -86,7 +85,7 @@ SOURCES = \
   $(GEOLIB)/amr2.f90 \
   $(GEOLIB)/fgmax_read.f90 \
   $(GEOLIB)/fgmax_frompatch.f90 \
-  $(GEOLIB)/fgmax_interpolate0.f90 \
+  $(GEOLIB)/fgmax_interpolate.f90 \
   $(GEOLIB)/fgmax_values.f90 \
   $(GEOLIB)/fgmax_finalize.f90 \
   $(AMRLIB)/quick_sort1.f \
@@ -176,13 +175,14 @@ include $(CLAWMAKE)
 
 # Construct the topography data
 .PHONY: topo all
-topo: 
+topo:
 	python maketopo.py
 
-all:
+all: 
 	$(MAKE) topo
 	python make_fgmax.py
 	$(MAKE) .output
 	python plot_fgmax.py
-	$(MAKE) plots
+	$(MAKE) .plots
 	$(MAKE) .htmls
+
