@@ -139,7 +139,7 @@ def plot_riemann(states, s, riemann_eval, t, fig=None, color='b'):
         ax[i+1].set_title('q[%s] at t = %6.3f' % (i,t))
     
     if t == 0:
-        q = riemann_eval(x)
+        q = riemann_eval(x/1e-10)
     else:
         q = riemann_eval(x/t)
 
