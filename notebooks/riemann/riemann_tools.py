@@ -41,7 +41,22 @@ def riemann_solution(num_eqn,solver,q_l,q_r,aux_l=None,aux_r=None,t=0.2,problem_
     s_sym = sympy.Matrix(s)
     display(s_sym.T)
     
-    return states, s
+    def riemann_eval(xi):
+        "Return Riemann solution as function of xi = x/t."
+        qout = np.zeros((num_eqn,len(xi)))
+        if xi[0] == np.inf:  # For t=0, return initial left and right states
+            for m in range(num_eqn):
+                qout[m,:] = states[m,0]*(xi<=0) + states[m,-1]*(xi>0)
+        else:
+            intervals = [(xi>=s[i])*(xi<=s[i+1]) for i in range(len(s)-1)]
+            intervals.insert(0, xi<s[0])
+            intervals.append(xi>=s[-1])
+            for m in range(num_eqn):
+                qout[m,:] = np.piecewise(xi, intervals, states[m,:])
+
+        return qout
+
+    return states, s, riemann_eval
 
 def plot_phase(states, i_h=0, i_v=1, ax=None):
     """
@@ -80,9 +95,11 @@ def plot_phase_3d(states):
     ax.text(states[0,0]+0.05,states[1,0],states[2,0],'q_left')
     ax.text(states[0,-1]+0.05,states[1,-1],states[2,-1],'q_right')
  
-def plot_riemann(states, s, t, fig=None, color='b'):
+def plot_riemann(states, s, riemann_eval, t, fig=None, color='b'):
     """
     Take an array of states and speeds s and plot the solution at time t.
+    For rarefaction waves, the corresponding entry in s should be tuple of two values,
+    which are the wave speeds that bound the rarefaction fan.
     Plots in the x-t plane and also produces a separate plot for each component of q.
     """
     
@@ -92,12 +109,21 @@ def plot_riemann(states, s, t, fig=None, color='b'):
         fig, ax = plt.subplots(1,num_eqn+1,figsize=(figwidth,4))
     else:
         ax = fig.axes
+        xmin, xmax = ax[1].get_xlim()
     tmax = 1.0
     xmax = 0.
     for i in range(len(s)):
-        x1 = tmax * s[i]
-        ax[0].plot([0,x1],[0,tmax],color=color)
-        xmax = max(xmax,abs(x1))
+        if type(s[i]) not in (tuple, list):  # this is a jump
+            x1 = tmax * s[i]
+            ax[0].plot([0,x1],[0,tmax],color=color)
+            xmax = max(xmax,abs(x1))
+        else: #plot rarefaction fan
+            speeds = np.linspace(s[i][0],s[i][1],5)
+            for ss in speeds:
+                x1 = tmax * ss
+                ax[0].plot([0,x1],[0,tmax],color=color)
+                xmax = max(xmax,abs(x1))
+
     x = np.linspace(-xmax,xmax,1000)
                    
     ax[0].set_xlim(-xmax,xmax)
@@ -112,65 +138,44 @@ def plot_riemann(states, s, t, fig=None, color='b'):
         ax[i+1].set_ylim((qmin-0.1*qdiff,qmax+0.1*qdiff))
         ax[i+1].set_title('q[%s] at t = %6.3f' % (i,t))
     
-    q = np.outer(states[:,0],(x<t*s[0]))
-
-    for i in range(len(s)-1):
-        q = q + np.outer(states[:,i+1],(x>=t*s[i])*(x<t*s[i+1]))
-    q = q + np.outer(states[:,-1],(x>s[-1]*t))
+    if t == 0:
+        q = riemann_eval(x)
+    else:
+        q = riemann_eval(x/t)
 
     for i in range(num_eqn):
-        ax[i+1].plot(x,q[i,:],color=color)
+        ax[i+1].plot(x,q[i][:],color=color,lw=2)
+
     return fig
             
 
-def plot_exact(reval, t, fig, color='k'):
-    ax = fig.axes
-    xmin,xmax = ax[1].get_xlim()
-    x = np.linspace(xmin,xmax,1000)
-    xi = x/t
-    q = reval(xi)
-    for i in range(len(ax)-1):
-        ax[i+1].plot(x,q[i],color=color)
-    return fig
-
-            
-def make_plot_function(states,s):
-    """
-    Utility function to create a plot_function that takes a single argument t.
-    This function can then be used in a StaticInteract widget.
-    """
-    def plot_function(t):
-        fig = plot_riemann(states,s,t)
-        return fig
-    return plot_function
-
-def dummy(reval, t, fig, color='k'):
-    pass
-
-def make_plot_function_compare(states_list,speeds_list,exact_solution=None):
+def make_plot_function(states_list,speeds_list,riemann_eval_list,names=None):
     """
     Utility function to create a plot_function that takes a single argument t.
     This function can then be used in a StaticInteract widget.
     Version that takes an arbitrary list of sets of states and speeds in order to make a comparison.
     """
-    colors = "brg"
+    colors = "kbrg"
     if type(states_list) is not list:
         states_list = [states_list]
         speeds_list = [speeds_list]
+        riemann_eval_list = [riemann_eval_list]
 
     def plot_function(t):
+        fig = None
         for i in range(len(states_list)):
             states = states_list[i]
             speeds = speeds_list[i]
+            riemann_eval = riemann_eval_list[i]
 
-            if i==0:
-                fig = plot_riemann(states,speeds,t,color=colors[i])
+            if fig is None:
+                fig = plot_riemann(states,speeds,riemann_eval,t,color=colors[i])
             else:
-                fig = plot_riemann(states,speeds,t,fig,colors[i])
-        if exact_solution is not None:
-            #fig = plot_exact(reval, t, fig)
-            plot_exact(exact_solution, t, fig)
-            #dummy(fig)
+                fig = plot_riemann(states,speeds,riemann_eval,t,fig,colors[i])
+
+            if names is not None:
+                # We could use fig.legend here if we had the line plot handles
+                fig.axes[1].legend(names,loc='best')
 
         return fig
 

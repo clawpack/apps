@@ -103,10 +103,10 @@ def exact_riemann_solution(q_l,q_r,gamma=1.4):
         p3 = p_r*(rho3/rho_r)**gamma
         return rho3, u3, p3
     
-    q_l_star = primitive_to_conservative(rho_l_star,u,p)
-    q_r_star = primitive_to_conservative(rho_r_star,u,p)
+    q_l_star = np.squeeze(np.array(primitive_to_conservative(rho_l_star,u,p)))
+    q_r_star = np.squeeze(np.array(primitive_to_conservative(rho_r_star,u,p)))
     
-    states = [q_l,q_l_star,q_r_star,q_r]
+    states = np.column_stack([q_l,q_l_star,q_r_star,q_r])
     speeds = [(ws[0],ws[1]),ws[2],(ws[3],ws[4])]
 
     def reval(xi):
