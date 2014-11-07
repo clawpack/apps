@@ -122,6 +122,17 @@ def plot_riemann(states, s, t, fig=None, color='b'):
         ax[i+1].plot(x,q[i,:],color=color)
     return fig
             
+
+def plot_exact(reval, t, fig, color='k'):
+    ax = fig.axes
+    xmin,xmax = ax[1].get_xlim()
+    x = np.linspace(xmin,xmax,1000)
+    xi = x/t
+    q = reval(xi)
+    for i in range(len(ax)-1):
+        ax[i+1].plot(x,q[i],color=color)
+    return fig
+
             
 def make_plot_function(states,s):
     """
@@ -133,14 +144,34 @@ def make_plot_function(states,s):
         return fig
     return plot_function
 
-def make_plot_function_compare(states,s,states2,s2):
+def dummy(reval, t, fig, color='k'):
+    pass
+
+def make_plot_function_compare(states_list,speeds_list,exact_solution=None):
     """
     Utility function to create a plot_function that takes a single argument t.
     This function can then be used in a StaticInteract widget.
-    Version that takes two sets of states and speeds in order to make a comparison.
+    Version that takes an arbitrary list of sets of states and speeds in order to make a comparison.
     """
+    colors = "brg"
+    if type(states_list) is not list:
+        states_list = [states_list]
+        speeds_list = [speeds_list]
+
     def plot_function(t):
-        fig = plot_riemann(states,s,t)
-        fig = plot_riemann(states2,s2,t,fig,'r')
+        for i in range(len(states_list)):
+            states = states_list[i]
+            speeds = speeds_list[i]
+
+            if i==0:
+                fig = plot_riemann(states,speeds,t,color=colors[i])
+            else:
+                fig = plot_riemann(states,speeds,t,fig,colors[i])
+        if exact_solution is not None:
+            #fig = plot_exact(reval, t, fig)
+            plot_exact(exact_solution, t, fig)
+            #dummy(fig)
+
         return fig
+
     return plot_function
