@@ -44,15 +44,11 @@ def riemann_solution(num_eqn,solver,q_l,q_r,aux_l=None,aux_r=None,t=0.2,problem_
     def riemann_eval(xi):
         "Return Riemann solution as function of xi = x/t."
         qout = np.zeros((num_eqn,len(xi)))
-        if xi[0] == np.inf:  # For t=0, return initial left and right states
-            for m in range(num_eqn):
-                qout[m,:] = states[m,0]*(xi<=0) + states[m,-1]*(xi>0)
-        else:
-            intervals = [(xi>=s[i])*(xi<=s[i+1]) for i in range(len(s)-1)]
-            intervals.insert(0, xi<s[0])
-            intervals.append(xi>=s[-1])
-            for m in range(num_eqn):
-                qout[m,:] = np.piecewise(xi, intervals, states[m,:])
+        intervals = [(xi>=s[i])*(xi<=s[i+1]) for i in range(len(s)-1)]
+        intervals.insert(0, xi<s[0])
+        intervals.append(xi>=s[-1])
+        for m in range(num_eqn):
+            qout[m,:] = np.piecewise(xi, intervals, states[m,:])
 
         return qout
 
@@ -100,6 +96,7 @@ def plot_riemann(states, s, riemann_eval, t, fig=None, color='b'):
     Take an array of states and speeds s and plot the solution at time t.
     For rarefaction waves, the corresponding entry in s should be tuple of two values,
     which are the wave speeds that bound the rarefaction fan.
+
     Plots in the x-t plane and also produces a separate plot for each component of q.
     """
     
@@ -121,7 +118,7 @@ def plot_riemann(states, s, riemann_eval, t, fig=None, color='b'):
             speeds = np.linspace(s[i][0],s[i][1],5)
             for ss in speeds:
                 x1 = tmax * ss
-                ax[0].plot([0,x1],[0,tmax],color=color)
+                ax[0].plot([0,x1],[0,tmax],color=color,lw=0.3)
                 xmax = max(xmax,abs(x1))
 
     x = np.linspace(-xmax,xmax,1000)
