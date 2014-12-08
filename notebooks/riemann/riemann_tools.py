@@ -17,6 +17,10 @@ def riemann_solution(num_eqn,solver,q_l,q_r,aux_l=None,aux_r=None,t=0.2,problem_
         aux_l = np.zeros(num_eqn)
     if aux_r is None:
         aux_r = np.zeros(num_eqn)
+
+    if num_eqn == 1:
+        q_l = np.array(q_l)   # in case q_l, q_r specified as scalars
+        q_r = np.array(q_r)
     
     wave, s, amdq, apdq = solver(q_l.reshape((num_eqn,1)),q_r.reshape((num_eqn,1)),
                                  aux_l.reshape((num_eqn,1)),aux_r.reshape((num_eqn,1)),problem_data)
@@ -40,6 +44,11 @@ def riemann_solution(num_eqn,solver,q_l,q_r,aux_l=None,aux_r=None,t=0.2,problem_
     print "Speeds: "
     s_sym = sympy.Matrix(s)
     display(s_sym.T)
+    
+    print "amdq, apdq: "
+    amdq_sym = sympy.Matrix(amdq).T
+    apdq_sym = sympy.Matrix(apdq).T
+    display([amdq_sym, apdq_sym])
     
     def riemann_eval(xi):
         "Return Riemann solution as function of xi = x/t."
