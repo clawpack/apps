@@ -1,5 +1,5 @@
 
-.. _apps_euler_2d_shockbubble_amrclaw:
+.. _apps_euler_shockbubble_2d_axisym:
 
 2D Axisymmetric shock-bubble intereaction
 ==========================================
@@ -20,6 +20,9 @@ Version history:
 ----------------
 
 - This version works with Clawpack 5.3.0 
-- 28 Dec 2014: Updated `Makefile` to include dimensional splitting 
-  option introduced in 5.3.
+- 28 Dec 2014: 
+
+  - Updated `Makefile` to include dimensional splitting 
+    option introduced in 5.3.
+  - Moved from `apps/euler_2d_shockbubble` to `apps/euler/shockbubble/2d_axisym`
 
