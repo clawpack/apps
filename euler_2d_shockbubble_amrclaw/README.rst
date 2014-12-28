@@ -16,4 +16,10 @@ initially as the gas outside.  Parameters are specified in `setrun.py`.
 A passive tracer is also advected to show the motion of the gas originally inside
 the bubble.
 
-Version:  This version works with Clawpack 5.0 -- 5.2 (?)
+Version history:  
+----------------
+
+- This version works with Clawpack 5.3.0 
+- 28 Dec 2014: Updated `Makefile` to include dimensional splitting 
+  option introduced in 5.3.
+
