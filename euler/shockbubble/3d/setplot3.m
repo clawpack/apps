@@ -6,7 +6,7 @@ OutputDir = '_output';
 setopengl;
 setviews  % set viewpoints so that view(xSlice), for example, can be used.
 
-PlotType = 3;                % type of plot to produce:
+PlotType = 1;                % type of plot to produce:
 			     % 1 = pcolor on slices (with optional contours)
 			     % 2 = contour lines in 3d on transparent slices
 			     % 3 = Schlieren plot on slices
@@ -21,8 +21,8 @@ MaxLevels = 6;               % max number of AMR levels
 
 PlotData =  [1 1 1 0 0 0];       % Data on refinement level k is plotted only
 			         % if k'th component is nonzero
-PlotGrid =  [0 0 0 0 0 0];       % Plot grid lines on each level?
-PlotGridEdges =  [1 0 0 0 0 0];  % Plot edges of patches of each grid at
+PlotGrid =  [1 0 0 0 0 0];       % Plot grid lines on each level?
+PlotGridEdges =  [1 1 0 0 0 0];  % Plot edges of patches of each grid at
                                  % this level on slices?
 PlotCubeEdges = [0 0 0 0 0 0];   % Plot edges of cube of refinement patch at
                                  % this level?
@@ -49,11 +49,11 @@ PlotCubeEdges = [0 0 0 0 0 0];   % Plot edges of cube of refinement patch at
 % Note:  Lengths of SurfTransparency and SurfColors must greater than or
 %        equal to the length of SurfValues..
 
-  IsosurfValues    =  [2.4 0.5];     % Plot surfaces at q = surfValue(i).
+  IsosurfValues    =  [0.5];     % Plot surfaces at q = surfValue(i).
 
-  IsosurfAlphas    =  [0.2   1  ];     % Transparency of each surface
+  IsosurfAlphas    =  [0.5];     % Transparency of each surface
                                           % (0=clear; 1=opaque)
                                           % NOTE: Your system must be able to
                                           % use the OpenGL Renderer.
 
-  IsosurfColors    = strvcat('b','r');      % Colors for each surface.
+  IsosurfColors    = strvcat('y');      % Colors for each surface.

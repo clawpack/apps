@@ -65,16 +65,16 @@ def setrun(claw_pkg='amrclaw'):
     
     # Lower and upper edge of computational domain:
     clawdata.lower[0] = 0.000000e+00          # xlower
-    clawdata.upper[0] = 1.200000e+00          # xupper
+    clawdata.upper[0] = 2.000000e+00          # xupper
     clawdata.lower[1] = 0.000000e+00          # ylower
     clawdata.upper[1] = 0.500000e+00          # yupper
     clawdata.lower[2] = 0.000000e+00          # zlower
     clawdata.upper[2] = 0.500000e+00          # zupper
     
     # Number of grid cells:
-    clawdata.num_cells[0] = 30     # mx
-    clawdata.num_cells[1] = 12     # my
-    clawdata.num_cells[2] = 12     # mz
+    clawdata.num_cells[0] = 40     # mx
+    clawdata.num_cells[1] = 10     # my
+    clawdata.num_cells[2] = 10     # mz
     
 
     # ---------------
@@ -121,8 +121,8 @@ def setrun(claw_pkg='amrclaw'):
     if clawdata.output_style==1:
         # Output ntimes frames at equally spaced times up to tfinal:
         # Can specify num_output_times = 0 for no output
-        clawdata.num_output_times = 4
-        clawdata.tfinal = .3
+        clawdata.num_output_times = 7
+        clawdata.tfinal = .7
         clawdata.output_t0 = True  # output at initial (or restart) time?
         
     elif clawdata.output_style == 2:
@@ -165,7 +165,7 @@ def setrun(claw_pkg='amrclaw'):
     
     # Initial time step for variable dt.  
     # (If dt_variable==0 then dt=dt_initial for all steps)
-    clawdata.dt_initial = 1.00000e-02
+    clawdata.dt_initial = 5e-3
     
     # Max time step to be allowed if variable dt used:
     clawdata.dt_max = 1.000000e+99
@@ -187,7 +187,7 @@ def setrun(claw_pkg='amrclaw'):
     clawdata.order = 2
     
     # Use dimensional splitting?
-    clawdata.dimensional_split = 'unsplit'
+    clawdata.dimensional_split = 'godunov'
     
     # For unsplit method, transverse_waves can be 
     #  0 or 'none'      ==> donor cell (only normal solver used)
@@ -276,14 +276,13 @@ def setrun(claw_pkg='amrclaw'):
     amrdata = rundata.amrdata
 
     # max number of refinement levels:
-    #amrdata.amr_levels_max = 3   #original 4.3 code had 3 levels, but too expensive for default
-    amrdata.amr_levels_max = 2
+    amrdata.amr_levels_max = 3
 
     # List of refinement ratios at each level (length at least amr_level_max-1)
-    amrdata.refinement_ratios_x = [2, 4]
-    amrdata.refinement_ratios_y = [2, 4]
-    amrdata.refinement_ratios_z = [2, 4]
-    amrdata.refinement_ratios_t = [2, 4]
+    amrdata.refinement_ratios_x = [4, 2]
+    amrdata.refinement_ratios_y = [4, 2]
+    amrdata.refinement_ratios_z = [4, 2]
+    amrdata.refinement_ratios_t = [4, 2]
 
 
     # Specify type of each aux variable in clawdata.auxtype.
@@ -298,7 +297,7 @@ def setrun(claw_pkg='amrclaw'):
     
     # Flag for refinement using routine flag2refine:
     amrdata.flag2refine = True      # use this?
-    amrdata.flag2refine_tol = 0.12  # tolerance used in this routine
+    amrdata.flag2refine_tol = 0.2  # tolerance used in this routine
     # User can modify flag2refine to change the criterion for flagging.
     # Default: check maximum absolute difference of first component of q
     # between a cell and each of its neighbors.
