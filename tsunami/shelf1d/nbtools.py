@@ -6,6 +6,29 @@ except:
     print "*** Ipython version does not support FileLink"
 
 
+def make_htmls(outfile=None, verbose=False, readme_link=True):
+    """Perform 'make .htmls' and display link."""
+    import os,sys
+    
+    if outfile is None:
+        outfile='htmls_output.txt'
+    cmd = 'make .htmls &> %s' % outfile
+
+    if verbose:
+        print "Making html documentation files... %s" % cmd
+        sys.stdout.flush()
+
+    status = os.system(cmd)
+    
+    if verbose:
+        local_file = FileLink(outfile)
+        print "Done...  Check this file to see output:" 
+        display(local_file)
+    if readme_link:
+        print "See the README.html file for links to input files..."
+        display(FileLink('README.html'))
+    
+
 def make_exe(outfile=None, verbose=True):
     """Perform 'make .exe' and display link."""
     import os,sys
