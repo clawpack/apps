@@ -119,6 +119,7 @@ def setplot(plotdata):
     
 
     plotfigure = plotdata.new_plotfigure(name='u-velocity', figno=3)
+    plotfigure.show = False
     plotfigure.kwargs = {'figsize':(16,5)}
 
     # Set up for axes in this figure:
