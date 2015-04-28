@@ -1,5 +1,5 @@
 """
-Create fgmax_grid.txt and fgmax_transect input files 
+Create fgmax_grid.txt input files 
 """
 
 
