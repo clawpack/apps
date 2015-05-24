@@ -240,6 +240,17 @@ def setrun(claw_pkg='amrclaw'):
     clawdata.bc_lower[2] = 'wall'     # at zlower
     clawdata.bc_upper[2] = 'extrap'   # at zupper
 
+
+    # ---------------
+    # Gauges:
+    # ---------------
+    rundata.gaugedata.gauges = []
+    # for gauges append lines of the form  [gaugeno, x, y, z, t1, t2]
+    yz = 0.1 / np.sqrt(2.)
+    rundata.gaugedata.gauges.append([1, 0.25, yz, yz, 0.,10.])
+    rundata.gaugedata.gauges.append([2, 0.5, yz, yz, 0., 10.])
+    rundata.gaugedata.gauges.append([3, 1.0, yz, yz, 0., 10.])
+    rundata.gaugedata.gauges.append([4, 1.5, yz, yz, 0., 10.])
     
     # --------------
     # Checkpointing:
