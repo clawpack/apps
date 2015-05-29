@@ -161,7 +161,7 @@ def setrun(claw_pkg='classic'):
     clawdata.cfl_max = 1.000000
     
     # Maximum number of time steps to allow between output times:
-    clawdata.steps_max = 500
+    clawdata.steps_max = 50000
 
 
     # ------------------
