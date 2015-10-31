@@ -36,8 +36,9 @@ def setrun(claw_pkg='classic'):
     # Problem-specific parameters to be written to setprob.data:
     #------------------------------------------------------------------
     probdata = rundata.new_UserData(name='probdata', fname='setprob.data')
-    probdata.add_param('u',  1.0,  'advection velocity')
-    probdata.add_param('beta', 400., 'Gaussian width parameter')
+    probdata.add_param('rho',  1.0,  'density of medium')
+    probdata.add_param('K',    4.0,  'bulk modulus')
+    probdata.add_param('beta', 200., 'Gaussian width parameter')
 
     
     #------------------------------------------------------------------
@@ -55,11 +56,11 @@ def setrun(claw_pkg='classic'):
     clawdata.num_dim = num_dim
     
     # Lower and upper edge of computational domain:
-    clawdata.lower[0] = 0.000000e+00          # xlower
+    clawdata.lower[0] = -1.000000e+00          # xlower
     clawdata.upper[0] = 1.000000e+00          # xupper
     
     # Number of grid cells:
-    clawdata.num_cells[0] = 200      # mx
+    clawdata.num_cells[0] = 400      # mx
     
 
     # ---------------
@@ -67,7 +68,7 @@ def setrun(claw_pkg='classic'):
     # ---------------
 
     # Number of equations in the system:
-    clawdata.num_eqn = 1
+    clawdata.num_eqn = 2
 
     # Number of auxiliary variables in the aux array (initialized in setaux)
     clawdata.num_aux = 0
@@ -106,8 +107,8 @@ def setrun(claw_pkg='classic'):
     if clawdata.output_style==1:
         # Output ntimes frames at equally spaced times up to tfinal:
         # Can specify num_output_times = 0 for no output
-        clawdata.num_output_times = 20
-        clawdata.tfinal = 4.000000
+        clawdata.num_output_times = 16
+        clawdata.tfinal = 0.800000
         clawdata.output_t0 = True  # output at initial (or restart) time?
         
     elif clawdata.output_style == 2:
@@ -161,7 +162,7 @@ def setrun(claw_pkg='classic'):
     clawdata.cfl_max = 1.000000
     
     # Maximum number of time steps to allow between output times:
-    clawdata.steps_max = 50000
+    clawdata.steps_max = 500
 
 
     # ------------------
@@ -173,7 +174,7 @@ def setrun(claw_pkg='classic'):
     
     
     # Number of waves in the Riemann solution:
-    clawdata.num_waves = 1
+    clawdata.num_waves = 2
     
     # List of limiters to use for each wave family:  
     # Required:  len(limiter) == num_waves
@@ -183,7 +184,7 @@ def setrun(claw_pkg='classic'):
     #   2 or 'superbee' ==> superbee
     #   3 or 'vanleer'  ==> van Leer
     #   4 or 'mc'       ==> MC limiter
-    clawdata.limiter = ['mc']
+    clawdata.limiter = ['mc', 'mc']
     
     clawdata.use_fwaves = False    # True ==> use f-wave version of algorithms
     
@@ -207,8 +208,8 @@ def setrun(claw_pkg='classic'):
     #   2 or 'periodic' => periodic (must specify this at both boundaries)
     #   3 or 'wall'     => solid wall for systems where q(2) is normal velocity
     
-    clawdata.bc_lower[0] = 'periodic'   # at xlower
-    clawdata.bc_upper[0] = 'periodic'   # at xupper
+    clawdata.bc_lower[0] = 'extrap'   # at xlower
+    clawdata.bc_upper[0] = 'extrap'   # at xupper
                   
     return rundata
 

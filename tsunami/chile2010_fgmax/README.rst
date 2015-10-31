@@ -66,3 +66,8 @@ along with the usual time frame plots.
 
   This results in the link found on `_plots/_PlotIndex.html`.
 
+Version history:  
+----------------
+
+- Updated for Clawpack 5.3.0 on 15 Sept 2015
+

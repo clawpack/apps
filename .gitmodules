@@ -1,0 +1,6 @@
+[submodule "surge-examples"]
+	path = surge-examples
+	url = https://github.com/mandli/surge-examples
+[submodule "multilayer-examples"]
+	path = multilayer-examples
+	url = git@github.com:mandli/multilayer-examples
