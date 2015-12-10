@@ -106,5 +106,5 @@ def make_dtopo(makeplots=False):
 
 
 if __name__=='__main__':
-    get_topo(True)
-    make_dtopo(True)
+    get_topo(False)
+    make_dtopo(False)
