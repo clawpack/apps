@@ -100,7 +100,7 @@ def make_dtopo(makeplots=False):
         ax1.set_xlim(x.min(),x.max())
         ax1.set_ylim(y.min(),y.max())
         dtopo.plot_dZ_colors(1.,axes=ax2)
-        fname = os.path.split(dtopo_fname)[-1] + '.png'
+        fname = os.path.splitext(os.path.split(dtopo_fname)[-1])[0] + '.png'
         plt.savefig(fname)
         print "Created ",fname
 
