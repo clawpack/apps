@@ -1,56 +1,64 @@
 
-"""
+""" 
 Set up the plot figures, axes, and items to be done for each frame.
 
 This module is imported by the plotting routines and then the
 function setplot is called to set the plot parameters.
-
-"""
-
+    
+""" 
 
 #--------------------------
-def setplot(plotdata):
+def setplot(plotdata=None):
 #--------------------------
-    """   
+    
+    """ 
     Specify what is to be plotted at each frame.
-    Input:  plotdata, an instance of pyclaw.data.ClawPlotData.
+    Input:  plotdata, an instance of clawpack.visclaw.data.ClawPlotData.
     Output: a modified version of plotdata.
-    """
+    
+    """ 
 
-    from clawpack.visclaw.frametools import var_limits
+    if plotdata is None:
+        from clawpack.visclaw.data import ClawPlotData
+        plotdata = ClawPlotData()
 
+    plotdata.clearfigures()  # clear any old figures,axes,items data
 
-    plimits = [-1., 1.]
-    ulimits = [-1., 1.]
-    xlimits = 'auto'          # choose automatically
-
+    # Figure for pressure and velocity:
+    plotfigure = plotdata.new_plotfigure(name='Pressure and Velocity', figno=1)
 
     # Pressure:
     # ---------
-    
-    plotfigure = plotdata.new_plotfigure(name='Pressure', figno=1)
-    plotaxes = plotfigure.new_plotaxes(name='Pressure')
-    plotaxes.axescmd = 'subplot(1,1,1)' 
-    plotaxes.xlimits = xlimits
-    plotaxes.ylimits = plimits
-    plotitem = plotaxes.new_plotitem(name='Pressure',plot_type='1d')
-    plotitem.plot_var = 0       # q[0] is the pressure
+
+    # Set up for axes in this figure:
+    plotaxes = plotfigure.new_plotaxes()
+    plotaxes.axescmd = 'subplot(2,1,1)'   # top figure
+    plotaxes.xlimits = 'auto'
+    plotaxes.ylimits = [-.5,1.]
+    plotaxes.title = 'Pressure'
+
+    # Set up for item on these axes:
+    plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
+    plotitem.plot_var = 0
     plotitem.plotstyle = '-'
     plotitem.color = 'b'
 
 
     # Velocity:
     # ---------
-    plotfigure = plotdata.new_plotfigure(name='Velocity', figno=2)
-    plotaxes = plotfigure.new_plotaxes(name='Velocity')
-    plotaxes.axescmd = 'subplot(1,1,1)' 
-    plotaxes.xlimits = xlimits
-    plotaxes.ylimits = ulimits
-    plotitem = plotaxes.new_plotitem(name='Velocity',plot_type='1d')
-    plotitem.plot_var = 1       # q[1] is the velocity
+
+    # Set up for axes in this figure:
+    plotaxes = plotfigure.new_plotaxes()
+    plotaxes.axescmd = 'subplot(2,1,2)'   # bottom figure
+    plotaxes.xlimits = 'auto'
+    plotaxes.ylimits = [-1.,1.]
+    plotaxes.title = 'Velocity'
+
+    # Set up for item on these axes:
+    plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
+    plotitem.plot_var = 1
     plotitem.plotstyle = '-'
     plotitem.color = 'b'
-
 
     # Parameters used only when creating html and/or latex hardcopy
     # e.g., via clawpack.visclaw.frametools.printframes:
@@ -60,6 +68,7 @@ def setplot(plotdata):
     plotdata.print_framenos = 'all'          # list of frames to print
     plotdata.print_fignos = 'all'            # list of figures to print
     plotdata.html = True                     # create html files of plots?
+    plotdata.html_homelink = '../README.html'
     plotdata.latex = True                    # create latex file of plots?
     plotdata.latex_figsperline = 2           # layout of plots
     plotdata.latex_framesperline = 1         # layout of plots
@@ -67,3 +76,4 @@ def setplot(plotdata):
 
     return plotdata
 
+    
