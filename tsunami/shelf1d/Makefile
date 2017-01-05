@@ -12,14 +12,15 @@ CLAWMAKE = $(CLAW)/clawutil/src/Makefile.common
 # Adjust these variables if desired:
 # ----------------------------------
 
-CLAW_PKG = amrclaw                  # Clawpack package to use
-EXE = xamr                          # Executable to create
+CLAW_PKG = classic                  # Clawpack package to use
+EXE = xclaw                         # Executable to create
 SETRUN_FILE = setrun.py             # File containing function to make data
 OUTDIR = _output                    # Directory for output
 SETPLOT_FILE = setplot.py           # File containing function to set plots
 PLOTDIR = _plots                    # Directory for plots
 
 OVERWRITE ?= True                   # False ==> make a copy of OUTDIR first
+RESTART ?= False                    # Should = clawdata.restart in setrun
 
 # Environment variable FC should be set to fortran compiler, e.g. gfortran
 
@@ -27,33 +28,27 @@ OVERWRITE ?= True                   # False ==> make a copy of OUTDIR first
 FFLAGS ?=  
 
 # ---------------------------------
-# package sources for this program:
+# List of sources for this program:
 # ---------------------------------
-
-AMRLIB = $(CLAW)/amrclaw/src/2d
-include $(AMRLIB)/Makefile.amr_2d
-
-# ---------------------------------------
-# package sources specifically to exclude
-# (i.e. if a custom replacement source 
-#  under a different name is provided)
-# ---------------------------------------
-
-EXCLUDE_MODULES = \
-
-EXCLUDE_SOURCES = \
-
-# ----------------------------------------
-# List of custom sources for this program:
-# ----------------------------------------
 
 MODULES = \
 
 SOURCES = \
   qinit.f \
+  rp1swfw.f90 \
+  setaux.f \
   setprob.f \
-  $(CLAW)/riemann/src/rpn2_advection.f \
-  $(CLAW)/riemann/src/rpt2_advection.f \
+  $(CLAW)/classic/src/1d/bc1.f \
+  $(CLAW)/classic/src/1d/b4step1.f90 \
+  $(CLAW)/classic/src/1d/driver.f90 \
+  $(CLAW)/classic/src/1d/claw1ez.f \
+  $(CLAW)/classic/src/1d/claw1.f \
+  $(CLAW)/classic/src/1d/copyq1.f \
+  $(CLAW)/classic/src/1d/inlinelimiter.f90 \
+  $(CLAW)/classic/src/1d/opendatafile.f \
+  $(CLAW)/classic/src/1d/out1.f \
+  $(CLAW)/classic/src/1d/src1.f90 \
+  $(CLAW)/classic/src/1d/step1.f90
 
 #-------------------------------------------------------------------
 # Include Makefile containing standard definitions and make options:

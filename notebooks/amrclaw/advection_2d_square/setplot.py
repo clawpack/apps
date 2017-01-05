@@ -7,7 +7,7 @@ function setplot is called to set the plot parameters.
 """
 
 #--------------------------
-def setplot(plotdata):
+def setplot(plotdata=None):
 #--------------------------
     
     """ 
@@ -19,6 +19,11 @@ def setplot(plotdata):
 
 
     from clawpack.visclaw import colormaps
+    from clawpack.visclaw.data import ClawPlotData
+
+    if plotdata is None:
+        plotdata = ClawPlotData()
+
 
     plotdata.clearfigures() # clear any old figures,axes,items data
 
@@ -47,7 +52,7 @@ def setplot(plotdata):
 
     # Figure for contour plot
     plotfigure = plotdata.new_plotfigure(name='contour', figno=1)
-    plotfigure.show = False
+    #plotfigure.show = False
 
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes()
@@ -64,6 +69,7 @@ def setplot(plotdata):
     plotitem.contour_min = 0.01
     plotitem.contour_max = 0.99
     plotitem.amr_contour_colors = ['r','g','b']  # color on each level
+    plotitem.amr_contour_show = [0,0,1]  # only show on finest level
     plotitem.amr_patch_bgcolor = ['#ffeeee', '#eeeeff', '#eeffee']
     plotitem.celledges_show = 0
     plotitem.patchedges_show = 0
@@ -71,7 +77,7 @@ def setplot(plotdata):
 
     # Figure for grid cells
     plotfigure = plotdata.new_plotfigure(name='cells', figno=2)
-    plotfigure.show = False
+    #plotfigure.show = False
 
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes()

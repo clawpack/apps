@@ -12,8 +12,8 @@ CLAWMAKE = $(CLAW)/clawutil/src/Makefile.common
 # Adjust these variables if desired:
 # ----------------------------------
 
-CLAW_PKG = amrclaw                  # Clawpack package to use
-EXE = xamr                          # Executable to create
+CLAW_PKG = classic                  # Clawpack package to use
+EXE = xclaw                         # Executable to create
 SETRUN_FILE = setrun.py             # File containing function to make data
 OUTDIR = _output                    # Directory for output
 SETPLOT_FILE = setplot.py           # File containing function to set plots
@@ -30,8 +30,7 @@ FFLAGS ?=
 # package sources for this program:
 # ---------------------------------
 
-AMRLIB = $(CLAW)/amrclaw/src/2d
-include $(AMRLIB)/Makefile.amr_2d
+include $(CLAW)/classic/src/1d/Makefile.classic_1d
 
 # ---------------------------------------
 # package sources specifically to exclude
@@ -46,14 +45,12 @@ EXCLUDE_SOURCES = \
 # ----------------------------------------
 # List of custom sources for this program:
 # ----------------------------------------
-
 MODULES = \
 
 SOURCES = \
-  qinit.f \
-  setprob.f \
-  $(CLAW)/riemann/src/rpn2_advection.f \
-  $(CLAW)/riemann/src/rpt2_advection.f \
+  qinit.f90 \
+  setprob.f90 \
+  $(CLAW)/riemann/src/rp1_acoustics.f90
 
 #-------------------------------------------------------------------
 # Include Makefile containing standard definitions and make options:
