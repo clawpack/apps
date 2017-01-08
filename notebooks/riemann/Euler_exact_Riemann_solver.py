@@ -112,8 +112,14 @@ def exact_riemann_solution(q_l,q_r,gamma=1.4,
         p3 = p_r*(rho3/rho_r)**gamma
         return rho3, u3, p3
     
-    q_l_star = np.squeeze(np.array(primitive_to_conservative(rho_l_star,u,p)))
-    q_r_star = np.squeeze(np.array(primitive_to_conservative(rho_r_star,u,p)))
+    if out_vars == 'conservative':
+        q_l_star = np.squeeze(np.array(primitive_to_conservative(rho_l_star,u,p)))
+        q_r_star = np.squeeze(np.array(primitive_to_conservative(rho_r_star,u,p)))
+    elif out_vars == 'primitive':
+        q_l_star = np.array((rho_l_star,u,p))
+        q_r_star = np.array((rho_r_star,u,p))
+    else:
+        raise ValueError('** Unrecoginzed out_vars = %s' % out_vars)
     
     states = np.column_stack([q_l,q_l_star,q_r_star,q_r])
     speeds = [(ws[0],ws[1]),ws[2],(ws[3],ws[4])]
@@ -121,9 +127,24 @@ def exact_riemann_solution(q_l,q_r,gamma=1.4,
     def reval(xi):
         rar1 = raref1(xi)
         rar3 = raref3(xi)
-        rho_out = (xi<=speeds[0][0])*rho_l + (xi>speeds[0][0])*(xi<=speeds[0][1])*rar1[0] + (xi>speeds[0][1])*(xi<=speeds[1])*rho_l_star + (xi>speeds[1])*(xi<=speeds[2][0])*rho_r_star + (xi>speeds[2][0])*(xi<=speeds[2][1])*rar3[0] + (xi>speeds[2][1])*rho_r
-        u_out   = (xi<=speeds[0][0])*u_l   + (xi>speeds[0][0])*(xi<=speeds[0][1])*rar1[1] + (xi>speeds[0][1])*(xi<=speeds[1])*u          + (xi>speeds[1])*(xi<=speeds[2][0])*u          + (xi>speeds[2][0])*(xi<=speeds[2][1])*rar3[1] + (xi>speeds[2][1])*u_r
-        p_out   = (xi<=speeds[0][0])*p_l   + (xi>speeds[0][0])*(xi<=speeds[0][1])*rar1[2] + (xi>speeds[0][1])*(xi<=speeds[1])*p          + (xi>speeds[1])*(xi<=speeds[2][0])*p          + (xi>speeds[2][0])*(xi<=speeds[2][1])*rar3[2] + (xi>speeds[2][1])*p_r        
+        rho_out = (xi<=speeds[0][0])*rho_l \
+                + (xi>speeds[0][0])*(xi<=speeds[0][1])*rar1[0] \
+                + (xi>speeds[0][1])*(xi<=speeds[1])*rho_l_star \
+                + (xi>speeds[1])*(xi<=speeds[2][0])*rho_r_star \
+                + (xi>speeds[2][0])*(xi<=speeds[2][1])*rar3[0] \
+                + (xi>speeds[2][1])*rho_r
+        u_out   = (xi<=speeds[0][0])*u_l   \
+                + (xi>speeds[0][0])*(xi<=speeds[0][1])*rar1[1] \
+                + (xi>speeds[0][1])*(xi<=speeds[1])*u          \
+                + (xi>speeds[1])*(xi<=speeds[2][0])*u          \
+                + (xi>speeds[2][0])*(xi<=speeds[2][1])*rar3[1] \
+                + (xi>speeds[2][1])*u_r
+        p_out   = (xi<=speeds[0][0])*p_l   \
+                + (xi>speeds[0][0])*(xi<=speeds[0][1])*rar1[2] \
+                + (xi>speeds[0][1])*(xi<=speeds[1])*p          \
+                + (xi>speeds[1])*(xi<=speeds[2][0])*p          \
+                + (xi>speeds[2][0])*(xi<=speeds[2][1])*rar3[2] \
+                + (xi>speeds[2][1])*p_r        
 
         if out_vars == 'conservative':
             q0,q1,q2 =  primitive_to_conservative(rho_out,u_out,p_out)
