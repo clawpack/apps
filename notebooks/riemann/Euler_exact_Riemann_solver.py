@@ -11,7 +11,9 @@ def conservative_to_primitive(rho,mom,E,gamma=1.4):
     p = (gamma-1.)*(E - 0.5*rho*u**2)
     return rho, u, p
 
-def exact_riemann_solution(q_l,q_r,gamma=1.4):
+def exact_riemann_solution(q_l,q_r,gamma=1.4,
+            in_vars='conservative',out_vars='conservative'):
+
     """Return the exact solution to the Riemann problem with initial states q_l, q_r.
        The solution is given in terms of a list of states, a list of speeds (each of which
        may be a pair in case of a rarefaction fan), and a function reval(xi) that gives the
@@ -19,8 +21,15 @@ def exact_riemann_solution(q_l,q_r,gamma=1.4):
        
        The input and output vectors are the conserved quantities.
     """
-    rho_l, u_l, p_l = conservative_to_primitive(*q_l)
-    rho_r, u_r, p_r = conservative_to_primitive(*q_r)
+
+    if in_vars == 'conservative':
+        rho_l, u_l, p_l = conservative_to_primitive(*q_l)
+        rho_r, u_r, p_r = conservative_to_primitive(*q_r)
+    elif in_vars == 'primitive':
+        rho_l, u_l, p_l = q_l
+        rho_r, u_r, p_r = q_r
+    else:
+        raise ValueError('** Unrecoginzed in_vars = %s' % in_vars)
 
     # Compute left and right state sound speeds
     c_l = np.sqrt(gamma*p_l/rho_l)
@@ -115,6 +124,14 @@ def exact_riemann_solution(q_l,q_r,gamma=1.4):
         rho_out = (xi<=speeds[0][0])*rho_l + (xi>speeds[0][0])*(xi<=speeds[0][1])*rar1[0] + (xi>speeds[0][1])*(xi<=speeds[1])*rho_l_star + (xi>speeds[1])*(xi<=speeds[2][0])*rho_r_star + (xi>speeds[2][0])*(xi<=speeds[2][1])*rar3[0] + (xi>speeds[2][1])*rho_r
         u_out   = (xi<=speeds[0][0])*u_l   + (xi>speeds[0][0])*(xi<=speeds[0][1])*rar1[1] + (xi>speeds[0][1])*(xi<=speeds[1])*u          + (xi>speeds[1])*(xi<=speeds[2][0])*u          + (xi>speeds[2][0])*(xi<=speeds[2][1])*rar3[1] + (xi>speeds[2][1])*u_r
         p_out   = (xi<=speeds[0][0])*p_l   + (xi>speeds[0][0])*(xi<=speeds[0][1])*rar1[2] + (xi>speeds[0][1])*(xi<=speeds[1])*p          + (xi>speeds[1])*(xi<=speeds[2][0])*p          + (xi>speeds[2][0])*(xi<=speeds[2][1])*rar3[2] + (xi>speeds[2][1])*p_r        
-        return primitive_to_conservative(rho_out,u_out,p_out)
+
+        if out_vars == 'conservative':
+            q0,q1,q2 =  primitive_to_conservative(rho_out,u_out,p_out)
+        elif out_vars == 'primitive':
+            q0,q1,q2 = rho_out,u_out,p_out
+        else:
+            raise ValueError('** Unrecoginzed out_vars = %s' % out_vars)
+
+        return np.vstack((q0,q1,q2))
 
     return states, speeds, reval
