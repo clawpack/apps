@@ -15,3 +15,7 @@ Boundary conditions are outflow at both boundaries.
 After running this code and creating plots via "make .plots", you
 should be able to view the plots in _plots/_PlotIndex.html.
 
+This example has been modified to work with the notebook 
+   acoustics_1d_example1.ipynb
+
+Updated to v5.4.0, January 2017
