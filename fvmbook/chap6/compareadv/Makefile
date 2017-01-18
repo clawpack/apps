@@ -20,7 +20,6 @@ SETPLOT_FILE = setplot.py           # File containing function to set plots
 PLOTDIR = _plots                    # Directory for plots
 
 OVERWRITE ?= True                   # False ==> make a copy of OUTDIR first
-RESTART ?= False                    # Should = clawdata.restart in setrun
 
 # Environment variable FC should be set to fortran compiler, e.g. gfortran
 
@@ -28,27 +27,30 @@ RESTART ?= False                    # Should = clawdata.restart in setrun
 FFLAGS ?=  
 
 # ---------------------------------
-# List of sources for this program:
+# package sources for this program:
 # ---------------------------------
 
+include $(CLAW)/classic/src/1d/Makefile.classic_1d
+
+# ---------------------------------------
+# package sources specifically to exclude
+# (i.e. if a custom replacement source 
+#  under a different name is provided)
+# ---------------------------------------
+
+EXCLUDE_MODULES = \
+
+EXCLUDE_SOURCES = \
+
+# ----------------------------------------
+# List of custom sources for this program:
+# ----------------------------------------
 MODULES = \
 
 SOURCES = \
   qinit.f \
   setprob.f \
-  $(CLAW)/riemann/src/rp1_advection.f90 \
-  $(CLAW)/classic/src/1d/setaux.f90 \
-  $(CLAW)/classic/src/1d/bc1.f \
-  $(CLAW)/classic/src/1d/b4step1.f90 \
-  $(CLAW)/classic/src/1d/driver.f90 \
-  $(CLAW)/classic/src/1d/claw1ez.f \
-  $(CLAW)/classic/src/1d/claw1.f \
-  $(CLAW)/classic/src/1d/copyq1.f \
-  $(CLAW)/classic/src/1d/inlinelimiter.f90 \
-  $(CLAW)/classic/src/1d/opendatafile.f \
-  $(CLAW)/classic/src/1d/out1.f \
-  $(CLAW)/classic/src/1d/src1.f90 \
-  $(CLAW)/classic/src/1d/step1.f90
+  $(CLAW)/riemann/src/rp1_advection.f90
 
 #-------------------------------------------------------------------
 # Include Makefile containing standard definitions and make options:
