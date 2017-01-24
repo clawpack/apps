@@ -169,7 +169,7 @@ def setrun(claw_pkg='classic'):
     # ------------------
 
     # Order of accuracy:  1 => Godunov,  2 => Lax-Wendroff plus limiters
-    clawdata.order = 1
+    clawdata.order = 2
     
     
     # Number of waves in the Riemann solution:
@@ -183,6 +183,7 @@ def setrun(claw_pkg='classic'):
     #   2 or 'superbee' ==> superbee
     #   3 or 'vanleer'  ==> van Leer
     #   4 or 'mc'       ==> MC limiter
+
     clawdata.limiter = ['none']
     
     clawdata.use_fwaves = False    # True ==> use f-wave version of algorithms
