@@ -7,6 +7,9 @@ function setplot is called to set the plot parameters.
     
 """ 
 
+from __future__ import absolute_import
+from __future__ import print_function
+
 #--------------------------
 def setplot(plotdata):
 #--------------------------
@@ -18,40 +21,41 @@ def setplot(plotdata):
     
     """ 
 
+    if plotdata is None:
+        from clawpack.visclaw.data import ClawPlotData
+        plotdata = ClawPlotData()
+
     plotdata.clearfigures()  # clear any old figures,axes,items data
 
     
-
-    # Figure for q[0]
-    plotfigure = plotdata.new_plotfigure(name='q[0]', figno=0)
+    # Figure with both components
+    plotfigure = plotdata.new_plotfigure(name='h and hu', figno=0)
+    plotfigure.kwargs = {'figsize':(6,8)}
 
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes()
+    plotaxes.axescmd = 'subplot(2,1,1)'
     plotaxes.xlimits = 'auto'
     plotaxes.ylimits = [0., 4.5]
-    plotaxes.title = 'q[0]'
+    plotaxes.title = 'depth h'
 
     # Set up for item on these axes:
     plotitem = plotaxes.new_plotitem(plot_type='1d')
     plotitem.plot_var = 0
-    plotitem.plotstyle = '-o'
+    plotitem.plotstyle = '-'
     plotitem.color = 'b'
-    plotitem.show = True       # show on plot?
     
 
-    # Figure for q[1]
-    plotfigure = plotdata.new_plotfigure(name='q[1]', figno=1)
-
-    # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes()
+    plotaxes.axescmd = 'subplot(2,1,2)'
     plotaxes.xlimits = 'auto'
     plotaxes.ylimits = [-2., 6.]
-    plotaxes.title = 'q[1]'
+    plotaxes.title = 'momentum hu'
 
     # Set up for item on these axes:
     plotitem = plotaxes.new_plotitem(plot_type='1d')
     plotitem.plot_var = 1
-    plotitem.plotstyle = '-o'
+    plotitem.plotstyle = '-'
     plotitem.color = 'b'
     plotitem.show = True       # show on plot?
     

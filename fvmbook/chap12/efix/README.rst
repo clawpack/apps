@@ -10,7 +10,7 @@ Example [book/chap12/efix] to accompany the book
 <http://www.clawpack.org/book.html>`_
 by R. J. LeVeque.
 
-Converted to Clawpack 5.0 form in 2013.
+Converted to Clawpack 5.4.0 form in 2017.
 
 Burgers' equation with a transonic rarefaction wave.
 

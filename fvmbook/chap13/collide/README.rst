@@ -9,8 +9,8 @@ which collide and produce a 1-rarefaction and 2-shock.
 Example [book/chap13/collide] to accompany the book 
 `Finite Volume Methods for Hyperbolic Problems
 <http://www.clawpack.org/book.html>`_
-by R. J. LeVeque.
+by R. J. LeVeque.  This illustrates the solution shown in Figure 13.19.
 
-Converted to Clawpack 5.0 form in 2013.
+Converted to Clawpack 5.4 form in 2017.
         
 
