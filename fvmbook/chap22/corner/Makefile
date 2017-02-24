@@ -20,7 +20,6 @@ SETPLOT_FILE = setplot.py           # File containing function to set plots
 PLOTDIR = _plots                    # Directory for plots
 
 OVERWRITE ?= True                   # False ==> make a copy of OUTDIR first
-RESTART ?= False                    # Should = clawdata.restart in setrun
 
 # Environment variable FC should be set to fortran compiler, e.g. gfortran
 
@@ -28,10 +27,25 @@ RESTART ?= False                    # Should = clawdata.restart in setrun
 FFLAGS ?=  
 
 # ---------------------------------
-# List of sources for this program:
+# package sources for this program:
 # ---------------------------------
 
-LIB = $(CLAW)/classic/src/2d
+include $(CLAW)/classic/src/2d/Makefile.classic_2d
+
+# ---------------------------------------
+# package sources specifically to exclude
+# (i.e. if a custom replacement source 
+#  under a different name is provided)
+# ---------------------------------------
+
+EXCLUDE_MODULES = \
+
+EXCLUDE_SOURCES = \
+
+
+# ---------------------------------
+# List of custom sources for this program:
+# ---------------------------------
 
 MODULES = \
 
@@ -43,21 +57,8 @@ SOURCES = \
   $(CLAW)/classic/src/2d/cellave.f \
   $(CLAW)/riemann/src/rpn2_vc_elasticity.f90 \
   $(CLAW)/riemann/src/rpt2_vc_elasticity.f90 \
-  $(CLAW)/classic/src/2d/driver.f90 \
-  $(CLAW)/classic/src/2d/claw2ez.f \
-  $(CLAW)/classic/src/2d/claw2.f \
-  $(CLAW)/classic/src/2d/bc2.f \
-  $(CLAW)/classic/src/2d/b4step2.f90 \
-  $(CLAW)/classic/src/2d/step2.f90 \
-  $(CLAW)/classic/src/2d/step2ds.f90 \
-  $(CLAW)/classic/src/2d/dimsp2.f \
-  $(CLAW)/classic/src/2d/flux2.f90 \
-  $(CLAW)/classic/src/2d/copyq2.f \
-  $(CLAW)/classic/src/2d/inlinelimiter.f90 \
-  $(CLAW)/classic/src/2d/src2.f90 \
-  $(CLAW)/classic/src/2d/out2.f \
-  $(CLAW)/classic/src/2d/restart2.f \
-  $(CLAW)/classic/src/2d/opendatafile.f
+
+
 
 #-------------------------------------------------------------------
 # Include Makefile containing standard definitions and make options:
