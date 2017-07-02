@@ -7,10 +7,11 @@ function setplot is called to set the plot parameters.
     
 """ 
 
+from __future__ import print_function
 from clawpack.clawutil.data import ClawData
 probdata = ClawData()
 probdata.read('setprob.data', force=True)
-print "Parameters: u = %g, beta = %g" % (probdata.u, probdata.beta)
+print("Parameters: u = %g, beta = %g" % (probdata.u, probdata.beta))
 
 def qtrue(x,t):
     """
