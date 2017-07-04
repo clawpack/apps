@@ -1,6 +1,6 @@
 
 """ 
-Dummy setplot does nothing currently in 3d.
+setplot currently only plots gauges in 3d.
 Still need to implement Python plotting in 3d.
 
 Set up the plot figures, axes, and items to be done for each frame.
@@ -10,9 +10,11 @@ function setplot is called to set the plot parameters.
     
 """ 
 
+from __future__ import absolute_import
+from __future__ import print_function
 
 #--------------------------
-def setplot(plotdata):
+def setplot(plotdata=None):
 #--------------------------
     
     """ 
@@ -22,11 +24,34 @@ def setplot(plotdata):
     
     """ 
 
+    if plotdata is None:
+        from clawpack.visclaw.data import ClawPlotData
+        plotdata = ClawPlotData()
+
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
     
-    print "**** Python plotting tools not yet implemented in 3d"
-    print "**** No plots will be generated."
+    print("**** Python plotting tools not yet implemented in 3d")
+    print("**** No frame plots will be generated.")
+
+    #-----------------------------------------
+    # Figures for gauges
+    #-----------------------------------------
+    plotfigure = plotdata.new_plotfigure(name='q', figno=300, \
+                    type='each_gauge')
+    plotfigure.clf_each_gauge = True
+
+    # Set up for axes in this figure:
+    plotaxes = plotfigure.new_plotaxes()
+    plotaxes.xlimits = 'auto'
+    plotaxes.ylimits = 'auto'
+    plotaxes.title = 'q'
+
+    # Plot q as blue curve:
+    plotitem = plotaxes.new_plotitem(plot_type='1d_plot')
+    plotitem.plot_var = 0
+    plotitem.plotstyle = 'b-'
+
 
     # Parameters used only when creating html and/or latex hardcopy
     # e.g., via clawpack.visclaw.frametools.printframes:
@@ -42,6 +67,7 @@ def setplot(plotdata):
     plotdata.latex_figsperline = 2           # layout of plots
     plotdata.latex_framesperline = 1         # layout of plots
     plotdata.latex_makepdf = False           # also run pdflatex?
+    plotdata.parallel = True                 # make multiple frame png's at once
 
     return plotdata
 

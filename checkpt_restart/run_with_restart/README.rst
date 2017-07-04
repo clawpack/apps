@@ -32,11 +32,12 @@ To test 2d version... ::
 Then check the following:
 
 - `run_output.txt`  contains stdout output from each run and info about restarts
-- `_output/fort.gauge`  has final set of gauge data from last execution
-- `_output/fort.gauge_DATETIME`  files contain fort.gauge from earlier
+- `_output/gauge*.txt` should contain the gauge output for the full time
             
-All `fort.gauge*` files need to be catenated together, but there may be some
-overlapping times (after last checkpoint and before code died).
+Note that the `_output/gauge*.txt` might contain some repeated times 
+since the restart will append to the end, starting at the restart time.
+There might also be some missing times from gauge data buffered but not yet
+written to `gauge*.txt` when the run was aborted.
 
 Similary in 3d.
 
@@ -46,3 +47,4 @@ Version history:
 
 - This version works with Clawpack 5.3.1
 
+- This version works with Clawpack 5.4.1 and Python2 or Python3

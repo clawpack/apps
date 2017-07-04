@@ -44,8 +44,12 @@ Notes:
 
 """
 
+from __future__ import print_function
+from __future__ import absolute_import
+
 import subprocess
 import os, sys
+sys.path.append('.')
 from setrun import setrun
 
 outdir = '_output'
@@ -92,8 +96,8 @@ def examine_outdir(outdir='_output'):
         tb = -Inf
 
     if (ta == -Inf) and (tb == -Inf):
-        print "Could not read fort.tckaaaaa or fort.tckbbbbb in outdir %s" \
-            % outdir
+        print("Could not read fort.tckaaaaa or fort.tckbbbbb in outdir %s" \
+            % outdir)
         latest = None
         t_latest = None
     elif ta > tb:
@@ -121,7 +125,7 @@ def run_code_or_restart():
     finished, latest, t_latest = examine_outdir(outdir)
 
     if finished:
-        print "Code has finished running, remove %s to run again" % outdir
+        print("Code has finished running, remove %s to run again" % outdir)
         return
 
     restart = (latest is not None)
@@ -130,13 +134,13 @@ def run_code_or_restart():
     fname_errors = 'run_errors.txt'
 
     if restart:
-        print "Will attempt to restart using checkpoint file %s at t = %s" \
-                % (latest, t_latest)
-        print "Appending output stream to %s" % fname_output
+        print("Will attempt to restart using checkpoint file %s at t = %s" \
+                % (latest, t_latest))
+        print("Appending output stream to %s" % fname_output)
         access = 'a'
     else:
-        print "Will run code -- no restart"
-        print "Writing output stream to %s" % fname_output
+        print("Will run code -- no restart")
+        print("Writing output stream to %s" % fname_output)
         access = 'w'
 
     fout = open(fname_output, access)
@@ -153,12 +157,13 @@ def run_code_or_restart():
     else:
         make_args = ['make','output']
 
-    if restart:
-        fortgauge = os.path.join(outdir,'fort.gauge')
-        fortgauge2 = os.path.join(outdir,'fort.gauge_%s' % timestamp)
-        os.system("mv %s %s" % (fortgauge,fortgauge2))
-        fout.write("Moving %s to %s \n" % (fortgauge,fortgauge2))
-        fout.flush()
+    #if restart:
+    #    No longer need to do this since new restart now adds to gauge*.txt files
+    #    fortgauge = os.path.join(outdir,'fort.gauge')
+    #    fortgauge2 = os.path.join(outdir,'fort.gauge_%s' % timestamp)
+    #    os.system("mv %s %s" % (fortgauge,fortgauge2))
+    #    fout.write("Moving %s to %s \n" % (fortgauge,fortgauge2))
+    #    fout.flush()
 
     rundata = setrun('amrclaw')
     rundata.clawdata.restart = restart
@@ -171,10 +176,10 @@ def run_code_or_restart():
     return_code = job.wait()
     
     if return_code == 0:
-        print "Successful run\n"
+        print("Successful run\n")
     else:
-        print "Problem running code\n"
-    print "See %s and %s" % (fname_output,fname_errors)
+        print("Problem running code\n")
+    print("See %s and %s" % (fname_output,fname_errors))
     
     fout.close()
     ferr.close()
