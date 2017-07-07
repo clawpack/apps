@@ -12,7 +12,7 @@ or more simply with a new enough version of `git`
 ```
 $> git clone --recursive https://github.com/clawpack/apps
 ```
-Cloning with HTTPS URLS may result in 'Permission denied' errors. In that case, add ssh keys to your GitHub account and rerun
+Cloning with HTTPS URLs may result in 'Permission denied' errors. In that case, add ssh keys to your GitHub account and rerun
 ```
 $> git submodule init
 $> git submodule update
