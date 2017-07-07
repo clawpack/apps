@@ -16,5 +16,5 @@ Cloning with HTTPS URLs may result in 'Permission denied' errors. In that case, 
 ```
 $> git submodule init
 $> git submodule update
-
+```
 Refer to the `git submodule` documentation for instructions on checking out only one submodule.
