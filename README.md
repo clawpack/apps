@@ -5,7 +5,7 @@ This is a repository of applications of Clawpack and related software.  Many of 
 ### Application Submodules
 Some of the applications are included as git submodules of the main repository.  This allows the responsible developers to maintain their application independent of the rest of the apps repository and lets users checkout only those apps that they are interested in.  If you have already cloned the `apps` repository, then to fetch all submodules you can do the following:
 ```
-$> cd $CLAW/apps
+$> cd $CLAW/apps  # or proper path to apps
 $> git submodule init
 $> git submodule update
 ```
@@ -14,7 +14,7 @@ The file `.gitmodules` contains a list of the submodules that will be fetched.  
 
 If you have not yet cloned the `apps` repository, you can clone it along with all the submodules via the following (with a new enough version of `git`):
 ```
-$> cd  $CLAW  # (or you could put it elsewhere)
+$> cd $CLAW  # or where ever you want apps to be
 $> git clone --recursive https://github.com/clawpack/apps
 ```
 
