@@ -27,4 +27,8 @@ To run both test problems from the paper and produce some plots::
 
     source make_all.sh
 
+To make comparison plots of gauges from the two runs:
 
+    python compare_gauges.py
+
+This creates gauges1-2.png and gauges3-4.png

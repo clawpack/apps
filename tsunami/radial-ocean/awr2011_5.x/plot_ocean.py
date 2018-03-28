@@ -44,7 +44,7 @@ x = linspace(-5,5,51)
 y = linspace(35,45,51)
 X,Y = meshgrid(x,y)
 Z = maketopo.qinit(X,Y)
-contour(X,Y,Z,[2,2],linewidth=2,colors='k')
+contour(X,Y,Z,[2],linewidth=2,colors='k')
 
 axis('scaled')
 xlim([-21,21])
