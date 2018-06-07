@@ -105,10 +105,10 @@ def setplot(plotdata):
     xisland,yisland = latlong(1600e3, theta_island, 40., Rearth)
     plotaxes.xlimits = [xisland-0.6, xisland+0.6]
     plotaxes.ylimits = [yisland-0.6, yisland+0.6]
-    #plotaxes.afteraxes = addgauges
     def bigfont(current_data):
         import pylab
         t = current_data.t
+        addgauges(current_data)
         pylab.title("Surface at t = %8.1f" % t, fontsize=20)
         pylab.xticks(fontsize=15)
         pylab.yticks(fontsize=15)
@@ -165,7 +165,7 @@ def setplot(plotdata):
     #-----------------------------------------
     plotfigure = plotdata.new_plotfigure(name='Surface & topo', figno=300, \
                     type='each_gauge')
-    plotfigure.clf_each_gauge = False
+    plotfigure.clf_each_gauge = True
 
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes()
