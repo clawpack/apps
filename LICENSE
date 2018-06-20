@@ -1,5 +1,10 @@
 BSD 3-Clause License
 
+Note that individual sub-repositories may have their own licenses depending on
+their origin.  Any sub-repositories that include their own licenses are licensed
+under that license rather than this license.  Any questions regarding this 
+should be directed towards the owner of the individual sub-repositories.
+
 Copyright (c) 1994-2018, Clawpack Developers
 All rights reserved.
 
