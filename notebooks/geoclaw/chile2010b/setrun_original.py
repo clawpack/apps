@@ -6,6 +6,7 @@ that will be read in by the Fortran code.
 
 """
 
+from __future__ import absolute_import
 from __future__ import print_function
 import os
 import numpy as np
@@ -108,14 +109,12 @@ def setrun(claw_pkg='geoclaw'):
 
 
     # Restart from checkpoint file of a previous run?
-    # Note: If restarting, you must also change the Makefile to set:
-    #    RESTART = True
     # If restarting, t0 above should be from original run, and the
     # restart_file 'fort.chkNNNNN' specified below should be in 
     # the OUTDIR indicated in Makefile.
 
-    clawdata.restart = False               # True to restart from prior results
-    clawdata.restart_file = 'fort.chk00036'  # File to use for restart data
+    clawdata.restart = False              # True to restart from prior results
+    clawdata.restart_file = 'fort.chk00096'  # File to use for restart data
 
     # -------------
     # Output times:
@@ -135,7 +134,7 @@ def setrun(claw_pkg='geoclaw'):
 
     elif clawdata.output_style == 2:
         # Specify a list of output times.
-        clawdata.output_times = np.linspace(4,8,17) * 3600.
+        clawdata.output_times = [0.5, 1.0]
 
     elif clawdata.output_style == 3:
         # Output every iout timesteps with a total of ntot time steps:
@@ -144,7 +143,7 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.output_t0 = True
         
 
-    clawdata.output_format = 'ascii'      # 'ascii' or 'netcdf' 
+    clawdata.output_format = 'ascii'      # 'ascii' or 'binary' 
 
     clawdata.output_q_components = 'all'   # need all
     clawdata.output_aux_components = 'none'  # eta=h+B is in q
@@ -261,15 +260,15 @@ def setrun(claw_pkg='geoclaw'):
         # Do not checkpoint at all
         pass
 
-    elif clawdata.checkpt_style == 1:
+    elif np.abs(clawdata.checkpt_style) == 1:
         # Checkpoint only at tfinal.
         pass
 
-    elif clawdata.checkpt_style == 2:
+    elif np.abs(clawdata.checkpt_style) == 2:
         # Specify a list of checkpoint times.  
         clawdata.checkpt_times = [0.1,0.15]
 
-    elif clawdata.checkpt_style == 3:
+    elif np.abs(clawdata.checkpt_style) == 3:
         # Checkpoint every checkpt_interval timesteps (on Level 1)
         # and at the final time.
         clawdata.checkpt_interval = 5
@@ -281,12 +280,12 @@ def setrun(claw_pkg='geoclaw'):
     amrdata = rundata.amrdata
 
     # max number of refinement levels:
-    amrdata.amr_levels_max = 3
+    amrdata.amr_levels_max = 1
 
     # List of refinement ratios at each level (length at least mxnest-1)
-    amrdata.refinement_ratios_x = [2,6]
-    amrdata.refinement_ratios_y = [2,6]
-    amrdata.refinement_ratios_t = [2,6]
+    amrdata.refinement_ratios_x = [2]
+    amrdata.refinement_ratios_y = [2]
+    amrdata.refinement_ratios_t = [2]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
@@ -298,6 +297,7 @@ def setrun(claw_pkg='geoclaw'):
 
     # Flag using refinement routine flag2refine rather than richardson error
     amrdata.flag_richardson = False    # use Richardson?
+    amrdata.flag_richardson_tol = 0.002  # Richardson tolerance
     amrdata.flag2refine = True
 
     # steps to take on each level L between regriddings of level L+1:
@@ -336,21 +336,22 @@ def setrun(claw_pkg='geoclaw'):
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
 
-    # Allow only level 1 as default everywhere:
-    rundata.regiondata.regions.append([1, 1, 0., 1e9, -180, 180, -90, 90])
+    if 0:
+        # Allow only level 1 as default everywhere:
+        rundata.regiondata.regions.append([1, 1, 0., 1e9, -180, 180, -90, 90])
 
-    # Force refinement around earthquake source region for first hour:
-    rundata.regiondata.regions.append([3, 3, 0., 3600., -85,-72,-38,-25])
+        # Force refinement around earthquake source region for first hour:
+        rundata.regiondata.regions.append([3, 3, 0., 3600., -85,-72,-38,-25])
 
-    # Allow up to level 3 in northeastern part of domain:
-    rundata.regiondata.regions.append([1, 3, 0., 1.e9, -90,-60,-30,0])
+        # Allow up to level 3 in northeastern part of domain:
+        rundata.regiondata.regions.append([1, 3, 0., 1.e9, -90,-60,-30,0])
 
     # ---------------
     # Gauges:
     # ---------------
     rundata.gaugedata.gauges = []
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
-    rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
+    #rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
     
 
     return rundata
@@ -390,7 +391,7 @@ def setgeo(rundata):
     # Refinement settings
     refinement_data = rundata.refinement_data
     refinement_data.variable_dt_refinement_ratios = True
-    refinement_data.wave_tolerance = 0.02
+    refinement_data.wave_tolerance = 0.1
     refinement_data.deep_depth = 1e2
     refinement_data.max_level_deep = 3
 
@@ -431,6 +432,9 @@ def setgeo(rundata):
 if __name__ == '__main__':
     # Set up run-time parameters and write all data files.
     import sys
+    from clawpack.geoclaw import kmltools
+
     rundata = setrun(*sys.argv[1:])
     rundata.write()
 
+    kmltools.make_input_data_kmls(rundata)

@@ -1,22 +1,10 @@
 """
-This script creates the following files in the $CLAW/geoclaw/scratch
-directory:
-
-  - etopo1_-140_-60_-60_10_4min.tt3    
-
-    4-minute resolution resolution topography/bathymetry from the
-    etopo1 data set. See http://www.ngdc.noaa.gov/mgg/global/global.html
-
-    This is finer bathymetry than the 10-second bathymetry used in the 
-    original GeoClaw example chile2010 and is now downloaded 
-    directly from NCEI (if the file does not already exist locally)
-    using the GeoClaw etopotools.py module.
-                       
-  - dtopo_usgs100227.tt3
-
-    Seafloor deformation file created using the Okada model as implemented
-    in the GeoClaw dtopotools.py module.
-
+Create topo and dtopo files needed for this example:
+    etopo10min120W60W60S0S.asc        download from GeoClaw topo repository
+    dtopo_usgs100227.tt3              create using Okada model 
+Prior to Clawpack 5.2.1, the fault parameters we specified in a .cfg file,
+but now they are explicit below.
+    
 Call functions with makeplots==True to create plots of topo, slip, and dtopo.
 """
 
@@ -31,29 +19,18 @@ try:
 except:
     raise Exception("*** Must first set CLAW enviornment variable")
 
-
 # Scratch directory for storing topo and dtopo files:
 scratch_dir = os.path.join(CLAW, 'geoclaw', 'scratch')
-
 
 def get_topo(makeplots=False):
     """
     Retrieve the topo file from the GeoClaw repository.
     """
-    from clawpack.geoclaw import topotools, etopotools
-
-    topo_fname = 'etopo1_-140_-60_-60_10_10min.tt3'
-
-    if os.path.exists(topo_fname):
-        print("*** Not regenerating dtopo file (already exists): %s" \
-                    % dtopo_fname)
-    else:
-        xlimits = (-140,-60)
-        ylimits = (-60,10)
-        resolution = 10./60.   # degrees
-
-        topo = etopotools.etopo1_download(xlimits,ylimits, dx=resolution, \
-                output_dir=scratch_dir, file_name=topo_fname, return_topo=True)
+    from clawpack.geoclaw import topotools
+    topo_fname = 'etopo10min120W60W60S0S.asc'
+    url = 'http://depts.washington.edu/clawpack/geoclaw/topo/etopo/' + topo_fname
+    clawpack.clawutil.data.get_remote_file(url, output_dir=scratch_dir, 
+            file_name=topo_fname, verbose=True)
 
     if makeplots:
         from matplotlib import pyplot as plt
@@ -64,8 +41,7 @@ def get_topo(makeplots=False):
         print("Created ",fname)
 
 
-
-
+    
 def make_dtopo(makeplots=False):
     """
     Create dtopo data file for deformation of sea floor due to earthquake.
@@ -94,7 +70,7 @@ def make_dtopo(makeplots=False):
     fault = dtopotools.Fault()
     fault.subfaults = [usgs_subfault]
 
-    print("Earthquake moment magnitude Mw = %5.2f" % fault.Mw())
+    print("Mw = ",fault.Mw())
 
     if os.path.exists(dtopo_fname):
         print("*** Not regenerating dtopo file (already exists): %s" \
@@ -126,8 +102,8 @@ def make_dtopo(makeplots=False):
         fault.plot_subfaults(axes=ax1,slip_color=True)
         ax1.set_xlim(x.min(),x.max())
         ax1.set_ylim(y.min(),y.max())
-        dtopo.plot_dz_colors(1.,axes=ax2)
-        fname = os.path.splitext(dtopo_fname)[0] + '.png'
+        dtopo.plot_dZ_colors(1.,axes=ax2)
+        fname = os.path.splitext(os.path.split(dtopo_fname)[-1])[0] + '.png'
         plt.savefig(fname)
         print("Created ",fname)
 
