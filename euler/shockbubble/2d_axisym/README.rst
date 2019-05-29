@@ -19,7 +19,8 @@ the bubble.
 Version history:  
 ----------------
 
-- This version works with Clawpack 5.3.0 
+- 29 May 2019: This version works with Clawpack 5.6.0 
+
 - 28 Dec 2014: 
 
   - Updated `Makefile` to include dimensional splitting 
