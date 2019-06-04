@@ -6,6 +6,7 @@ that will be read in by the Fortran code.
 
 """
 
+from __future__ import absolute_import
 from __future__ import print_function
 import os
 import numpy as np
@@ -108,14 +109,12 @@ def setrun(claw_pkg='geoclaw'):
 
 
     # Restart from checkpoint file of a previous run?
-    # Note: If restarting, you must also change the Makefile to set:
-    #    RESTART = True
     # If restarting, t0 above should be from original run, and the
     # restart_file 'fort.chkNNNNN' specified below should be in 
     # the OUTDIR indicated in Makefile.
 
-    clawdata.restart = False               # True to restart from prior results
-    clawdata.restart_file = 'fort.chk00036'  # File to use for restart data
+    clawdata.restart = False              # True to restart from prior results
+    clawdata.restart_file = 'fort.chk00096'  # File to use for restart data
 
     # -------------
     # Output times:
@@ -144,7 +143,7 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.output_t0 = True
         
 
-    clawdata.output_format = 'ascii'      # 'ascii' or 'netcdf' 
+    clawdata.output_format = 'ascii'      # 'ascii' or 'binary' 
 
     clawdata.output_q_components = 'all'   # need all
     clawdata.output_aux_components = 'none'  # eta=h+B is in q
@@ -261,15 +260,15 @@ def setrun(claw_pkg='geoclaw'):
         # Do not checkpoint at all
         pass
 
-    elif clawdata.checkpt_style == 1:
+    elif np.abs(clawdata.checkpt_style) == 1:
         # Checkpoint only at tfinal.
         pass
 
-    elif clawdata.checkpt_style == 2:
+    elif np.abs(clawdata.checkpt_style) == 2:
         # Specify a list of checkpoint times.  
         clawdata.checkpt_times = [0.1,0.15]
 
-    elif clawdata.checkpt_style == 3:
+    elif np.abs(clawdata.checkpt_style) == 3:
         # Checkpoint every checkpt_interval timesteps (on Level 1)
         # and at the final time.
         clawdata.checkpt_interval = 5
@@ -283,10 +282,11 @@ def setrun(claw_pkg='geoclaw'):
     # max number of refinement levels:
     amrdata.amr_levels_max = 1
 
-    # List of refinement ratios at each level:
+    # List of refinement ratios at each level (length at least mxnest-1)
     amrdata.refinement_ratios_x = [2]
     amrdata.refinement_ratios_y = [2]
     amrdata.refinement_ratios_t = [2]
+
 
     # Specify type of each aux variable in amrdata.auxtype.
     # This must be a list of length maux, each element of which is one of:
@@ -297,6 +297,7 @@ def setrun(claw_pkg='geoclaw'):
 
     # Flag using refinement routine flag2refine rather than richardson error
     amrdata.flag_richardson = False    # use Richardson?
+    amrdata.flag_richardson_tol = 0.002  # Richardson tolerance
     amrdata.flag2refine = True
 
     # steps to take on each level L between regriddings of level L+1:
@@ -331,7 +332,6 @@ def setrun(claw_pkg='geoclaw'):
     # ---------------
     # Regions:
     # ---------------
-
     rundata.regiondata.regions = []
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
@@ -352,7 +352,6 @@ def setrun(claw_pkg='geoclaw'):
     rundata.gaugedata.gauges = []
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
     #rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
-    #rundata.gaugedata.gauges.append([123, -80., -7., 0., 1.e10])
     
 
     return rundata
@@ -400,8 +399,8 @@ def setgeo(rundata):
     topo_data = rundata.topo_data
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
-    topo_path = os.path.join(scratch_dir, 'etopo1_-140_-60_-60_10_10min.tt3')
-    topo_data.topofiles.append([3, 1, 3, 0., 1.e10, topo_path])
+    topo_path = os.path.join(scratch_dir, 'etopo10min120W60W60S0S.asc')
+    topo_data.topofiles.append([2, 1, 3, 0., 1.e10, topo_path])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
@@ -433,6 +432,9 @@ def setgeo(rundata):
 if __name__ == '__main__':
     # Set up run-time parameters and write all data files.
     import sys
+    from clawpack.geoclaw import kmltools
+
     rundata = setrun(*sys.argv[1:])
     rundata.write()
 
+    kmltools.make_input_data_kmls(rundata)
