@@ -1,4 +1,5 @@
 
+from __future__ import print_function
 from clawpack.geoclaw import topotools
 from clawpack.geoclaw.data import Rearth  # radius of earth
 from interp import pwcubic
@@ -12,7 +13,7 @@ import maketopo
 probdata = ClawData()
 probdata.read('setprob.data', force=True)
 theta_island = probdata.theta_island
-print "theta_island = ",theta_island
+print("theta_island = ",theta_island)
 
 
 (xisland,yisland) = latlong(1600.e3, theta_island, 40., Rearth)
@@ -34,7 +35,7 @@ def ocean():
     plt.yticks(fontsize=15)
     plt.savefig('topo1.png')
     #plt.savefig('topo1.tif')
-    print "Cross-section plot in topo1.png"
+    print("Cross-section plot in topo1.png")
 
     plt.xlim([1500,1650])
     plt.ylim([-200.,20])
@@ -45,7 +46,7 @@ def ocean():
     plt.yticks(fontsize=15)
     plt.savefig('topo2.png')
     #plt.savefig('topo2.tif')
-    print "Zoom near shore in topo2.png"
+    print("Zoom near shore in topo2.png")
 
 
 def with_island():
@@ -66,7 +67,7 @@ def with_island():
     plt.yticks(fontsize=15)
     plt.savefig('topo3.png')
     #plt.savefig('topo3.tif')
-    print "Cross-section through island in topo3.png"
+    print("Cross-section through island in topo3.png")
 
 if __name__=="__main__":
     ocean()

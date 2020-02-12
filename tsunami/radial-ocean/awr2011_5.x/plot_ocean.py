@@ -1,4 +1,5 @@
 
+from __future__ import print_function
 from pylab import *
 
 from clawpack.geoclaw import topotools
@@ -10,7 +11,7 @@ import maketopo
 probdata = ClawData()
 probdata.read('setprob.data', force=True)
 theta_island = probdata.theta_island
-print "theta_island = ",theta_island
+print("theta_island = ",theta_island)
 
 
 #close(1)
@@ -55,7 +56,7 @@ xlabel('Longitude',fontsize=15)
 ylabel('Latitude',fontsize=15)
 
 savefig('ocean.png')
-print "Created ocean.png"
+print("Created ocean.png")
 
 if 0:
     axes([.65,.6,.25,.25])

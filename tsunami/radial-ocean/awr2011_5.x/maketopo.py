@@ -3,6 +3,7 @@
 Module to create topo and qinit data files for this example.
 """
 
+from __future__ import print_function
 from clawpack.geoclaw import topotools
 from clawpack.geoclaw.data import Rearth  # radius of earth
 from interp import pwcubic
@@ -14,7 +15,7 @@ from mapper import latlong, gcdist
 probdata = ClawData()
 probdata.read('setprob.data', force=True)
 theta_island = probdata.theta_island
-print "theta_island = ",theta_island
+print("theta_island = ",theta_island)
 
 (xisland,yisland) = latlong(1600.e3, theta_island, 40., Rearth)
 
@@ -73,8 +74,8 @@ def shelf1(r):
     zr = zl  # continuous!
     slope_of_shelf = (z3 - z2) / (rad3 - rad2)
     slope_of_beach = (z4 - z3) / (rad4 - rad3)
-    print "Slope of shelf = ",slope_of_shelf
-    print "Slope of beach = ",slope_of_beach
+    print("Slope of shelf = ",slope_of_shelf)
+    print("Slope of beach = ",slope_of_beach)
     slopel = array([0., 0., slope_of_shelf, slope_of_shelf, slope_of_beach])
     sloper = array([0., 0., slope_of_shelf, slope_of_beach, slope_of_beach])
     z = pwcubic(xi, zl, zr, slopel, sloper, r)

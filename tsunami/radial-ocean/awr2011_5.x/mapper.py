@@ -1,4 +1,5 @@
 
+from __future__ import print_function
 from pylab import *
 
 def latlong(d,theta,phi,Rearth):
@@ -90,7 +91,7 @@ def gcdist(x1,y1,x2,y2,Rearth,units='degrees'):
 
     # alternative formula that may have more rounding error:
     #dsigma2 = arccos(sin(y1)*sin(y2)+ cos(y1)*cos(y2)*cos(dx))
-    #print "max diff in dsigma: ", abs(dsigma-dsigma2).max()
+    #print("max diff in dsigma: ", abs(dsigma-dsigma2).max())
 
     d = Rearth * dsigma
     return d

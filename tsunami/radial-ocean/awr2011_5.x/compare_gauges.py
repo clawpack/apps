@@ -32,7 +32,7 @@ pylab.annotate('Gauge 2',[9300,2.7] ,[9700,3.1],arrowprops={'width':1,'color':'k
 
 pylab.savefig('gauges1-2.png')
 
-print "Created gauges1-2.png"
+print("Created gauges1-2.png")
 
 #===============================
 
@@ -61,4 +61,4 @@ pylab.annotate('Gauge 4',[11550,1.0] ,[11200,2.0],arrowprops={'width':1,'color':
 
 pylab.savefig('gauges3-4.png')
 
-print "Created gauges3-4.png"
+print("Created gauges3-4.png")
