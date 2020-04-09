@@ -48,9 +48,9 @@ def setplot(plotdata=None):
         #addgauges(current_data)
         t = current_data.t
         t = t / 3600.  # hours
-        pylab.title('Surface at %4.2f hours' % t, fontsize=20)
-        pylab.xticks(fontsize=15)
-        pylab.yticks(fontsize=15)
+        pylab.title('Surface at %4.2f hours' % t, fontsize=15)
+        #pylab.xticks(fontsize=15)
+        #pylab.yticks(fontsize=15)
 
     #-----------------------------------------
     # Figure for surface

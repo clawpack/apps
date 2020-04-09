@@ -7,9 +7,18 @@ function setplot is called to set the plot parameters.
     
 """ 
 
+from __future__ import absolute_import
+from __future__ import print_function
+
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Import de-tided DART 32412 data for comparison:
+
+try:
+    TG32412 = np.loadtxt('32412_notide.txt')
+except:
+    print("*** Could not load DART data file")
 
 #--------------------------
 def setplot(plotdata=None):
@@ -40,21 +49,21 @@ def setplot(plotdata=None):
     def addgauges(current_data):
         from clawpack.visclaw import gaugetools
         gaugetools.plot_gauge_locations(current_data.plotdata, \
-             gaugenos='all', format_string='ko', add_labels=True)
+             gaugenos='all', format_string='wo', add_labels=True)
     
     def fixup(current_data):
         import pylab
-        #addgauges(current_data)
+        addgauges(current_data)
         t = current_data.t
         t = t / 3600.  # hours
-        pylab.title('Surface at %4.2f hours' % t, fontsize=20)
-        pylab.xticks(fontsize=15)
-        pylab.yticks(fontsize=15)
+        pylab.title('Surface at %4.2f hours' % t, fontsize=15)
+        #pylab.xticks(fontsize=15)
+        #pylab.yticks(fontsize=15)
 
     #-----------------------------------------
     # Figure for surface
     #-----------------------------------------
-    plotfigure = plotdata.new_plotfigure(name='Surface', figno=0)
+    plotfigure = plotdata.new_plotfigure(name='Full Domain', figno=0)
 
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes('pcolor')
@@ -86,6 +95,42 @@ def setplot(plotdata=None):
     plotaxes.ylimits = [-60,0]
 
     #-----------------------------------------
+    # Figure for zoom near Peru
+    #-----------------------------------------
+    plotfigure = plotdata.new_plotfigure(name='Peru coast', figno=1)
+
+    # Set up for axes in this figure:
+    plotaxes = plotfigure.new_plotaxes('pcolor')
+    plotaxes.title = 'Surface'
+    plotaxes.scaled = True
+    plotaxes.afteraxes = fixup
+    plotaxes.xlimits = [-85,-70]
+    plotaxes.ylimits = [-20,0]
+
+    # Water
+    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    #plotitem.plot_var = geoplot.surface
+    plotitem.plot_var = geoplot.surface_or_depth
+    plotitem.pcolor_cmap = geoplot.tsunami_colormap
+    plotitem.pcolor_cmin = -0.2
+    plotitem.pcolor_cmax = 0.2
+    plotitem.add_colorbar = True
+    plotitem.amr_celledges_show = [1,1,0]
+    plotitem.patchedges_show = 1
+
+    # Land
+    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    plotitem.plot_var = geoplot.land
+    plotitem.pcolor_cmap = geoplot.land_colors
+    plotitem.pcolor_cmin = 0.0
+    plotitem.pcolor_cmax = 100.0
+    plotitem.add_colorbar = False
+    plotitem.amr_celledges_show = [1,1,0]
+    plotitem.patchedges_show = 1
+
+
+
+    #-----------------------------------------
     # Figures for gauges
     #-----------------------------------------
     plotfigure = plotdata.new_plotfigure(name='Surface at gauges', figno=300, \
@@ -108,6 +153,13 @@ def setplot(plotdata=None):
         from pylab import plot, legend, xticks, floor, axis, xlabel
         t = current_data.t 
         gaugeno = current_data.gaugeno
+
+        if gaugeno == 32412:
+            try:
+                plot(TG32412[:,0], TG32412[:,1], 'r')
+                legend(['GeoClaw','Obs'],loc='lower right')
+            except: pass
+            axis((0,t.max(),-0.3,0.3))
 
         plot(t, 0*t, 'k')
         n = int(floor(t.max()/3600.) + 2)
