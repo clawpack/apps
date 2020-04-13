@@ -280,12 +280,12 @@ def setrun(claw_pkg='geoclaw'):
     amrdata = rundata.amrdata
 
     # max number of refinement levels:
-    amrdata.amr_levels_max = 1
+    amrdata.amr_levels_max = 3
 
     # List of refinement ratios at each level (length at least mxnest-1)
-    amrdata.refinement_ratios_x = [2]
-    amrdata.refinement_ratios_y = [2]
-    amrdata.refinement_ratios_t = [2]
+    amrdata.refinement_ratios_x = [2,6]
+    amrdata.refinement_ratios_y = [2,6]
+    amrdata.refinement_ratios_t = [2,6]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
@@ -336,22 +336,22 @@ def setrun(claw_pkg='geoclaw'):
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
 
-    if 0:
-        # Allow only level 1 as default everywhere:
-        rundata.regiondata.regions.append([1, 1, 0., 1e9, -180, 180, -90, 90])
+    # Allow only level 1 as default everywhere:
+    rundata.regiondata.regions.append([1, 1, 0., 1e9, -180, 180, -90, 90])
 
-        # Force refinement around earthquake source region for first hour:
-        rundata.regiondata.regions.append([3, 3, 0., 3600., -85,-72,-38,-25])
+    # Force refinement around earthquake source region for first hour:
+    rundata.regiondata.regions.append([3, 3, 0., 3600., -85,-72,-38,-25])
 
-        # Allow up to level 3 in northeastern part of domain:
-        rundata.regiondata.regions.append([1, 3, 0., 1.e9, -90,-60,-30,0])
+    # Allow up to level 3 in northeastern part of domain:
+    rundata.regiondata.regions.append([1, 3, 0., 1.e9, -90,-60,-30,0])
 
     # ---------------
     # Gauges:
     # ---------------
     rundata.gaugedata.gauges = []
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
-    #rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
+    rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
+    rundata.gaugedata.gauges.append([123, -77.3, -12.3, 3.5*3600, 1.e10])
     
 
     return rundata
@@ -391,7 +391,7 @@ def setgeo(rundata):
     # Refinement settings
     refinement_data = rundata.refinement_data
     refinement_data.variable_dt_refinement_ratios = True
-    refinement_data.wave_tolerance = 0.1
+    refinement_data.wave_tolerance = 0.02
     refinement_data.deep_depth = 1e2
     refinement_data.max_level_deep = 3
 
