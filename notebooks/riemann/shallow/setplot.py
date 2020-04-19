@@ -92,7 +92,6 @@ def setplot(plotdata):
     plotitem.kwargs = {'linewidth':2}
     def fill_with_cmap(current_data):
         from clawpack.visclaw.colormaps import make_colormap
-        import string
         x = current_data.x
         h = current_data.q[0,:]
         u = current_data.q[1,:] / h
@@ -118,7 +117,7 @@ def setplot(plotdata):
         C = vstack((c,c))
         pcolor(X,Y,C,cmap=cmap)
         outdir = current_data.plotdata.outdir
-        frameno = string.zfill(current_data.frameno,4)
+        frameno = str(current_data.frameno).zfill(4)
         #plot_approx_Rsoln(current_data)
         ylim([0,3.5])
         xticks(fontsize=20)
