@@ -8,6 +8,7 @@ that will be read in by the Fortran code.
 
 import os
 import numpy as np
+from clawpack.geoclaw import fgmax_tools
 
 try:
     CLAW = os.environ['CLAW']
@@ -361,7 +362,7 @@ def setgeo(rundata):
     try:
         geo_data = rundata.geo_data
     except:
-        print "*** Error, this rundata has no geo_data attribute"
+        print("*** Error, this rundata has no geo_data attribute")
         raise AttributeError("Missing geo_data attribute")
        
     # == Physics ==
@@ -414,12 +415,39 @@ def setgeo(rundata):
     # [t1,t2,noutput,x1,x2,y1,y2,xpoints,ypoints,\
     #  ioutarrivaltimes,ioutsurfacemax]
 
-    # == fgmax.data values ==
-    fgmax_files = rundata.fgmax_data.fgmax_files
-    # for fixed grids append to this list names of any fgmax input files
-    fgmax_files.append('fgmax_grid.txt')
-    rundata.fgmax_data.num_fgmax_val = 1  # Save depth only
 
+    # == fgmax_grids.data values ==
+    # NEW STYLE STARTING IN v5.7.0
+
+    # set num_fgmax_val = 1 to save only max depth,
+    #                     2 to also save max speed,
+    #                     5 to also save max hs,hss,hmin
+    rundata.fgmax_data.num_fgmax_val = 2  # Save depth and speed
+
+    fgmax_grids = rundata.fgmax_data.fgmax_grids  # empty list to start
+
+    # Now append to this list objects of class fgmax_tools.FGmaxGrid
+    # specifying any fgmax grids.
+
+    # Points on a uniform 2d grid:
+    dx_fine = 2./(3.*4.)  # grid resolution at finest level
+
+    fg = fgmax_tools.FGmaxGrid()
+    fg.point_style = 2  # uniform rectangular x-y grid
+    fg.x1 = -120. + dx_fine/2.
+    fg.x2 = -60. - dx_fine/2.
+    fg.y1 = -60. + dx_fine/2.
+    fg.y2 = 0. - dx_fine/2.
+    fg.dx = dx_fine
+    fg.tstart_max =  10.      # when to start monitoring max values
+    fg.tend_max = 1.e10       # when to stop monitoring max values
+    fg.dt_check = 60.         # target time (sec) increment between updating 
+                              # max values
+    fg.min_level_check = 3    # which levels to monitor max on
+    fg.arrival_tol = 1.e-2    # tolerance for flagging arrival
+
+    fg.interp_method = 0      # 0 ==> pw const in cells, recommended
+    fgmax_grids.append(fg)    # written to fgmax_grids.data
 
 
     return rundata

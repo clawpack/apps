@@ -10,7 +10,7 @@ from clawpack.geoclaw import fgmax_tools, geoplot
 def plot_fgmax_grid():
 
     fg = fgmax_tools.FGmaxGrid()
-    fg.read_input_data('fgmax_grid.txt')
+    fg.read_fgmax_grids_data(fgno=1)
     fg.read_output()
 
     clines_zeta = [0.01] + list(numpy.linspace(0.05,0.3,6)) + [0.5,1.0,10.0]
@@ -31,7 +31,7 @@ def plot_fgmax_grid():
     plt.clabel(con_t, clines_t_label)
 
     # fix axes:
-    plt.ticklabel_format(format='plain',useOffset=False)
+    plt.ticklabel_format(style='plain',useOffset=False)
     plt.xticks(rotation=20)
     plt.gca().set_aspect(1./numpy.cos(fg.Y.mean()*numpy.pi/180.))
     plt.title("Maximum amplitude / arrival times")
@@ -45,4 +45,4 @@ if __name__=="__main__":
         os.mkdir(plotdir)
     fname = os.path.join(plotdir, "amplitude_times.png")
     plt.savefig(fname)
-    print "Created ",fname
+    print("Created ",fname)
