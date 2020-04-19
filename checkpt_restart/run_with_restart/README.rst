@@ -48,3 +48,5 @@ Version history:
 - This version works with Clawpack 5.3.1
 
 - This version works with Clawpack 5.4.1 and Python2 or Python3
+
+- Updated for v5.7.0 on 19 April 2020
