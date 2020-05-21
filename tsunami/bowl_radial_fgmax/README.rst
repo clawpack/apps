@@ -4,6 +4,11 @@
 Radial bowl test case for fgmax routines  
 ========================================
 
+.. warning::
+   **This example needs updating for v5.7.0.**
+   A newer example illustrating many of the same things is now available in
+   `$CLAW/geoclaw/examples/tsunami/radial-ocean-island-fgmax`.
+
 Illustrates how to set up a grid of points to monitor the maximum amplitude of
 the wave at each point on a grid of points, a transect, and a curve along
 the shoreline.

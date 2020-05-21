@@ -21,7 +21,7 @@ def setplot(plotdata):
     from numpy import loadtxt
     fname = plotdata.outdir + '/fort.H'
     B = loadtxt(fname)
-    print "Loaded B"
+    print("Loaded B")
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
 

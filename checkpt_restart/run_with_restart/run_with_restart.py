@@ -28,19 +28,8 @@ generated.
 
 Notes:
 
- - This requires replacing `check.f` by `check_twofiles.f` in the Makefile
-   to use the version that alternates writing two sets of checkpoint files
-   rather than accumulating files.
-
  - The setrun.py file is used also for the restart.  The clawdata.restart
    value is set to True and written to claw.data explicitly from this script.
-
- - check_twofiles.f also flushes buffers for output to fort.gauge,
-   fort.amr, fort.debug so output is not lost.
-
- - Before restarting, it moves any fort.gauge file to fort.gauge_<datetime>
-   so that eventually these can be catenated together (after editing out
-   repeated entries).
 
 """
 
