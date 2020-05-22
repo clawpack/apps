@@ -13,21 +13,20 @@ from __future__ import absolute_import
 import os
 import sys
 import datetime
+import gzip
 
 import numpy as np
 
-import clawpack.clawutil.data as data
-import clawpack.geoclaw.topotools as topotools
-import clawpack.geoclaw.etopotools as etopotools
+from clawpack.geoclaw.surge.storm import Storm
+import clawpack.clawutil as clawutil
 
-# Landfall of hurricane 1110 UTC (6:10 a.m. CDT) on Monday, August 29, 2005
-katrina_landfall = datetime.datetime(2005, 8, 28, 6)     \
-                 - datetime.datetime(2005, 1, 1, 0)
 
-#                           days   s/hour    hours/day
-days2seconds = lambda days: days * 60.0**2 * 24.0
-seconds2days = lambda seconds: seconds / (60.0**2 * 24.0)
+# Time Conversions
+def days2seconds(days):
+    return days * 60.0**2 * 24.0
 
+# Scratch directory for storing topo and dtopo files:
+scratch_dir = os.path.join(os.environ["CLAW"], 'geoclaw', 'scratch')
 
 def setrun(claw_pkg='geoclaw'):
     """
@@ -40,6 +39,8 @@ def setrun(claw_pkg='geoclaw'):
         rundata - object of class ClawRunData
 
     """
+
+    from clawpack.clawutil import data
 
     assert claw_pkg.lower() == 'geoclaw',  "Expected claw_pkg = 'geoclaw'"
 
@@ -104,8 +105,8 @@ def setrun(claw_pkg='geoclaw'):
     # Initial time:
     # -------------
 
-    # Katrina 2005082412 20260800.000000000
-    clawdata.t0 = days2seconds(katrina_landfall.days - 2) + katrina_landfall.seconds
+    # Katrina
+    clawdata.t0 = -days2seconds(2)
 
     # -------------
     # Output times:
@@ -121,10 +122,10 @@ def setrun(claw_pkg='geoclaw'):
         # Output nout frames at equally spaced times up to tfinal:
         #                 day     s/hour  hours/day
         # Katrina 2005083012
-        clawdata.tfinal = days2seconds(katrina_landfall.days + 2) + katrina_landfall.seconds
+        clawdata.tfinal = days2seconds(1)
 
         # Output files per day requested
-        recurrence = 6
+        recurrence = 4
         clawdata.num_output_times = int((clawdata.tfinal - clawdata.t0) *
                                         recurrence / (60**2 * 24))
 
@@ -141,7 +142,6 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.output_t0 = True
         
     clawdata.output_format = 'ascii'      # 'ascii' or 'netcdf'
-
     clawdata.output_q_components = 'all'   # could be list such as [True,True]
     clawdata.output_aux_components = 'all' # could be list
     clawdata.output_aux_onlyonce = False    # output aux arrays only at t0
@@ -272,12 +272,12 @@ def setrun(claw_pkg='geoclaw'):
 
 
     # max number of refinement levels:
-    amrdata.amr_levels_max = 1
+    amrdata.amr_levels_max = 2
 
-    # List of refinement ratios at each level (length at least mxnest-1)
-    amrdata.refinement_ratios_x = [2, 2, 3, 4, 4, 4]
-    amrdata.refinement_ratios_y = [2, 2, 3, 4, 4, 4]
-    amrdata.refinement_ratios_t = [2, 2, 3, 4, 4, 4]
+    # List of refinement ratios at each level
+    amrdata.refinement_ratios_x = [2, 4, 10]
+    amrdata.refinement_ratios_y = [2, 4, 10]
+    amrdata.refinement_ratios_t = [2, 4, 10]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
@@ -327,14 +327,23 @@ def setrun(claw_pkg='geoclaw'):
 
     # == setgauges.data values ==
     gauges = rundata.gaugedata.gauges
-    # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
-    gauges.append([1, -88.270704,  29.671603,  rundata.clawdata.t0, rundata.clawdata.tfinal])
 
-    #------------------------------------------------------------------
+    # Grand Isle, LA (Station ID: 8761724)
+    gauges.append([1, -89.96, 29.26, rundata.clawdata.t0, rundata.clawdata.tfinal])
+
+    # Pilots Station East, SW Pass, LA (Station ID: 8760922)
+    gauges.append([2, -89.41, 28.93, rundata.clawdata.t0, rundata.clawdata.tfinal])
+
+    # Dauphin Island, AL (Station ID: 8735180)
+    gauges.append([3, -88.08, 30.25, rundata.clawdata.t0, rundata.clawdata.tfinal])
+
+    # Force the gauges to also record the wind and pressure fields
+    rundata.gaugedata.aux_out_fields = [4, 5, 6]
+
+    # ------------------------------------------------------------------
     # GeoClaw specific parameters:
-    #------------------------------------------------------------------
-
-    rundata = setgeo(rundata)   # Defined below
+    # ------------------------------------------------------------------
+    rundata = setgeo(rundata)
     
     # Set storm
     set_storm(rundata)
@@ -342,30 +351,25 @@ def setrun(claw_pkg='geoclaw'):
     # Set variable friction
     set_friction(rundata)
 
-    # Fetch topography if needed
-    get_topo(plot=False)
-
     return rundata
     # end of function setrun
-    # ----------------------
 
-
+# -------------------
 def setgeo(rundata):
     """
     Set GeoClaw specific runtime parameters.
     For documentation see ....
     """
 
-    try:
-        geo_data = rundata.geo_data
-    except:
-        print("*** Error, this rundata has no geodata attribute")
-        raise AttributeError("Missing geodata attribute")
+    geo_data = rundata.geo_data
        
     # == Physics ==
     geo_data.gravity = 9.81
     geo_data.coordinate_system = 2
     geo_data.earth_radius = 6367.5e3
+    geo_data.rho = 1025.0
+    geo_data.rho_air = 1.15
+    geo_data.ambient_pressure = 101.3e3
 
     # == Forcing Options
     geo_data.coriolis_forcing = True
@@ -374,34 +378,27 @@ def setgeo(rundata):
     geo_data.friction_depth = 1e10
 
     # == Algorithm and Initial Conditions ==
-    geo_data.sea_level = 0.0
+    geo_data.sea_level = 0.125  # Due to seasonal swelling of gulf
     geo_data.dry_tolerance = 1.e-2
 
     # Refinement Criteria
     refine_data = rundata.refinement_data
     refine_data.wave_tolerance = 1.0
-    # refine_data.wave_tolerance = 0.5
-    # refine_data.speed_tolerance = [0.25,0.5,1.0,2.0,3.0,4.0]
-    # refine_data.speed_tolerance = [0.5,1.0,1.5,2.0,2.5,3.0]
     refine_data.speed_tolerance = [1.0,2.0,3.0,4.0]
-    refine_data.deep_depth = 1e6
-    refine_data.max_level_deep = 5
+    refine_data.deep_depth = 300
+    refine_data.max_level_deep = 4
     refine_data.variable_dt_refinement_ratios = True
 
     # == settopo.data values ==
     topo_data = rundata.topo_data
     # for topography, append lines of the form
     #   [topotype, minlevel, maxlevel, t1, t2, fname]
-    topo_path = os.path.join(os.environ["CLAW"], "geoclaw", "scratch")
-    topo_data.topofiles.append([3, 1, 3, rundata.clawdata.t0, rundata.clawdata.tfinal, 
-                              os.path.join(topo_path, 'gulf_caribbean.tt3')])
-    # geodata.topofiles.append([3, 1, 3, 0., 1.e10, \
-    #                           './bathy/gulf_coarse_bathy.tt3'])
-    # topo_data.topofiles.append([3, 1, 5, rundata.clawdata.t0, rundata.clawdata.tfinal,
-    #                           os.path.join(topo_path, 'NewOrleans_3s.tt3')])
-    # topo_data.topofiles.append([4, 1, 5, rundata.clawdata.t0, rundata.clawdata.tfinal,
-    #                           os.path.join(topo_path, 'NewOrleans_3s.nc')])
-
+    clawutil.data.get_remote_file(
+           "http://www.columbia.edu/~ktm2132/bathy/gulf_caribbean.tt3.tar.bz2")
+    topo_path = os.path.join(scratch_dir, 'gulf_caribbean.tt3')
+    topo_data.topofiles.append([3, 1, 5, rundata.clawdata.t0,
+                                rundata.clawdata.tfinal,
+                                topo_path])
 
     # == setqinit.data values ==
     rundata.qinit_data.qinit_type = 0
@@ -426,28 +423,41 @@ def set_storm(rundata):
 
     data = rundata.surge_data
 
-    # Physics parameters
-    data.rho_air = 1.15
-    data.ambient_pressure = 101.3e3 # Nominal atmos pressure
-
-    # Source term controls - These are currently not respected
+    # Source term controls
     data.wind_forcing = True
     data.pressure_forcing = True
     data.drag_law = 2
+
+    data.display_landfall_time = True
 
     # AMR parameters - m/s for wind refinement and (m) for radius
     data.wind_refine = [20.0, 40.0, 60.0]
     data.R_refine = [60.0e3, 40e3, 20e3]
 
     # Storm parameters - Storm Type 1 is Holland parameterized
-    data.storm_type = 1
-    data.landfall = days2seconds(katrina_landfall.days)         \
-                    + katrina_landfall.seconds
-    data.display_landfall_time = True
-
-    # Storm type 1 - Idealized storm track
+    data.storm_specification_type = 'holland80'
     data.storm_file = os.path.expandvars(os.path.join(os.getcwd(),
                                          'katrina.storm'))
+    
+    # Convert ATCF data to GeoClaw format
+    clawutil.data.get_remote_file(
+                   'http://ftp.nhc.noaa.gov/atcf/archive/2005/bal122005.dat.gz')
+    atcf_path = os.path.join(scratch_dir, "bal122005.dat")
+    # Note that the get_remote_file function does not support gzip files which
+    # are not also tar files.  The following code handles this
+    with gzip.open(".".join((atcf_path, 'gz')), 'rb') as atcf_file,    \
+            open(atcf_path, 'w') as atcf_unzipped_file:
+        atcf_unzipped_file.write(atcf_file.read().decode('ascii'))
+
+
+    # Read in the newly downloaded and decompressed file
+    katrina = Storm(path=atcf_path, file_format="ATCF")
+
+    # Calculate landfall time
+    katrina.time_offset = datetime.datetime(2005, 8, 29, 11, 10)
+
+    # Write out the storm data into the GeoClaw format
+    katrina.write(data.storm_file, file_format='geoclaw')
 
     return data
 
@@ -471,39 +481,13 @@ def set_friction(rundata):
                                   [np.infty, -10.0, -200.0, -np.infty],
                                   [0.030, 0.012, 0.022]])
 
-    return data
-
-
-def get_topo(plot=False):
-    """
-    Retrieve the topo file from the GeoClaw repository.
-    """
-
-    # Fetch topography
-    base_url = "https://dl.dropboxusercontent.com/u/8449354/bathy/"
-    urls = [os.path.join(base_url, "gulf_caribbean.tt3.tar.bz2"),
-            os.path.join(base_url, "NewOrleans_3s.tt3.tar.bz2"),
-            os.path.join(base_url, "NewOrleans_3s.nc.tar.bz2")]
-    for url in urls:
-        data.get_remote_file(url, verbose=True)
-
-    # Plot if requested
-    if plot:
-        import matplotlib.pyplot as plt
-        scratch_dir = os.path.join(os.environ.get("CLAW", os.getcwd()),
-                                   'geoclaw', 'scratch')
-        for topo_name in ['gulf_caribbean.tt3', 'NewOrleans_3s.tt3']:
-            topo_path = os.path.join(scratch_dir, topo_name)
-            topo = topotools.Topography(topo_path, topo_type=3)
-            topo.plot()
-            fname = os.path.splitext(topo_name)[0] + '.png'
-            plt.savefig(fname)
+    return rundata
+    # end of function setrun
+    # ----------------------
 
 
 if __name__ == '__main__':
     # Set up run-time parameters and write all data files.
-
-    rundata = data.ClawRunData("geoclaw", 2)
     if len(sys.argv) == 2:
         rundata = setrun(sys.argv[1])
     else:
