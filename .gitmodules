@@ -4,3 +4,6 @@
 [submodule "multilayer-examples"]
 	path = multilayer-examples
 	url = https://github.com/mandli/multilayer-examples
+[submodule "tsunami-examples"]
+	path = tsunami-examples
+	url = https://github.com/clawpack/tsunami-examples
