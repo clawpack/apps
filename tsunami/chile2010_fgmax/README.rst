@@ -60,4 +60,5 @@ Version history:
 
 - Updated for Clawpack 5.3.0 on 15 Sept 2015
 - Updated for Clawpack 5.7.0 on 18 April 2020
+- Updated for Clawpack 5.7.1 on 4 Sept 2020
 
