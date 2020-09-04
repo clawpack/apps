@@ -7,7 +7,8 @@ that will be read in by the Fortran code.
 """
 
 import os
-import numpy as np
+import numpy
+from clawpack.geoclaw import fgmax_tools
 
 
 #------------------------------
@@ -324,7 +325,7 @@ def setrun(claw_pkg='geoclaw'):
 
     # gauges along x-axis:
     gaugeno = 0
-    for r in np.linspace(86., 93., 9):
+    for r in numpy.linspace(86., 93., 9):
         gaugeno = gaugeno+1
         x = r + .001  # shift a bit away from cell corners
         y = .001
@@ -332,10 +333,10 @@ def setrun(claw_pkg='geoclaw'):
 
     # gauges along diagonal:
     gaugeno = 100
-    for r in np.linspace(86., 93., 9):
+    for r in numpy.linspace(86., 93., 9):
         gaugeno = gaugeno+1
-        x = (r + .001) / np.sqrt(2.)
-        y = (r + .001) / np.sqrt(2.)
+        x = (r + .001) / numpy.sqrt(2.)
+        y = (r + .001) / numpy.sqrt(2.)
         rundata.gaugedata.gauges.append([gaugeno, x, y, 0., 1e10])
     
 
@@ -355,7 +356,7 @@ def setgeo(rundata):
     try:
         geo_data = rundata.geo_data
     except:
-        print "*** Error, this rundata has no geo_data attribute"
+        print("*** Error, this rundata has no geo_data attribute")
         raise AttributeError("Missing geo_data attribute")
 
        
@@ -399,22 +400,143 @@ def setgeo(rundata):
     #   [minlev, maxlev, fname]
     rundata.qinit_data.qinitfiles.append([1, 2, 'hump.xyz'])
 
-    # == setfixedgrids.data values ==  
-    # DEPRECATED
-    fixedgrids = rundata.fixed_grid_data.fixedgrids
-    # for fixed grids append lines of the form
-    # [t1,t2,noutput,x1,x2,y1,y2,xpoints,ypoints,\
-    #  ioutarrivaltimes,ioutsurfacemax]
+    # == fgmax_grids.data values ==
+    # NEW STYLE STARTING IN v5.7.0
 
-    # == fgmax.data values ==
-    fgmax_files = rundata.fgmax_data.fgmax_files
-    # for fixed grids append to this list names of any fgmax input files
-    rundata.fgmax_data.num_fgmax_val = 1  # Save depth only
-    fgmax_files.append('fgmax_grid1.txt')
-    fgmax_files.append('fgmax_grid2.txt')
-    fgmax_files.append('fgmax_transect1.txt')
-    fgmax_files.append('fgmax_transect2.txt')
-    fgmax_files.append('fgmax_along_shore.txt')
+    # set num_fgmax_val = 1 to save only max depth,
+    #                     2 to also save max speed,
+    #                     5 to also save max hs,hss,hmin
+    rundata.fgmax_data.num_fgmax_val = 1  # Save depth
+
+    fgmax_grids = rundata.fgmax_data.fgmax_grids  # empty list to start
+
+    # Now append to this list objects of class fgmax_tools.FGmaxGrid
+    # specifying any fgmax grids.
+
+    # For illustration, set up several fgmax grids of different types:
+
+    # Default values (might be changed below)
+    tstart_max =  4.       # when to start monitoring max values
+    tend_max = 1.e10       # when to stop monitoring max values
+    dt_check = 0.1         # target time (sec) increment between updating 
+                           # max values
+    min_level_check = 4    # which levels to monitor max on
+    arrival_tol = 1.e-2    # tolerance for flagging arrival
+    interp_method = 0      # pw constant in FV cell, not interpolated
+
+    # ======================== 
+    # Lat-Long grid on x-axis:
+
+    fg = fgmax_tools.FGmaxGrid()
+    fg.point_style = 2       # will specify a 2d grid of points
+    fg.nx = 100
+    fg.ny = 80
+    fg.x1 = 88.
+    fg.y1 = -2.
+    fg.x2 = 93.
+    fg.y2 = 2.
+    fg.tstart_max = tstart_max
+    fg.tend_max = tend_max
+    fg.dt_check = dt_check
+    fg.min_level_check = min_level_check
+    fg.arrival_tol = arrival_tol
+    fg.interp_method = interp_method
+    fgmax_grids.append(fg)    # written to fgmax_grids.data
+
+    # ===============================
+    # Quadrilateral grid on diagonal:
+
+    fg = fgmax_tools.FGmaxGrid()
+    fg.point_style = 3       # will specify a 2d grid of points
+    fg.n12 = 100
+    fg.n23 = 80
+
+    # rotate grid1 from above by pi/4 to place on diagonal:
+    x1 = 88.
+    y1 = -2.
+    x2 = 93.
+    y2 = -2.
+    x3 = 93.
+    y3 = 2.
+    x4 = 88.
+    y4 = 2.
+    c = numpy.cos(numpy.pi / 4.)
+    s = numpy.sin(numpy.pi / 4.)
+    fg.x1 = c*x1 - s*y1
+    fg.y1 = s*x1 + c*y1
+    fg.x2 = c*x2 - s*y2
+    fg.y2 = s*x2 + c*y2
+    fg.x3 = c*x3 - s*y3
+    fg.y3 = s*x3 + c*y3
+    fg.x4 = c*x4 - s*y4
+    fg.y4 = s*x4 + c*y4
+
+    fg.tstart_max = tstart_max
+    fg.tend_max = tend_max
+    fg.dt_check = dt_check
+    fg.min_level_check = min_level_check
+    fg.arrival_tol = arrival_tol
+    fg.interp_method = interp_method
+    fgmax_grids.append(fg)    # written to fgmax_grids.data
+
+    # ===============================
+    # Transect on x-axis:
+
+    fg = fgmax_tools.FGmaxGrid()
+    fg.point_style = 1       # will specify a 1d grid of points
+    fg.npts = 100
+    fg.x1 = 85.
+    fg.y1 = 0.
+    fg.x2 = 93.
+    fg.y2 = 0.
+    fg.tstart_max = tstart_max
+    fg.tend_max = tend_max
+    fg.dt_check = dt_check
+    fg.min_level_check = min_level_check
+    fg.arrival_tol = arrival_tol
+    fg.interp_method = interp_method
+    fgmax_grids.append(fg)    # written to fgmax_grids.data
+
+
+    # ===============================
+    # Transect on diagonal:
+
+    fg = fgmax_tools.FGmaxGrid()
+    fg.point_style = 1       # will specify a 1d grid of points
+    fg.npts = 100
+    fg.x1 = 60.
+    fg.y1 = 60.
+    fg.x2 = 66.
+    fg.y2 = 66.
+    fg.tstart_max = tstart_max
+    fg.tend_max = tend_max
+    fg.dt_check = dt_check
+    fg.min_level_check = min_level_check
+    fg.arrival_tol = arrival_tol
+    fg.interp_method = interp_method
+    fgmax_grids.append(fg)    # written to fgmax_grids.data
+
+    # ===============================
+    # Points along shoreline:
+    # Around circle in first quadrant at 90 meters from center
+
+    fg = fgmax_tools.FGmaxGrid()
+    fg.point_style = 0       # will specify a list of points
+    fg.npts = 500
+
+    from numpy import pi
+    theta = numpy.linspace(-pi/8.,3*pi/8,fg.npts)  
+    fg.X = 90.*numpy.cos(theta)  
+    fg.Y = 90.*numpy.sin(theta)
+
+    fg.tstart_max = tstart_max
+    fg.tend_max = tend_max
+    fg.dt_check = dt_check
+    fg.min_level_check = min_level_check
+    fg.arrival_tol = arrival_tol
+    fg.interp_method = interp_method
+    fgmax_grids.append(fg)    # written to fgmax_grids.data
+
 
     return rundata
     # end of function setgeo

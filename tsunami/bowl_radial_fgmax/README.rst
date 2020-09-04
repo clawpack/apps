@@ -4,10 +4,6 @@
 Radial bowl test case for fgmax routines  
 ========================================
 
-.. warning::
-   **This example needs updating for v5.7.0.**
-   A newer example illustrating many of the same things is now available in
-   `$CLAW/geoclaw/examples/tsunami/radial-ocean-island-fgmax`.
 
 Illustrates how to set up a grid of points to monitor the maximum amplitude of
 the wave at each point on a grid of points, a transect, and a curve along
@@ -61,22 +57,10 @@ In addition to the usual time frame plots in
 - See http://www.clawpack.org/fgmax.html for more information about
   specifying fgmax parameters.
 
-- The file `make_fgmax.py` is used to create 5 input files for the 5
-  different grids, as required by the Fortran code. 
+- The file `make_fgmax.py` is no longer present in this directory.
+  Instead all the fgmax grids are set up directly in `setrun.py`.
 
-  The following lines in `setrun.py` specify these::
-
-        # == fgmax.data values ==
-        fgmax_files = rundata.fgmax_data.fgmax_files
-        # for fixed grids append to this list names of any fgmax input files
-        rundata.fgmax_data.num_fgmax_val = 1  # Save depth only
-        fgmax_files.append('fgmax_grid1.txt')
-        fgmax_files.append('fgmax_grid2.txt')
-        fgmax_files.append('fgmax_transect1.txt')
-        fgmax_files.append('fgmax_transect2.txt')
-        fgmax_files.append('fgmax_along_shore.txt')
-
-  Inspect `make_fgmax.py` for an example of how to specify a rectangular
+  Inspect `setrun.py` for an example of how to specify a rectangular
   grid (grid1), a quadrilateral grid (grid2), a transect, or an arbitrary
   set of points (in this case a circular arc along the shoreline).
 
@@ -104,6 +88,6 @@ Version history:
 ----------------
 
 - Updated for Clawpack 5.3.0 on 15 Sept 2015
-
 - Updated for Clawpack 5.4.0 on 4 Jan 2017
+- Updated for Clawpack 5.7.0 on 4 Sept 2020
 

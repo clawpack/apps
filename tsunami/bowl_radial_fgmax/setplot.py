@@ -11,7 +11,7 @@ function setplot is called to set the plot parameters.
 try:
     from setplotfg import setplotfg
 except:
-    print "Did not find setplotfg.py"
+    print("Did not find setplotfg.py")
     setplotfg = None
 
 

@@ -5,7 +5,8 @@ Plot fgmax output from GeoClaw run.
 
 import matplotlib.pyplot as plt
 import numpy
-from clawpack.geoclaw import fgmax_tools, geoplot
+from clawpack.geoclaw import fgmax_tools
+from clawpack.visclaw import  geoplot
 from numpy import ma  # masked arrays
 
 dry_tolerance = 1e-2   # smaller h treated as dry
@@ -13,9 +14,8 @@ dry_tolerance = 1e-2   # smaller h treated as dry
 def plot_fgmax_grid(fgno):
 
     fg = fgmax_tools.FGmaxGrid()
-    fname = 'fgmax_grid%s.txt' % fgno
-    fg.read_input_data(fname)
-    fg.read_output(fgno)
+    fg.read_fgmax_grids_data(fgno=fgno)
+    fg.read_output()
 
     clines_zeta = [0.01] + list(numpy.linspace(.3, 2.1, 7))
     colors = geoplot.discrete_cmap_1(clines_zeta)
@@ -34,7 +34,7 @@ def plot_fgmax_grid(fgno):
     plt.plot(90*numpy.cos(theta), 90*numpy.sin(theta), 'k')
 
     # fix axes:
-    plt.ticklabel_format(format='plain',useOffset=False)
+    plt.ticklabel_format(useOffset=False)
     plt.xticks(rotation=20)
     plt.gca().set_aspect(1./numpy.cos(fg.Y.mean()*numpy.pi/180.))
     plt.title("Zeta = max depth or surface elevation")
@@ -48,8 +48,8 @@ def plot_fgmax_transects():
 
     # === Transect on x-axis:
     fg = fgmax_tools.FGmaxGrid()
-    fg.read_input_data('fgmax_transect1.txt')
-    fg.read_output(3)
+    fg.read_fgmax_grids_data(fgno=3)
+    fg.read_output()
 
     plt.figure(3)
     plt.clf()
@@ -67,8 +67,8 @@ def plot_fgmax_transects():
 
     # === Transect on diagonal:
     fg = fgmax_tools.FGmaxGrid()
-    fg.read_input_data('fgmax_transect2.txt')
-    fg.read_output(4)
+    fg.read_fgmax_grids_data(fgno=4)
+    fg.read_output()
 
     surface = ma.masked_where(fg.h < dry_tolerance, fg.B+fg.h)
 
@@ -80,8 +80,8 @@ def plot_fgmax_transects():
 
     # === Along shoreline:
     fg = fgmax_tools.FGmaxGrid()
-    fg.read_input_data('fgmax_along_shore.txt')
-    fg.read_output(5)
+    fg.read_fgmax_grids_data(fgno=5)
+    fg.read_output()
     plt.figure(5)
     theta = numpy.arctan(fg.Y / fg.X)
     plt.plot(theta,  fg.h, 'b')
@@ -102,23 +102,23 @@ if __name__=="__main__":
     plt.figure(1)
     fname = os.path.join(plotdir, "fgmax_grid1.png")
     plt.savefig(fname)
-    print "Created ",fname
+    print("Created ",fname)
 
     plot_fgmax_grid(2)
     plt.figure(2)
     fname = os.path.join(plotdir, "fgmax_grid2.png")
     plt.savefig(fname)
-    print "Created ",fname
+    print("Created ",fname)
 
     plot_fgmax_transects()
     plt.figure(3)
     fname = os.path.join(plotdir, "fgmax_transects.png")
     plt.savefig(fname)
-    print "Created ",fname
+    print("Created ",fname)
 
     plt.figure(5)
     fname = os.path.join(plotdir, "fgmax_along_shore.png")
     plt.savefig(fname)
-    print "Created ",fname
+    print("Created ",fname)
 
 
