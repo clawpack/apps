@@ -85,7 +85,11 @@ def plot_fgmax_transects():
     plt.figure(5)
     theta = numpy.arctan(fg.Y / fg.X)
     plt.plot(theta,  fg.h, 'b')
-    plt.title("Max elevation along shore (radius 90 m) vs angle")
+    plt.xlim(-numpy.pi/4,numpy.pi/2)
+    plt.ylim(1.7,2.3)
+    plt.grid(True)
+    plt.title("Max elevation along shore (radius 90 m) vs angle\n" \
+              + "only captured on Level 4 grids")
     plt.xticks([0,numpy.pi/4.], ['0','pi/4'])
     plt.xlabel('theta')
     plt.ylabel('meters')
