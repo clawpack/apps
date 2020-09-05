@@ -63,7 +63,6 @@ topo:
 
 all: 
 	$(MAKE) topo
-	python make_fgmax.py
 	$(MAKE) .plots
 	python plot_fgmax.py
 	$(MAKE) .htmls
