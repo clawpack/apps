@@ -4,7 +4,10 @@
 #
 # Usage:
 #
-# In a directory containing notebook(s):
+# To convert a notebook nbname.ipynb to nbname.html:
+#   make nbname.html -f $CLAW/apps/notebooks/Makefile
+#
+# In a directory containing several notebooksi, you can convert all via:
 #   make notebook_htmls -f $CLAW/apps/notebooks/Makefile
 #
 # If the directory contains it's own Makefile based on Makefile.common,
@@ -16,6 +19,14 @@
 #   make readme
 # to create README.html with links to the rendered html version of notebooks.
 #
+# To convert a notebook nbname.ipynb to a script nbname.py:
+#   make nbname.py -f $CLAW/apps/notebooks/Makefile
+#
+# Note that any cells with the tag 'hide-py' are ignored when the command
+# NBCONVERTPY below is run.  If the notebook starts with a magic command like
+#       %matplotlib inline
+# then this cell should be tagged 'hide-py' since or the resulting script 
+# will not run properly.
 
 CLAW_PYTHON ?= python
 
@@ -34,4 +45,10 @@ notebook_htmls: $(NOTEBOOK_HTML);
 readme: 
 	@echo Converting README.rst...
 	$(CLAW_PYTHON) $(CLAW)/clawutil/src/python/clawutil/convert_readme.py
+
+# to create .py script from .ipynb notebook:
+
+NBCONVERTPY = jupyter nbconvert --to python --TagRemovePreprocessor.enabled=True  --TagRemovePreprocessor.remove_cell_tags="['hide-py']"
+
+%.py: %.ipynb ; $(NBCONVERTPY) $<
 
