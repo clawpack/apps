@@ -1,3 +1,5 @@
+# Bayesian Inference Examples
+
 The purpose of this project is to enable GeoClaw users to optimize GeoClaw's hyper-parameters using Bayesian Inference. The Bayesian inference engine, PyMCMCStat, treats the GeoClaw model as a black box and tries out various hyper-parameter combinations using a variation on the Metropolis-Hastings algorithm to find the best combination. This is a work-in-progress.
 
 I had trouble getting an adequate signal from GeoClaw using first Hurricane Sandy, then Hurricane Barry, then Dennis, all located in https://github.com/mandli/surge-examples. Now, I am trying Hurricane Ike, located in https://github.com/clawpack/geoclaw/tree/master/examples/storm-surge/ike. This implementation uses Ike. I worked on this project between 2020-2021, and I am handing it off to Xiao Huang during the summer of 2021.  
