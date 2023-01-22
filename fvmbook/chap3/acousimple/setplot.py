@@ -26,6 +26,7 @@ def setplot(plotdata=None):
 
     # Figure for pressure and velocity:
     plotfigure = plotdata.new_plotfigure(name='Pressure and Velocity', figno=1)
+    plotfigure.kwargs = {'figsize':(6,7)}
 
     # Pressure:
     # ---------
