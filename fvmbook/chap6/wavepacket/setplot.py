@@ -32,13 +32,13 @@ def setplot(plotdata):
     plotaxes.xlimits = 'auto'
     plotaxes.ylimits = [-1.1, 1.1]
     plotaxes.title = 'q[0]'
+    plotaxes.afteraxes = plot_true_soln
 
     # Set up for item on these axes:
     plotitem = plotaxes.new_plotitem(name='solution', plot_type='1d')
     plotitem.plot_var = 0
     plotitem.plotstyle = '-o'
     plotitem.color = 'b'
-    plotaxes.afteraxes = plot_true_soln
     plotitem.show = True       # show on plot?
     
     # Parameters used only when creating html and/or latex hardcopy
