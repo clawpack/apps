@@ -12,7 +12,6 @@ function setplot is called to set the plot parameters.
 
 from numpy import sqrt
 from clawpack.clawutil.data import ClawData
-#setprob = UserData('setprob.data')
 setprob = ClawData('setprob.data')
 setprob.read('setprob.data', force=True)
 Z = sqrt(setprob.bulk * setprob.rho)

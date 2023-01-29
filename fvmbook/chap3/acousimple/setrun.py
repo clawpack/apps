@@ -38,7 +38,6 @@ def setrun(claw_pkg='classic'):
     probdata = rundata.new_UserData(name='probdata',fname='setprob.data')
     probdata.add_param('rho',   1.0,  'density of medium')
     probdata.add_param('bulk',    0.25,  'bulk modulus')
-    probdata.add_param('beta', 200.,  'Gaussian width parameter')
     
     #------------------------------------------------------------------
     # Standard Clawpack parameters to be written to claw.data:
