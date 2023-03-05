@@ -40,7 +40,7 @@ def setplot(plotdata):
 
     # Figure with 4 subplots
     plotfigure = plotdata.new_plotfigure(name='solution', figno=0)
-    plotfigure.kwargs = {'figsize':(9,8)}
+    plotfigure.kwargs = {'figsize':(11,8)}
 
     # pressure:
     plotaxes = plotfigure.new_plotaxes()
@@ -56,9 +56,9 @@ def setplot(plotdata):
     plotitem.pcolor_cmap = colormaps.red_yellow_blue
     plotitem.pcolor_cmin = -0.2
     plotitem.pcolor_cmax = 0.2
-    plotitem.add_colorbar = False
-    #plotitem.add_colorbar = True
-    #plotitem.colorbar_shrink = 0.7
+    #plotitem.add_colorbar = False
+    plotitem.add_colorbar = True
+    plotitem.colorbar_shrink = 0.7
     
 
     # Contours of pressure:
