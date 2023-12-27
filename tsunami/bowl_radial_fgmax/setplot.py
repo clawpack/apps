@@ -49,6 +49,16 @@ def setplot(plotdata):
         gaugetools.plot_gauge_locations(current_data.plotdata, \
              gaugenos='all', format_string='ko', add_labels=True)
     
+    def addgauges_xaxis(current_data):
+        from clawpack.visclaw import gaugetools
+        gaugetools.plot_gauge_locations(current_data.plotdata, \
+             gaugenos=range(1,10), format_string='ko', add_labels=True)
+    
+    def addgauges_diag(current_data):
+        from clawpack.visclaw import gaugetools
+        gaugetools.plot_gauge_locations(current_data.plotdata, \
+             gaugenos=range(101,110), format_string='ko', add_labels=True)
+    
 
     #-----------------------------------------
     # Figure for pcolor plot
@@ -98,7 +108,7 @@ def setplot(plotdata):
     plotaxes.scaled = True
     plotaxes.xlimits = [55,66]
     plotaxes.ylimits = [55,66]
-    plotaxes.afteraxes = addgauges
+    plotaxes.afteraxes = addgauges_diag
 
     # Water
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
@@ -171,7 +181,7 @@ def setplot(plotdata):
     plotaxes.scaled = True
     plotaxes.xlimits = [82,93]
     plotaxes.ylimits = [-5,6]
-    plotaxes.afteraxes = addgauges
+    plotaxes.afteraxes = addgauges_xaxis
 
     # Water
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
