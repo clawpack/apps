@@ -63,4 +63,5 @@ Version
 - This code runs with Clawpack 5.2.2.
 - Added December, 2014
 - Updated to v5.7.0 on 18 April 2020
+- Updated to v5.9.2 on 26 Dec 2023
 
