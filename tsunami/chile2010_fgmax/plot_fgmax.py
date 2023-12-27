@@ -5,13 +5,13 @@ Plot fgmax output from GeoClaw run.
 
 import matplotlib.pyplot as plt
 import numpy
-from clawpack.geoclaw import fgmax_tools
-from clawpack.visclaw import geoplot
+from clawpack.geoclaw import fgmax_tools, geoplot
 
 def plot_fgmax_grid():
 
+    fgno = 1
     fg = fgmax_tools.FGmaxGrid()
-    fg.read_fgmax_grids_data(fgno=1)
+    fg.read_fgmax_grids_data(fgno)
     fg.read_output()
 
     clines_zeta = [0.01] + list(numpy.linspace(0.05,0.3,6)) + [0.5,1.0,10.0]
@@ -26,13 +26,13 @@ def plot_fgmax_grid():
     # plot arrival time contours and label:
     arrival_t = fg.arrival_time/3600.  # arrival time in hours
     clines_t = numpy.linspace(0,8,17)  # hours
-    clines_t_label = clines_t[2::2]  # which ones to label 
+    clines_t_label = clines_t[::2]  # which ones to label 
     clines_t_colors = ([.5,.5,.5],)
     con_t = plt.contour(fg.X,fg.Y,arrival_t, clines_t,colors=clines_t_colors) 
     plt.clabel(con_t, clines_t_label)
 
     # fix axes:
-    plt.ticklabel_format(style='plain',useOffset=False)
+    plt.ticklabel_format(useOffset=False)
     plt.xticks(rotation=20)
     plt.gca().set_aspect(1./numpy.cos(fg.Y.mean()*numpy.pi/180.))
     plt.title("Maximum amplitude / arrival times")
