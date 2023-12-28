@@ -41,7 +41,7 @@ def setplot(plotdata):
         from pylab import xticks,yticks,xlabel,ylabel,savefig,ylim,title
         t = current_data.t
         add_dashes(current_data)
-        xticks([-300000,-200000,-100000, -30000],['300','200','100','30','0'],\
+        xticks([-300000,-200000,-100000,-30000, 0],['300','200','100','30','0'],\
           fontsize=15)
         ylabel('Meters', fontsize=15)
         title('Surface at t = %i seconds' % int(t))
@@ -68,7 +68,7 @@ def setplot(plotdata):
         from pylab import xticks,yticks,xlabel,ylabel,savefig,ylim,title
         t = current_data.t
         add_dashes(current_data)
-        xticks([-300000,-200000,-100000, -30000],['300','200','100','30','0'],\
+        xticks([-300000,-200000,-100000,-30000,0],['300','200','100','30','0'],\
           fontsize=15)
         ylabel('Meters/sec', fontsize=15)
         title('Velocity at t = %i seconds' % int(t))
@@ -94,7 +94,7 @@ def setplot(plotdata):
         from pylab import xticks,yticks,xlabel,ylabel,savefig,ylim,title
         t = current_data.t
         add_dashes(current_data)
-        xticks([-300000,-200000,-100000, -30000],['300','200','100','30','0'],\
+        xticks([-300000,-200000,-100000,-30000,0],['300','200','100','30','0'],\
           fontsize=15)
         ylim(-4500,0)
         xlabel('kilometres offshore', fontsize=15)
