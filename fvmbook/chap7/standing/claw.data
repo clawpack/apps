@@ -7,7 +7,7 @@
 1                    =: num_dim             
 0.0                  =: lower               
 1.0                  =: upper               
-200                  =: num_cells           
+50                   =: num_cells           
 
 2                    =: num_eqn             
 2                    =: num_waves           
@@ -40,7 +40,7 @@ F                    =: use_fwaves
 
 2                    =: num_ghost           
 3                    =: bc_lower            
-3                    =: bc_upper            
+1                    =: bc_upper            
 
 F                    =: restart             
 'fort.q0006'         =: restart_file        

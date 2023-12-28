@@ -37,7 +37,6 @@ def setrun(claw_pkg='classic'):
     probdata = rundata.new_UserData(name='probdata',fname='setprob.data')
     probdata.add_param('rho',     1.0,  'density of medium')
     probdata.add_param('bulk',    1.0,  'bulk modulus')
-    probdata.add_param('beta',   100.0,  'beta for initial pulse')
     
     #------------------------------------------------------------------
     # Standard Clawpack parameters to be written to claw.data:
@@ -54,11 +53,11 @@ def setrun(claw_pkg='classic'):
     clawdata.num_dim = num_dim
     
     # Lower and upper edge of computational domain:
-    clawdata.lower[0] = 0.000000e+00          # xlower
-    clawdata.upper[0] = 1.000000e+00          # xupper
+    clawdata.lower[0] = 0.0          # xlower
+    clawdata.upper[0] = 1.0          # xupper
     
     # Number of grid cells:
-    clawdata.num_cells[0] = 200      # mx
+    clawdata.num_cells[0] = 50      # mx
     
 
     # ---------------
@@ -79,7 +78,7 @@ def setrun(claw_pkg='classic'):
     # Initial time:
     # -------------
 
-    clawdata.t0 = 0.000000
+    clawdata.t0 = 0.
     
 
     # Restart from checkpoint file of a previous run?
@@ -106,7 +105,7 @@ def setrun(claw_pkg='classic'):
         # Output ntimes frames at equally spaced times up to tfinal:
         # Can specify num_output_times = 0 for no output
         clawdata.num_output_times = 40
-        clawdata.tfinal = 2.000000
+        clawdata.tfinal = 2.
         clawdata.output_t0 = True  # output at initial (or restart) time?
         
     elif clawdata.output_style == 2:
@@ -121,7 +120,7 @@ def setrun(claw_pkg='classic'):
         clawdata.output_t0 = True  # output at initial (or restart) time?
         
 
-    clawdata.output_format = 'ascii'      # 'ascii', 'binary', 'netcdf'
+    clawdata.output_format = 'ascii'      # 'ascii', 'binary'
 
     clawdata.output_q_components = 'all'   # could be list such as [True,True]
     clawdata.output_aux_components = 'none'  # could be list
@@ -149,15 +148,15 @@ def setrun(claw_pkg='classic'):
     
     # Initial time step for variable dt.  
     # (If dt_variable==0 then dt=dt_initial for all steps)
-    clawdata.dt_initial = 1.000000e-01
+    clawdata.dt_initial = 0.1
     
     # Max time step to be allowed if variable dt used:
     clawdata.dt_max = 1.000000e+99
     
     # Desired Courant number if variable dt used 
-    clawdata.cfl_desired = 1.000000
+    clawdata.cfl_desired = 1.0
     # max Courant number to allow without retaking step with a smaller dt:
-    clawdata.cfl_max = 1.000000
+    clawdata.cfl_max = 1.0
     
     # Maximum number of time steps to allow between output times:
     clawdata.steps_max = 500

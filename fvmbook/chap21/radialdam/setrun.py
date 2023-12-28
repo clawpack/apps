@@ -32,20 +32,20 @@ def setrun(claw_pkg='classic'):
     num_dim = 2
     rundata = data.ClawRunData(claw_pkg, num_dim)
 
+
     #------------------------------------------------------------------
     # Problem-specific parameters to be written to setprob.data:
     #------------------------------------------------------------------
-    # Sample setup to write one line to setprob.data ...
+
     probdata = rundata.new_UserData(name='probdata',fname='setprob.data')
-    probdata.add_param('rho1',     1.,  'rho1')
-    probdata.add_param('lam1',     4.,  'lam1')
-    probdata.add_param('mu1',     0.5,  'mu1')
-    probdata.add_param('rho2',     1.,  'rho2')
-    probdata.add_param('lam2',     2.,  'lam2')
-    probdata.add_param('mu2',     1.0,  'mu2')
+    probdata.add_param('grav',  1.,  'gravitational constant')
+    probdata.add_param('r0',  0.5,  'location of dam')
+    probdata.add_param('hin', 2.0, 'h inside dam')
+    probdata.add_param('hout', 1.0,  'h outside dam')
     
     #------------------------------------------------------------------
     # Standard Clawpack parameters to be written to claw.data:
+    #   (or to amrclaw.data for AMR)
     #------------------------------------------------------------------
 
     clawdata = rundata.clawdata  # initialized when rundata instantiated
@@ -59,14 +59,14 @@ def setrun(claw_pkg='classic'):
     clawdata.num_dim = num_dim
     
     # Lower and upper edge of computational domain:
-    clawdata.lower[0] = -1.000000e+00          # xlower
-    clawdata.upper[0] = 1.000000e+00          # xupper
-    clawdata.lower[1] = -1.000000e+00          # ylower
-    clawdata.upper[1] = 1.000000e+00          # yupper
+    clawdata.lower[0] = -2.5          # xlower
+    clawdata.upper[0] = 2.5          # xupper
+    clawdata.lower[1] = -2.5          # ylower
+    clawdata.upper[1] = 2.5          # yupper
     
     # Number of grid cells:
-    clawdata.num_cells[0] = 400      # mx
-    clawdata.num_cells[1] = 400      # my
+    clawdata.num_cells[0] = 100      # mx
+    clawdata.num_cells[1] = 100      # my
     
 
     # ---------------
@@ -74,10 +74,10 @@ def setrun(claw_pkg='classic'):
     # ---------------
 
     # Number of equations in the system:
-    clawdata.num_eqn = 5
+    clawdata.num_eqn = 3
 
     # Number of auxiliary variables in the aux array (initialized in setaux)
-    clawdata.num_aux = 5
+    clawdata.num_aux = 0
     
     # Index of aux array corresponding to capacity function, if there is one:
     clawdata.capa_index = 0
@@ -87,18 +87,16 @@ def setrun(claw_pkg='classic'):
     # Initial time:
     # -------------
 
-    clawdata.t0 = 0.000000
+    clawdata.t0 = 0.0
     
 
     # Restart from checkpoint file of a previous run?
-    # Note: If restarting, you must also change the Makefile to set:
-    #    RESTART = True
     # If restarting, t0 above should be from original run, and the
-    # restart_file 'fort.qNNNN' specified below should be in 
+    # restart_file 'fort.chkNNNNN' specified below should be in 
     # the OUTDIR indicated in Makefile.
 
     clawdata.restart = False               # True to restart from prior results
-    clawdata.restart_file = 'fort.q0006'   # File to use for restart data
+    clawdata.restart_file = 'fort.chk00006'  # File to use for restart data
     
     
     # -------------
@@ -113,8 +111,8 @@ def setrun(claw_pkg='classic'):
     if clawdata.output_style==1:
         # Output ntimes frames at equally spaced times up to tfinal:
         # Can specify num_output_times = 0 for no output
-        clawdata.num_output_times = 10
-        clawdata.tfinal = 0.500000
+        clawdata.num_output_times = 8
+        clawdata.tfinal = 2.
         clawdata.output_t0 = True  # output at initial (or restart) time?
         
     elif clawdata.output_style == 2:
@@ -129,12 +127,9 @@ def setrun(claw_pkg='classic'):
         clawdata.output_t0 = True  # output at initial (or restart) time?
         
 
-    clawdata.output_format = 'ascii'      # 'ascii', 'binary', 'netcdf'
+    clawdata.output_format = 'ascii'      # 'ascii' is only option currently
 
-    clawdata.output_q_components = 'all'   # could be list such as [True,True]
-    clawdata.output_aux_components = 'none'  # could be list
-    clawdata.output_aux_onlyonce = True    # output aux arrays only at t0
-    
+
 
     # ---------------------------------------------------
     # Verbosity of messages to screen during integration:  
@@ -143,7 +138,7 @@ def setrun(claw_pkg='classic'):
     # The current t, dt, and cfl will be printed every time step
     # at AMR levels <= verbosity.  Set verbosity = 0 for no printing.
     #   (E.g. verbosity == 2 means print only on levels 1 and 2.)
-    clawdata.verbosity = 1
+    clawdata.verbosity = 0
     
     
 
@@ -157,18 +152,18 @@ def setrun(claw_pkg='classic'):
     
     # Initial time step for variable dt.  
     # (If dt_variable==0 then dt=dt_initial for all steps)
-    clawdata.dt_initial = 1.000000e-02
+    clawdata.dt_initial = 0.1
     
     # Max time step to be allowed if variable dt used:
-    clawdata.dt_max = 1.000000e+99
+    clawdata.dt_max = 1e+99
     
     # Desired Courant number if variable dt used 
-    clawdata.cfl_desired = 0.900000
+    clawdata.cfl_desired = 0.8
     # max Courant number to allow without retaking step with a smaller dt:
-    clawdata.cfl_max = 1.000000
+    clawdata.cfl_max = 1.0
     
     # Maximum number of time steps to allow between output times:
-    clawdata.steps_max = 500
+    clawdata.steps_max = 5000
 
 
     # ------------------
@@ -178,7 +173,7 @@ def setrun(claw_pkg='classic'):
     # Order of accuracy:  1 => Godunov,  2 => Lax-Wendroff plus limiters
     clawdata.order = 2
     
-    # Use dimensional splitting? (not yet available for AMR)
+    # Use dimensional splitting?
     clawdata.dimensional_split = 'unsplit'
     
     # For unsplit method, transverse_waves can be 
@@ -189,7 +184,7 @@ def setrun(claw_pkg='classic'):
     
     
     # Number of waves in the Riemann solution:
-    clawdata.num_waves = 4
+    clawdata.num_waves = 3
     
     # List of limiters to use for each wave family:  
     # Required:  len(limiter) == num_waves
@@ -199,14 +194,16 @@ def setrun(claw_pkg='classic'):
     #   2 or 'superbee' ==> superbee
     #   3 or 'vanleer'  ==> van Leer
     #   4 or 'mc'       ==> MC limiter
-    clawdata.limiter = ['mc', 'mc', 'mc', 'mc']
+    clawdata.limiter = [4,4,4]
     
     clawdata.use_fwaves = False    # True ==> use f-wave version of algorithms
     
     # Source terms splitting:
-    #   src_split == 0 or 'none'    ==> no source term (src routine never called)
+    #   src_split == 0 or 'none'    ==> no source term (src routine never
+    #   called)
     #   src_split == 1 or 'godunov' ==> Godunov (1st order) splitting used, 
-    #   src_split == 2 or 'strang'  ==> Strang (2nd order) splitting used,  not recommended.
+    #   src_split == 2 or 'strang'  ==> Strang (2nd order) splitting used,
+    #   not recommended.
     clawdata.source_split = 0
     
     
@@ -218,17 +215,19 @@ def setrun(claw_pkg='classic'):
     clawdata.num_ghost = 2
     
     # Choice of BCs at xlower and xupper:
-    #   0 or 'user'     => user specified (must modify bcNamr.f to use this option)
+    #   0 or 'user'     => user specified (must modify bcNamr.f to use this
+    #   option)
     #   1 or 'extrap'   => extrapolation (non-reflecting outflow)
     #   2 or 'periodic' => periodic (must specify this at both boundaries)
-    #   3 or 'wall'     => solid wall for systems where q(2) is normal velocity
+    #   3 or 'wall'     => solid wall for systems where q(2) is normal
+    #   velocity
     
     clawdata.bc_lower[0] = 'extrap'   # at xlower
     clawdata.bc_upper[0] = 'extrap'   # at xupper
 
     clawdata.bc_lower[1] = 'extrap'   # at ylower
     clawdata.bc_upper[1] = 'extrap'   # at yupper
-                  
+                         
     return rundata
 
     # end of function setrun
@@ -240,4 +239,3 @@ if __name__ == '__main__':
     import sys
     rundata = setrun(*sys.argv[1:])
     rundata.write()
-    

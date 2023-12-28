@@ -12,6 +12,9 @@ Example [book/chap7/standing] to accompany the book
 <http://www.clawpack.org/book.html>`_
 by R. J. LeVeque.
 
+Note that `cfl_desired` is set to 1 in `setrun.py`, and in this case even
+the first order Godunov method is "exact". 
+
 Converted to Clawpack 5.0 form in 2013.
         
 Converted to Clawpack 5.4.0 form in 2017.

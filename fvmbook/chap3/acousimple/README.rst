@@ -15,6 +15,7 @@ by R. J. LeVeque.
 
 Converted to Clawpack 5.0 form in 2013.
         
+Added plots of characteristic variables in 2023 using v5.9.0
 
 1d acoustics in a constant medium.
 
@@ -28,5 +29,6 @@ and the coefficient matrix is
 
 .. math:: A = \left[\begin{array}{cc} 0&K\\ 1/\rho & 0\end{array}\right].
          
-
+The density rho and bulk modulus K are set in `setrun.py` and then written out
+to `setprob.data`, which is read in by the Fortran code.
 

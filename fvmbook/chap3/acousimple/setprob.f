@@ -3,7 +3,6 @@
       character*12 fname
 
       common /cparam/ rho,bulk,cc,zz   
-      common /cqinit/ beta
 c
 c     # Set the material parameters for the acoustic equations
 c     # Passed to the Riemann solver rp1.f in a common block
@@ -26,9 +25,6 @@ c     # sound speed:
 
 c     # impedance:
       zz = cc*rho
-
-c     # beta for initial conditions:
-      read(7,*) beta
 
       return
       end

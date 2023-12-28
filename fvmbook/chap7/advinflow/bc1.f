@@ -48,30 +48,33 @@ c     # for inflow,  q(t,xlower) = g(t)
 c
   110 continue
 c     # zero-order extrapolation:
-      do 115 m=1,meqn
-         do 115 ibc=1,mbc
-               q(m,1-ibc) = q(m,1)
-  115       continue
+      do m=1,meqn
+         do ibc=1,mbc
+            q(m,1-ibc) = q(m,1)
+         enddo
+      enddo
       go to 199
 
   120 continue
 c     # periodic:  
-      do 125 m=1,meqn
-         do 125 ibc=1,mbc
-               q(m,1-ibc) = q(m,mx+1-ibc)
-  125       continue
+      do m=1,meqn
+         do ibc=1,mbc
+            q(m,1-ibc) = q(m,mx+1-ibc)
+         enddo
+      enddo
       go to 199
 
   130 continue
 c     # solid wall (assumes 2'nd component is velocity or momentum in x):
-      do 135 m=1,meqn
-         do 135 ibc=1,mbc
-               q(m,1-ibc) = q(m,ibc)
-  135       continue
+      do m=1,meqn
+         do ibc=1,mbc
+            q(m,1-ibc) = q(m,ibc)
+         enddo
+      enddo
 c     # negate the normal velocity:
-      do 136 ibc=1,mbc
-            q(2,1-ibc) = -q(2,ibc)
-  136    continue
+      do ibc=1,mbc
+         q(2,1-ibc) = -q(2,ibc)
+      enddo
       go to 199
 
   199 continue
@@ -90,29 +93,32 @@ c     # user-specified boundary conditions go here in place of error output
 
   210 continue
 c     # zero-order extrapolation:
-      do 215 m=1,meqn
-         do 215 ibc=1,mbc
-               q(m,mx+ibc) = q(m,mx)
-  215       continue
+      do m=1,meqn
+         do ibc=1,mbc
+            q(m,mx+ibc) = q(m,mx)
+         enddo
+      enddo
       go to 299
 
   220 continue
 c     # periodic:  
-      do 225 m=1,meqn
-         do 225 ibc=1,mbc
-               q(m,mx+ibc) = q(m,ibc)
-  225       continue
+      do m=1,meqn
+         do ibc=1,mbc
+            q(m,mx+ibc) = q(m,ibc)
+         enddo
+      enddo
       go to 299
 
   230 continue
 c     # solid wall (assumes 2'nd component is velocity or momentum in x):
-      do 235 m=1,meqn
-         do 235 ibc=1,mbc
-               q(m,mx+ibc) = q(m,mx+1-ibc)
-  235       continue
-      do 236 ibc=1,mbc
-            q(2,mx+ibc) = -q(2,mx+1-ibc)
-  236    continue
+      do m=1,meqn
+         do ibc=1,mbc
+            q(m,mx+ibc) = q(m,mx+1-ibc)
+         enddo
+      enddo
+      do ibc=1,mbc
+         q(2,mx+ibc) = -q(2,mx+1-ibc)
+      enddo
       go to 299
 
   299 continue

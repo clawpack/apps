@@ -33,13 +33,65 @@ def setplot(plotdata):
     
     def plot_corner(current_data):
         from pylab import plot
-        plot([.0,.0],[-1,0],'r',linewidth=2)
-        plot([.0,1],[0,.55],'r',linewidth=2)
+        plot([.0,.0],[-1,0],'k',linewidth=2)
+        plot([.0,1],[0,.55],'k',linewidth=2)
 
     def sigmatr(current_data):
         # trace of sigma
         q = current_data.q
         return q[0,:,:] + q[1,:,:]
+
+    def div(current_data):
+        from numpy import array,zeros,hstack,vstack
+        q = current_data.q
+        u = q[3,:,:]
+        v = q[4,:,:]
+        mx, my = u.shape
+        if (mx<3) or (my<3):
+            d = zeros(u.shape)
+            return d
+        dx, dy = current_data.dx, current_data.dy
+        I = array(range(1,mx-1))
+        J = array(range(1,my-1))
+        ux = (u[I+1,:][:,J] - u[I-1,:][:,J]) / (2*dx)
+        vy = (v[:,J+1][I,:] - v[:,J-1][I,:]) / (2*dy)
+        dint = ux + vy
+        
+        #zx = zeros((mx-2,1))
+        #zy = zeros((1,my))
+        #d = vstack((zy, hstack((zx, ux+vy, zx)), zy))
+        
+        d0 = dint[:,0]
+        d1 = dint[:,-1]
+        d2 = vstack((d0, dint.T, d1)).T
+        d0 = d2[0,:]
+        d1 = d2[-1,:]
+        d = vstack((d0,d2,d1))      
+        return d
+
+    def curl(current_data):
+        from numpy import array,zeros,hstack,vstack
+        q = current_data.q
+        u = q[3,:,:]
+        v = q[4,:,:]
+        mx, my = u.shape
+        if (mx<3) or (my<3):
+            c = zeros(u.shape)
+            return c
+        dx, dy = current_data.dx, current_data.dy
+        I = array(range(1,mx-1))
+        J = array(range(1,my-1))
+        vx = (v[I+1,:][:,J] - v[I-1,:][:,J]) / (2*dx)
+        uy = (u[:,J+1][I,:] - u[:,J-1][I,:]) / (2*dy)
+        cint = vx - uy
+
+        c0 = cint[:,0]
+        c1 = cint[:,-1]
+        c2 = vstack((c0, cint.T, c1)).T
+        c0 = c2[0,:]
+        c1 = c2[-1,:]
+        c = vstack((c0,c2,c1))      
+        return c
 
 
 
@@ -109,6 +161,54 @@ def setplot(plotdata):
     plotitem.plot_var = 2  # sigma_12
     plotitem.contour_levels = linspace(-0.4,0.4,30)
     plotitem.contour_colors = 'g'
+    plotitem.show = True       # show on plot?
+    
+
+    # Figure for contours 
+    plotfigure = plotdata.new_plotfigure(name='divcurl', figno=5)
+    plotfigure.kwargs = {'figsize':(9,6)}
+
+    # div
+    plotaxes = plotfigure.new_plotaxes()
+    plotaxes.axescmd = 'subplot(121)'
+    plotaxes.xlimits = [-1,1]
+    plotaxes.ylimits = [-1,1]
+    plotaxes.title = 'div(u)'
+    plotaxes.scaled = True
+    plotaxes.afteraxes = plot_corner
+
+    # Set up for item on these axes:
+    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    plotitem.plot_var = div
+    plotitem.pcolor_cmap = colormaps.blue_white_red
+    plotitem.pcolor_cmin = -1.
+    plotitem.pcolor_cmax = 1.
+    #plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
+    #plotitem.plot_var = div
+    #plotitem.contour_levels = linspace(-2,8,20)
+    #plotitem.contour_colors = 'r'
+    #plotitem.kwargs = {'linestyles':'-'}
+    plotitem.show = True       # show on plot?
+
+    # curl
+    plotaxes = plotfigure.new_plotaxes()
+    plotaxes.axescmd = 'subplot(122)'
+    plotaxes.xlimits = [-1,1]
+    plotaxes.ylimits = [-1,1]
+    plotaxes.title = 'curl(u)'
+    plotaxes.scaled = True
+    plotaxes.afteraxes = plot_corner
+
+
+    # Set up for item on these axes:
+    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    plotitem.plot_var = curl
+    plotitem.pcolor_cmap = colormaps.blue_white_red
+    plotitem.pcolor_cmin = -1.
+    plotitem.pcolor_cmax = 1.
+    #plotitem.contour_levels = linspace(-0.4,0.4,20)
+    #plotitem.contour_colors = 'b'
+    #plotitem.kwargs = {'linestyles':'-'}
     plotitem.show = True       # show on plot?
     
     

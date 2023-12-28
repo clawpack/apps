@@ -7,6 +7,18 @@ function setplot is called to set the plot parameters.
     
 """ 
 
+import setrun
+rundata = setrun.setrun()
+u = rundata.probdata.u
+
+def g(t):
+    """
+    Function defining boundary condition u(0,t) = g(t).
+    Should agree with Fortran version g.f.
+    """
+    from numpy import sin
+    return sin(10*t)
+
 #--------------------------
 def setplot(plotdata):
 #--------------------------
@@ -38,6 +50,18 @@ def setplot(plotdata):
     plotitem.color = 'b'
     plotitem.show = True       # show on plot?
     
+    def qtrue(current_data):
+        from numpy import where
+        t = current_data.t
+        x = current_data.x
+        qtrue = where(x<u*t, g(t-x/u), 0.)
+        return qtrue
+
+    plotitem = plotaxes.new_plotitem(plot_type='1d')
+    plotitem.plot_var = qtrue
+    plotitem.plotstyle = '-'
+    plotitem.color = 'r'
+    plotitem.show = True       # show on plot?
 
     # Parameters used only when creating html and/or latex hardcopy
     # e.g., via clawpack.visclaw.frametools.printframes:
