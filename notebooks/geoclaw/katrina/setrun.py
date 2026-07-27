@@ -385,8 +385,6 @@ def setgeo(rundata):
     refine_data = rundata.refinement_data
     refine_data.wave_tolerance = 1.0
     refine_data.speed_tolerance = [1.0,2.0,3.0,4.0]
-    refine_data.deep_depth = 300
-    refine_data.max_level_deep = 4
     refine_data.variable_dt_refinement_ratios = True
 
     # == settopo.data values ==
@@ -407,12 +405,8 @@ def setgeo(rundata):
     #   [minlev, maxlev, fname]
     # geodata.qinitfiles.append([1, 5, 'hump.xyz'])
 
-    # == setfixedgrids.data values ==
-    rundata.fixed_grid_data.fixedgrids = []
-    # for fixed grids append lines of the form
-    # [t1,t2,noutput,x1,x2,y1,y2,xpoints,ypoints,\
-    #  ioutarrivaltimes,ioutsurfacemax]
-    # geodata.fixedgrids.append([1e3,3.24e4,10,-90,-80,-30,-15,100,100,0,1])
+    # Note: the old rundata.fixed_grid_data interface was removed in GeoClaw
+    # v5.9.0; use rundata.fgout_data / rundata.fgmax_data for fixed-grid output.
 
     return rundata
     # end of function setgeo
@@ -434,8 +428,10 @@ def set_storm(rundata):
     data.wind_refine = [20.0, 40.0, 60.0]
     data.R_refine = [60.0e3, 40e3, 20e3]
 
-    # Storm parameters - Storm Type 1 is Holland parameterized
-    data.storm_specification_type = 'holland80'
+    # Storm parameters - parameterized storm (Holland 1980)
+    data.storm_family  = "parametric"
+    data.storm_subtype = "holland80"
+    # legacy equivalent: data.storm_specification_type = 'holland80'
     data.storm_file = os.path.expandvars(os.path.join(os.getcwd(),
                                          'katrina.storm'))
     
@@ -473,12 +469,12 @@ def set_friction(rundata):
     # Entire domain
     data.friction_regions.append([rundata.clawdata.lower,
                                   rundata.clawdata.upper,
-                                  [np.infty, 0.0, -np.infty],
+                                  [np.inf, 0.0, -np.inf],
                                   [0.030, 0.022]])
 
     # La-Tex Shelf
     data.friction_regions.append([(-98, 25.25), (-90, 30),
-                                  [np.infty, -10.0, -200.0, -np.infty],
+                                  [np.inf, -10.0, -200.0, -np.inf],
                                   [0.030, 0.012, 0.022]])
 
     return rundata
